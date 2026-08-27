@@ -11,16 +11,15 @@ export const PromotionalBannerSection: React.FC = () => {
   const product = INITIAL_PRODUCTS[0];
 
   return (
-    <Section padding="none" className="bg-[#6A1423] text-white relative overflow-hidden my-12">
+    <Section padding="none" className="bg-[#6A1423] text-white relative overflow-hidden my-12 opacity-100">
       <div className="absolute inset-0 bg-gradient-to-r from-[#3D0B15] via-[#6A1423] to-[#173C2B]/80 pointer-events-none" />
 
       <Container className="relative z-10 py-16 sm:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 1, x: 0 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
             className="lg:col-span-7 space-y-6 text-left"
           >
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-semibold text-[#F3E5AB]">
@@ -60,10 +59,9 @@ export const PromotionalBannerSection: React.FC = () => {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 1, x: 0 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
             className="lg:col-span-5 flex justify-center"
           >
             <div className="relative w-full max-w-xs sm:max-w-sm aspect-square bg-white/5 rounded-2xl p-6 border border-white/15 backdrop-blur-md flex items-center justify-center">

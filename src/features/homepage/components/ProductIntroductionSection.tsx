@@ -12,15 +12,14 @@ export const ProductIntroductionSection: React.FC = () => {
   const product = INITIAL_PRODUCTS[0];
 
   return (
-    <Section padding="xl" className="bg-[#FCFBF8] border-b border-[#EBE7DF] text-[#171717]">
+    <Section padding="xl" className="bg-[#FCFBF8] border-b border-[#EBE7DF] text-[#171717] opacity-100">
       <Container>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* 1. Product Image Stage */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 1, x: 0 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
             className="lg:col-span-6 relative"
           >
             <div className="relative bg-[#F7F4ED] rounded-3xl p-8 sm:p-12 overflow-hidden flex items-center justify-center min-h-[440px] border border-[#EBE7DF] shadow-subtle-card">
@@ -35,11 +34,10 @@ export const ProductIntroductionSection: React.FC = () => {
 
           {/* 2. Purchasing & Details Stage */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 1, x: 0 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="lg:col-span-6 space-y-6"
+            className="lg:col-span-6 space-y-6 text-left"
           >
             <div>
               <span className="text-xs uppercase font-bold tracking-widest text-[#6A1423] bg-[#6A1423]/10 px-3.5 py-1.5 rounded-full inline-block mb-3 border border-[#6A1423]/20">

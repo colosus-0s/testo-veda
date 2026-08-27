@@ -21,7 +21,7 @@ export const CategoryDiscoverySection: React.FC = () => {
       id: 'cat-stamina-endurance',
       title: 'Stamina & Endurance',
       description: 'Ashwagandha, Gokhuru, and Shilajit extracts engineered for physical performance.',
-      image: ASSET_REGISTRY.ingredients.tribulus,
+      image: ASSET_REGISTRY.ingredients.gokhuru,
       icon: HeartPulse,
       link: '/collections/vitality',
       tag: 'Core Formulation',
@@ -47,14 +47,13 @@ export const CategoryDiscoverySection: React.FC = () => {
   ];
 
   return (
-    <Section padding="xl" className="bg-[#F7F4ED] border-b border-[#EBE7DF] text-[#171717]">
+    <Section padding="xl" className="bg-[#F7F4ED] border-b border-[#EBE7DF] text-[#171717] opacity-100">
       <Container>
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 1 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
           >
             <span className="text-xs uppercase font-bold tracking-widest text-[#6A1423] block mb-2">
               Storefront Discovery
@@ -65,10 +64,9 @@ export const CategoryDiscoverySection: React.FC = () => {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 1 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
           >
             <Link
               to="/shop"
@@ -82,16 +80,10 @@ export const CategoryDiscoverySection: React.FC = () => {
 
         {/* Category Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((cat, idx) => {
+          {categories.map((cat) => {
             const Icon = cat.icon;
             return (
-              <motion.div
-                key={cat.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.08 }}
-              >
+              <div key={cat.id}>
                 <Link
                   to={cat.link}
                   className="group block bg-[#FCFBF8] rounded-2xl overflow-hidden border border-[#EBE7DF] shadow-subtle-card hover:shadow-elevated-card hover:border-[#6A1423]/40 transition-all duration-300 h-full flex flex-col justify-between"
@@ -115,7 +107,7 @@ export const CategoryDiscoverySection: React.FC = () => {
                           {cat.title}
                         </h3>
                       </div>
-                      <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                      <p className="text-xs text-slate-700 leading-relaxed font-normal">
                         {cat.description}
                       </p>
                     </div>
@@ -126,7 +118,7 @@ export const CategoryDiscoverySection: React.FC = () => {
                     </div>
                   </div>
                 </Link>
-              </motion.div>
+              </div>
             );
           })}
         </div>

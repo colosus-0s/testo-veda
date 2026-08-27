@@ -1,6 +1,6 @@
 /**
  * Central Asset Registry for Arogya Path
- * Allows switching seamlessly between local web assets and Supabase Storage / CDN URLs.
+ * Maps local high-resolution botanical photography and commercial product renders.
  */
 
 export const ASSET_REGISTRY = {
@@ -45,14 +45,15 @@ export const ASSET_REGISTRY = {
   ],
 
   ingredients: {
-    ashwagandha: '/docs/images-and-videos/testo ingredients (1).png',
-    fenugreek: '/docs/images-and-videos/testo ingredients (1).png',
-    tribulus: '/docs/images-and-videos/testo ingredients (1).png',
-    tongkatAli: '/docs/images-and-videos/testo ingredients (1).png',
-    mucuna: '/docs/images-and-videos/testo ingredients (1).png',
-    shilajit: '/docs/images-and-videos/testo ingredients (1).png',
-    safedMusli: '/docs/images-and-videos/testo ingredients (1).png',
-    zinc: '/docs/images-and-videos/testo ingredients (1).png',
-    saffron: '/docs/images-and-videos/testo ingredients (1).png',
+    ashwagandha: '/docs/images-and-videos/Gemini_Generated_Image_hw34frhw34frhw34.png',
+    shilajit: '/docs/images-and-videos/Gemini_Generated_Image_2b4qfc2b4qfc2b4q.png',
+    gokhuru: '/docs/images-and-videos/Gemini_Generated_Image_2dl0mc2dl0mc2dl0.png',
+    safedMusli: '/docs/images-and-videos/Gemini_Generated_Image_desv9mdesv9mdesv.png',
+    saffron: '/docs/images-and-videos/Gemini_Generated_Image_sfkhhqsfkhhqsfkh.png',
+    seaBuckthorn: '/docs/images-and-videos/Gemini_Generated_Image_c9n5fac9n5fac9n5.png',
+    fenugreek: '/docs/images-and-videos/Gemini_Generated_Image_8zpgnr8zpgnr8zpg.png',
+    kaunch: '/docs/images-and-videos/Gemini_Generated_Image_2uyfds2uyfds2uyf.png',
+    talmakhana: '/docs/images-and-videos/Gemini_Generated_Image_ek5sgqek5sgqek5s.png',
+    ginger: '/docs/images-and-videos/Gemini_Generated_Image_4cig6u4cig6u4cig.png',
   },
 } as const;
