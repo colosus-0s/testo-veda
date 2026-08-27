@@ -8,17 +8,17 @@ import { Button } from '@/components/ui/Button';
 
 export const FinalCTASection: React.FC = () => {
   return (
-    <Section padding="xl" dark className="bg-gradient-to-b from-[#8b1528]/40 via-[#0f0f11] to-[#0f0f11] border-t border-white/10 relative overflow-hidden text-white">
-      {/* Background Accent */}
-      <div className="absolute inset-0 bg-radial-gradient from-[#8b1528]/20 via-transparent to-transparent pointer-events-none" />
+    <Section padding="xl" className="bg-gradient-to-b from-[#6A1423] via-[#3D0B15] to-[#171717] border-t border-white/10 relative overflow-hidden text-white">
+      {/* Background Glow */}
+      <div className="absolute inset-0 bg-radial-gradient from-[#6A1423]/30 via-transparent to-transparent pointer-events-none" />
 
-      <Container size="narrow" className="relative z-10 text-center">
+      <Container size="narrow" className="relative z-10 text-center py-12">
         <motion.span
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-xs uppercase font-bold tracking-widest text-[#d4af37] bg-[#8b1528]/40 px-3.5 py-1.5 rounded-full inline-block mb-4 border border-[#8b1528]/80"
+          className="text-xs uppercase font-bold tracking-widest text-[#F3E5AB] bg-white/10 px-3.5 py-1.5 rounded-full inline-block mb-4 border border-white/20"
         >
           A Mindful Choice
         </motion.span>
@@ -54,7 +54,7 @@ export const FinalCTASection: React.FC = () => {
             <Button
               variant="gold"
               size="lg"
-              className="w-full sm:w-auto text-base shadow-xl shadow-[#d4af37]/20"
+              className="w-full sm:w-auto text-base shadow-xl shadow-black/30"
               rightIcon={<ArrowRight className="w-5 h-5" />}
             >
               Explore TESTO Power+ (₹999)
@@ -71,15 +71,15 @@ export const FinalCTASection: React.FC = () => {
         {/* Value Micro Badges */}
         <div className="pt-8 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-300 font-medium">
           <div className="flex items-center justify-center gap-2">
-            <Truck className="w-4 h-4 text-emerald-400" />
-            <span>Free Express Delivery Above ₹499</span>
+            <Truck className="w-4 h-4 text-[#F3E5AB]" />
+            <span>Free Express Shipping Above ₹499</span>
           </div>
           <div className="flex items-center justify-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-[#d4af37]" />
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
             <span>FSSAI License Compliance</span>
           </div>
           <div className="flex items-center justify-center gap-2">
-            <Lock className="w-4 h-4 text-blue-400" />
+            <Lock className="w-4 h-4 text-amber-300" />
             <span>100% Vegetarian Shell (E 464)</span>
           </div>
         </div>

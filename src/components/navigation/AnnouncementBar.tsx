@@ -10,14 +10,14 @@ export const AnnouncementBar: React.FC = () => {
   if (!config.enabled || dismissed) return null;
 
   return (
-    <div className="bg-gradient-to-r from-[#5c0b1a] via-[#8b1528] to-[#5c0b1a] text-white text-xs font-medium py-2 px-4 relative z-40 border-b border-[#a31c32]/30 shadow-sm">
+    <div className="bg-[#6A1423] text-white text-xs font-medium py-2 px-4 relative z-40 border-b border-white/10 shadow-sm">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         <div className="flex-1 text-center flex items-center justify-center gap-2 flex-wrap">
           <span>{config.text}</span>
           {config.ctaText && (
             <Link
               to={config.ctaLink}
-              className="inline-flex items-center gap-1 font-semibold text-[#f3e5ab] hover:underline underline-offset-2 ml-1"
+              className="inline-flex items-center gap-1 font-semibold text-[#F3E5AB] hover:underline underline-offset-2 ml-1"
             >
               <span>{config.ctaText}</span>
               <ArrowRight className="w-3 h-3" />

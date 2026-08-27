@@ -1,6 +1,5 @@
 import React from 'react';
 import type { Ingredient } from '@/types/product';
-import { Badge } from '@/components/ui/Badge';
 
 export interface IngredientCardProps {
   ingredient: Ingredient;
@@ -13,32 +12,34 @@ export const IngredientCard: React.FC<IngredientCardProps> = ({
 }) => {
   return (
     <div
-      className={`glass-card rounded-xl p-6 flex flex-col justify-between relative overflow-hidden group hover:border-[#8b1528]/50 transition-all duration-300 ${className}`}
+      className={`bg-[#FCFBF8] rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden border border-[#EBE7DF] shadow-subtle-card hover:shadow-elevated-card hover:border-[#6A1423]/40 transition-all duration-300 ${className}`}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <span className="text-[10px] uppercase font-semibold text-[#d4af37] tracking-wider block mb-1">
-            {ingredient.botanicalName}
-          </span>
-          <h3 className="font-serif-display text-xl font-bold text-white group-hover:text-[#d4af37] transition-colors">
-            {ingredient.name}
-          </h3>
+      <div>
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div>
+            <span className="text-[10px] uppercase font-bold text-[#6A1423] tracking-widest block mb-1">
+              {ingredient.botanicalName}
+            </span>
+            <h3 className="font-serif text-xl font-bold text-[#171717] group-hover:text-[#6A1423] transition-colors">
+              {ingredient.name}
+            </h3>
+          </div>
+          {ingredient.quantity && (
+            <span className="text-xs font-bold text-[#173C2B] bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full shrink-0">
+              {ingredient.quantity}
+            </span>
+          )}
         </div>
-        {ingredient.quantity && (
-          <Badge variant="gold" size="sm">
-            {ingredient.quantity}
-          </Badge>
-        )}
+
+        <p className="text-xs text-slate-700 leading-relaxed mb-4 font-normal">
+          {ingredient.shortDescription}
+        </p>
       </div>
 
-      <p className="text-sm text-neutral-300 leading-relaxed mb-4">
-        {ingredient.shortDescription}
-      </p>
-
-      <div className="pt-3 border-t border-neutral-800/80 flex items-center justify-between text-xs">
-        <span className="text-neutral-400">Approved Benefit:</span>
-        <span className="font-medium text-emerald-400 text-right max-w-[200px] line-clamp-1">
-          {ingredient.approvedBenefit}
+      <div className="pt-3 border-t border-[#EBE7DF] flex items-center justify-between text-xs">
+        <span className="text-slate-500 font-medium">Source / Extract:</span>
+        <span className="font-semibold text-[#173C2B]">
+          {ingredient.source || 'Botanical Extract'}
         </span>
       </div>
     </div>

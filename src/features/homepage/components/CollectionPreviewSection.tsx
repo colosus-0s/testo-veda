@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button';
 
 export const CollectionPreviewSection: React.FC = () => {
   return (
-    <Section padding="xl" dark className="bg-[#17171a] border-t border-neutral-800/80">
+    <Section padding="xl" className="bg-[#FCFBF8] border-b border-[#EBE7DF] text-[#171717]">
       <Container>
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
           <motion.div
@@ -19,11 +19,11 @@ export const CollectionPreviewSection: React.FC = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <span className="text-xs uppercase font-bold tracking-widest text-[#d4af37] block mb-2">
-              Catalog Discovery
+            <span className="text-xs uppercase font-bold tracking-widest text-[#6A1423] block mb-2">
+              Catalog Storefront
             </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white">
-              Featured Formulations
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#171717]">
+              Featured Botanical Formulations
             </h2>
           </motion.div>
 
@@ -34,7 +34,7 @@ export const CollectionPreviewSection: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             <Link to="/shop">
-              <Button variant="outline" size="md" className="border-white/20 hover:border-white/40 text-white" rightIcon={<ArrowRight className="w-4 h-4" />}>
+              <Button variant="outline" size="md" className="border-slate-300 text-[#171717] hover:border-[#6A1423] hover:text-[#6A1423]" rightIcon={<ArrowRight className="w-4 h-4" />}>
                 View Full Storefront
               </Button>
             </Link>

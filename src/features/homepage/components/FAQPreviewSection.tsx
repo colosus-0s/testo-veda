@@ -28,13 +28,13 @@ const HOMEPAGE_FAQ = [
   {
     id: 'faq-5',
     title: 'What are the delivery timelines and shipping policies?',
-    content: 'We offer free delivery across India on orders above ₹499. Typical delivery timelines range from 2 to 5 business days depending on destination pincode.',
+    content: 'We offer free express shipping across India on orders above ₹499. Typical delivery timelines range from 2 to 5 business days depending on destination pincode.',
   },
 ];
 
 export const FAQPreviewSection: React.FC = () => {
   return (
-    <Section padding="xl" className="bg-[#f5f5f7] border-y border-slate-200 text-[#111115]">
+    <Section padding="xl" className="bg-[#F7F4ED] border-b border-[#EBE7DF] text-[#171717]">
       <Container size="narrow">
         <div className="text-center mb-10">
           <motion.span
@@ -42,7 +42,7 @@ export const FAQPreviewSection: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="text-xs uppercase font-bold tracking-widest text-[#8b1528] block mb-2"
+            className="text-xs uppercase font-bold tracking-widest text-[#6A1423] block mb-2"
           >
             Product Clarity & Information
           </motion.span>
@@ -51,7 +51,7 @@ export const FAQPreviewSection: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-serif text-3xl sm:text-4xl font-bold text-[#111115] mb-3"
+            className="font-serif text-3xl sm:text-4xl font-bold text-[#171717] mb-3"
           >
             Frequently Asked Questions
           </motion.h2>
@@ -71,7 +71,7 @@ export const FAQPreviewSection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-300 shadow-lg"
+          className="bg-[#FCFBF8] rounded-2xl p-6 sm:p-8 border border-[#EBE7DF] shadow-subtle-card"
         >
           <Accordion items={HOMEPAGE_FAQ} defaultOpenId="faq-1" dark={false} />
         </motion.div>

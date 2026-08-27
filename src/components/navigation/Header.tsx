@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ShoppingBag, User, Menu, ShieldCheck } from 'lucide-react';
 import { SITE_CONFIG } from '@/config/site';
-import { IconButton } from '@/components/ui/IconButton';
 import { Drawer } from '@/components/ui/Drawer';
 
 export interface HeaderProps {
@@ -36,42 +35,44 @@ export const Header: React.FC<HeaderProps> = ({
       <header
         className={`sticky top-0 z-40 w-full transition-all duration-300 ${
           scrolled
-            ? 'glass-panel bg-[#0f0f11]/90 shadow-2xl py-3'
-            : 'bg-transparent py-5'
+            ? 'bg-[#FCFBF8]/95 backdrop-blur-md shadow-md py-3 border-b border-[#EBE7DF]'
+            : 'bg-[#F7F4ED]/90 backdrop-blur-sm py-4 border-b border-[#EBE7DF]/60'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
           {/* Mobile Menu Trigger */}
           <div className="flex items-center lg:hidden">
-            <IconButton
-              icon={<Menu className="w-6 h-6" />}
-              ariaLabel="Open navigation menu"
+            <button
               onClick={() => setMobileMenuOpen(true)}
-            />
+              className="p-2 text-[#171717] hover:text-[#6A1423] transition-colors focus:outline-none"
+              aria-label="Open navigation menu"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
           </div>
 
           {/* Brand Logo & Title */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-full bg-[#8b1528] border border-[#d4af37]/40 flex items-center justify-center font-serif-display font-black text-xl text-white shadow-lg shadow-[#8b1528]/30 group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-full bg-[#6A1423] border border-[#C7A33A]/40 flex items-center justify-center font-serif font-black text-xl text-white shadow-md group-hover:scale-105 transition-transform">
               AP
             </div>
             <div className="flex flex-col">
-              <span className="font-serif-display text-xl font-extrabold tracking-wider text-white group-hover:text-[#d4af37] transition-colors">
+              <span className="font-serif text-xl font-extrabold tracking-wider text-[#171717] group-hover:text-[#6A1423] transition-colors">
                 {SITE_CONFIG.brandName.toUpperCase()}
               </span>
-              <span className="text-[10px] tracking-widest text-[#d4af37] uppercase font-medium">
+              <span className="text-[10px] tracking-widest text-[#6A1423] uppercase font-bold">
                 {SITE_CONFIG.tagline}
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav aria-label="Main Navigation" className="hidden lg:flex items-center space-x-8">
+          <nav aria-label="Main Navigation" className="hidden lg:flex items-center space-x-7">
             {SITE_CONFIG.navigation.map((item) => (
               <Link
                 key={item.label}
                 to={item.href}
-                className="text-sm font-medium text-neutral-300 hover:text-white hover:border-b-2 hover:border-[#8b1528] pb-1 transition-all"
+                className="text-sm font-semibold text-[#171717] hover:text-[#6A1423] hover:border-b-2 hover:border-[#6A1423] pb-1 transition-all"
               >
                 {item.label}
               </Link>
@@ -79,28 +80,27 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
 
           {/* Header Action Icons */}
-          <div className="flex items-center space-x-2 sm:space-x-4">
-            <IconButton
-              icon={<Search className="w-5 h-5" />}
-              ariaLabel="Search products"
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <button
               onClick={onOpenSearch}
-            />
+              className="p-2 text-[#171717] hover:text-[#6A1423] transition-colors focus:outline-none"
+              aria-label="Search products"
+            >
+              <Search className="w-5 h-5" />
+            </button>
 
-            <Link to="/account">
-              <IconButton
-                icon={<User className="w-5 h-5" />}
-                ariaLabel="Customer account"
-              />
+            <Link to="/account" className="p-2 text-[#171717] hover:text-[#6A1423] transition-colors">
+              <User className="w-5 h-5" />
             </Link>
 
             <button
               onClick={onOpenCart}
-              className="relative p-2 text-neutral-300 hover:text-white transition-colors focus:outline-none"
+              className="relative p-2 text-[#171717] hover:text-[#6A1423] transition-colors focus:outline-none"
               aria-label="Shopping Cart"
             >
               <ShoppingBag className="w-6 h-6" />
               {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#8b1528] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#0f0f11]">
+                <span className="absolute -top-1 -right-1 bg-[#6A1423] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
                   {cartItemCount}
                 </span>
               )}
@@ -116,10 +116,10 @@ export const Header: React.FC<HeaderProps> = ({
         title="Navigation"
         position="left"
       >
-        <div className="flex flex-col space-y-6 pt-2">
-          <div className="pb-4 border-b border-neutral-800 flex items-center gap-3">
-            <ShieldCheck className="w-5 h-5 text-emerald-400" />
-            <span className="text-xs text-neutral-300">
+        <div className="flex flex-col space-y-6 pt-2 text-[#171717]">
+          <div className="pb-4 border-b border-slate-200 flex items-center gap-3">
+            <ShieldCheck className="w-5 h-5 text-emerald-600" />
+            <span className="text-xs font-semibold text-slate-700">
               FSSAI Lic. #{SITE_CONFIG.fssaiLicense}
             </span>
           </div>
@@ -129,15 +129,16 @@ export const Header: React.FC<HeaderProps> = ({
               <Link
                 key={item.label}
                 to={item.href}
-                className="text-lg font-serif-display font-medium text-neutral-200 hover:text-[#d4af37] transition-colors py-1"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-lg font-serif font-bold text-[#171717] hover:text-[#6A1423] transition-colors py-1"
               >
                 {item.label}
               </Link>
             ))}
           </nav>
 
-          <div className="pt-6 border-t border-neutral-800 space-y-3 text-xs text-neutral-400">
-            <p className="font-semibold text-white">Customer Support</p>
+          <div className="pt-6 border-t border-slate-200 space-y-3 text-xs text-slate-600">
+            <p className="font-bold text-[#171717]">Customer Support</p>
             <p>Email: {SITE_CONFIG.supportEmail}</p>
             <p>Phone: {SITE_CONFIG.supportPhone}</p>
           </div>

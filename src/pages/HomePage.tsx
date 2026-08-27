@@ -1,7 +1,8 @@
 import React from 'react';
 import { HeroSection } from '@/features/homepage/components/HeroSection';
-import { BrandStatementSection } from '@/features/homepage/components/BrandStatementSection';
+import { CategoryDiscoverySection } from '@/features/homepage/components/CategoryDiscoverySection';
 import { ProductIntroductionSection } from '@/features/homepage/components/ProductIntroductionSection';
+import { PromotionalBannerSection } from '@/features/homepage/components/PromotionalBannerSection';
 import { ProductSpotlightSection } from '@/features/homepage/components/ProductSpotlightSection';
 import { FormulaSection } from '@/features/homepage/components/FormulaSection';
 import { IngredientStorySection } from '@/features/homepage/components/IngredientStorySection';
@@ -15,44 +16,47 @@ import { FinalCTASection } from '@/features/homepage/components/FinalCTASection'
 
 export const HomePage: React.FC = () => {
   return (
-    <div className="w-full space-y-0">
-      {/* 01 Hero Entry */}
+    <div className="w-full space-y-0 bg-[#F7F4ED]">
+      {/* 03 Hero Campaign Entry */}
       <HeroSection />
 
-      {/* 02 Brand Philosophy & Statement */}
-      <BrandStatementSection />
+      {/* 04 Category / Need Discovery Grid */}
+      <CategoryDiscoverySection />
 
-      {/* 03 Product Introduction */}
+      {/* 05 Featured Product Stage (TESTO Natural Power+) */}
       <ProductIntroductionSection />
 
-      {/* 04 Product Spotlight Specs */}
+      {/* 06 Editorial Commerce Banner */}
+      <PromotionalBannerSection />
+
+      {/* 07 Product Formulation Pillars */}
       <ProductSpotlightSection />
 
-      {/* 05 Formula & Supplement Facts Breakdown */}
+      {/* 08 Formula & Supplement Facts Breakdown */}
       <FormulaSection />
 
-      {/* 06 10 Botanical Ingredients Story */}
+      {/* 09 10 Botanical Ingredients Story */}
       <IngredientStorySection />
 
-      {/* 07 Modern Vitality Lifestyle */}
+      {/* 10 Modern Vitality Lifestyle */}
       <LifestyleSection />
 
-      {/* 08 Regulatory & Compliance Trust */}
+      {/* 11 Regulatory & Compliance Trust */}
       <TrustSection />
 
-      {/* 09 Brand Standards & Transparency Commitments */}
+      {/* 12 Brand Quality Standards */}
       <BrandStandardsSection />
 
-      {/* 10 Collection Discovery Preview */}
+      {/* 13 Catalog Storefront Preview */}
       <CollectionPreviewSection />
 
-      {/* 11 Brand Worldview & Origin Story */}
+      {/* 14 Brand Worldview & Origin Story */}
       <BrandStorySection />
 
-      {/* 12 Frequently Asked Questions */}
+      {/* 15 Frequently Asked Questions */}
       <FAQPreviewSection />
 
-      {/* 13 Mindful Purchase Invitation CTA */}
+      {/* 16 Mindful Closing Invitation CTA */}
       <FinalCTASection />
     </div>
   );

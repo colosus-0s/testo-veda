@@ -10,7 +10,7 @@ export const HeroSection: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="relative min-h-[90vh] sm:min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#0f0f11] pt-16">
+    <section className="relative min-h-[85vh] sm:min-h-[90vh] w-full flex items-center justify-center overflow-hidden bg-[#0f0f11] pt-12">
       {/* Background Media Stage */}
       <div className="absolute inset-0 z-0">
         {!videoFailed && !shouldReduceMotion ? (
@@ -21,7 +21,7 @@ export const HeroSection: React.FC = () => {
             playsInline
             poster={HERO_CONFIG.posterUrl}
             onError={() => setVideoFailed(true)}
-            className="w-full h-full object-cover object-center opacity-40 scale-105 transition-all duration-1000"
+            className="w-full h-full object-cover object-center opacity-45 scale-105 transition-all duration-1000"
           >
             <source src={HERO_CONFIG.videoUrl} type="video/mp4" />
           </video>
@@ -29,23 +29,22 @@ export const HeroSection: React.FC = () => {
           <img
             src={HERO_CONFIG.fallbackImageUrl}
             alt="Arogya Path TESTO Natural Power+"
-            className="w-full h-full object-cover object-center opacity-40"
+            className="w-full h-full object-cover object-center opacity-45"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f11] via-[#0f0f11]/60 to-[#0f0f11]/30" />
-        <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#0f0f11]/40 to-[#0f0f11]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f11] via-[#0f0f11]/70 to-[#0f0f11]/40" />
       </div>
 
       {/* Atmospheric Glow Overlay */}
       <div className="hero-glow top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none" />
 
       {/* Hero Content Box */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-20 pb-16">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-16 pb-16">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#8b1528]/40 border border-[#8b1528]/80 text-xs font-semibold text-[#f3e5ab] mb-6 backdrop-blur-md"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#6A1423]/60 border border-[#6A1423] text-xs font-semibold text-[#F3E5AB] mb-6 backdrop-blur-md"
         >
           <ShieldCheck className="w-4 h-4 text-emerald-400" />
           <span>{HERO_CONFIG.trustBadgeText}</span>
@@ -65,7 +64,7 @@ export const HeroSection: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto font-normal leading-relaxed mb-10 text-shadow"
+          className="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto font-normal leading-relaxed mb-10 drop-shadow"
         >
           {HERO_CONFIG.subheadline}
         </motion.p>
@@ -80,7 +79,7 @@ export const HeroSection: React.FC = () => {
             <Button
               variant="gold"
               size="lg"
-              className="w-full sm:w-auto text-base shadow-lg shadow-[#d4af37]/20"
+              className="w-full sm:w-auto text-base shadow-xl shadow-[#C7A33A]/20"
               rightIcon={<ArrowRight className="w-5 h-5" />}
             >
               {HERO_CONFIG.primaryCtaText}
@@ -97,9 +96,9 @@ export const HeroSection: React.FC = () => {
 
       {/* Scroll Indicator */}
       <a
-        href="#brand-statement"
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 text-neutral-400 hover:text-white transition-colors animate-bounce p-2"
-        aria-label="Scroll down to brand statement"
+        href="#formula"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 text-slate-400 hover:text-white transition-colors animate-bounce p-2"
+        aria-label="Scroll down to formula"
       >
         <ChevronDown className="w-6 h-6" />
       </a>

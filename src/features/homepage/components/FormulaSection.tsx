@@ -10,7 +10,7 @@ export const FormulaSection: React.FC = () => {
   const facts = product.supplementFacts;
 
   return (
-    <Section id="formula" padding="xl" className="bg-[#f5f5f7] border-y border-neutral-300 text-[#111115]">
+    <Section id="formula" padding="xl" className="bg-[#173C2B] text-white border-y border-[#2E6B4A]/50">
       <Container size="narrow">
         <div className="text-center mb-12">
           <motion.span
@@ -18,16 +18,16 @@ export const FormulaSection: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="text-xs uppercase font-bold tracking-widest text-[#8b1528] block mb-2"
+            className="text-xs uppercase font-bold tracking-widest text-[#F3E5AB] bg-white/10 px-3.5 py-1.5 rounded-full inline-block mb-3 border border-white/20"
           >
-            Transparent Formulation
+            Transparent Formula Disclosure
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-serif text-3xl sm:text-4xl font-bold text-[#111115] mb-3"
+            className="font-serif text-3xl sm:text-4xl font-bold text-white mb-3"
           >
             Official Supplement Facts
           </motion.h2>
@@ -36,26 +36,50 @@ export const FormulaSection: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-xs text-slate-600 font-medium"
+            className="text-sm text-emerald-100 font-normal"
           >
             FSSAI License No. {product.regulatory.fssaiLicense} | Serving Size: {facts.servingSize}
           </motion.p>
         </div>
 
-        {/* Supplement Facts Panel */}
+        {/* Visual Ingredient Highlights */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10 text-center">
+          {[
+            { name: 'Ashwagandha', qty: '100mg' },
+            { name: 'Gokhuru (Tribulus)', qty: '100mg' },
+            { name: 'Safed Musli', qty: '50mg' },
+            { name: 'Sea Buckthorn', qty: '50mg' },
+            { name: 'Fenugreek', qty: '30mg' },
+            { name: 'Saffron', qty: '15mg' },
+          ].map((item, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: idx * 0.05 }}
+              className="bg-white/10 rounded-xl p-4 border border-white/15 backdrop-blur-sm"
+            >
+              <span className="text-xs text-emerald-200 font-medium block mb-1">{item.name}</span>
+              <span className="font-serif font-bold text-lg text-[#F3E5AB]">{item.qty}</span>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Supplement Facts Table Panel */}
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="bg-white rounded-2xl p-6 sm:p-8 border border-neutral-300 shadow-xl overflow-x-auto"
+          className="bg-[#FCFBF8] text-[#171717] rounded-2xl p-6 sm:p-8 border border-slate-300 shadow-2xl overflow-x-auto"
         >
-          <div className="border-b-4 border-[#111115] pb-3 mb-4">
+          <div className="border-b-4 border-[#171717] pb-3 mb-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-serif text-2xl font-black text-[#111115] uppercase tracking-wider">
+              <h3 className="font-serif text-2xl font-black text-[#171717] uppercase tracking-wider">
                 Supplement Facts
               </h3>
-              <FileText className="w-5 h-5 text-[#8b1528]" />
+              <FileText className="w-5 h-5 text-[#6A1423]" />
             </div>
             <div className="flex justify-between text-xs text-slate-600 font-medium mt-1">
               <span>Serving Size: {facts.servingSize}</span>
@@ -64,7 +88,7 @@ export const FormulaSection: React.FC = () => {
           </div>
 
           {/* Table Header */}
-          <div className="flex justify-between text-xs font-bold text-[#111115] border-b-2 border-slate-900 pb-2 mb-3">
+          <div className="flex justify-between text-xs font-bold text-[#171717] border-b-2 border-slate-900 pb-2 mb-3">
             <span>Amount Per Serving</span>
             <span>% Daily Value</span>
           </div>
@@ -87,12 +111,12 @@ export const FormulaSection: React.FC = () => {
 
             {/* Proprietary Blend Header */}
             {facts.proprietaryBlend && (
-              <div className="py-3 bg-slate-50 px-3 rounded-lg my-2 border border-slate-200">
+              <div className="py-3 bg-emerald-50/60 px-3.5 rounded-lg my-2 border border-emerald-200">
                 <div className="flex justify-between font-semibold text-slate-900">
                   <span>{facts.proprietaryBlend.name}</span>
-                  <span className="font-mono text-xs font-bold">{facts.proprietaryBlend.amount}</span>
+                  <span className="font-mono text-xs font-bold text-[#173C2B]">{facts.proprietaryBlend.amount}</span>
                 </div>
-                <ul className="mt-1.5 pl-4 list-disc text-xs text-slate-600 space-y-1">
+                <ul className="mt-1.5 pl-4 list-disc text-xs text-slate-700 space-y-1">
                   {facts.proprietaryBlend.ingredients.map((item, idx) => (
                     <li key={idx}>{item}</li>
                   ))}
@@ -101,7 +125,7 @@ export const FormulaSection: React.FC = () => {
             )}
           </div>
 
-          <div className="border-t-4 border-[#111115] pt-3 mt-4 text-[11px] text-slate-600 space-y-1">
+          <div className="border-t-4 border-[#171717] pt-3 mt-4 text-[11px] text-slate-600 space-y-1">
             <p>* Daily Value (% DV) not established for dietary supplements.</p>
             <p><strong>Other Ingredients:</strong> {facts.otherIngredients.join(', ')}.</p>
           </div>
@@ -109,17 +133,17 @@ export const FormulaSection: React.FC = () => {
 
         {/* Directions & Usage Guide */}
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-            <span className="text-[10px] uppercase font-bold text-[#8b1528] block mb-1">Dosage</span>
-            <p className="text-xs text-slate-900 font-medium">{product.directions.labelInstruction}</p>
+          <div className="bg-white/10 border border-white/15 rounded-xl p-4 backdrop-blur-sm">
+            <span className="text-[10px] uppercase font-bold text-[#F3E5AB] block mb-1">Dosage</span>
+            <p className="text-xs text-white font-medium">{product.directions.labelInstruction}</p>
           </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-            <span className="text-[10px] uppercase font-bold text-[#8b1528] block mb-1">How to Take</span>
-            <p className="text-xs text-slate-900 font-medium">{product.directions.suggestedUse}</p>
+          <div className="bg-white/10 border border-white/15 rounded-xl p-4 backdrop-blur-sm">
+            <span className="text-[10px] uppercase font-bold text-[#F3E5AB] block mb-1">How to Take</span>
+            <p className="text-xs text-white font-medium">{product.directions.suggestedUse}</p>
           </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-            <span className="text-[10px] uppercase font-bold text-[#8b1528] block mb-1">Daily Usage</span>
-            <p className="text-xs text-slate-900 font-medium">{product.directions.bestResultsDuration}</p>
+          <div className="bg-white/10 border border-white/15 rounded-xl p-4 backdrop-blur-sm">
+            <span className="text-[10px] uppercase font-bold text-[#F3E5AB] block mb-1">Daily Usage</span>
+            <p className="text-xs text-white font-medium">{product.directions.bestResultsDuration}</p>
           </div>
         </div>
       </Container>

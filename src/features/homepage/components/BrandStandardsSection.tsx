@@ -29,19 +29,16 @@ export const BrandStandardsSection: React.FC = () => {
   ];
 
   return (
-    <Section id="brand-standards" className="bg-[#0f0f11] py-20 border-t border-white/10 relative overflow-hidden text-white">
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#8b1528]/15 blur-[120px] rounded-full pointer-events-none" />
-
+    <Section id="brand-standards" className="bg-[#F7F4ED] py-20 border-b border-[#EBE7DF] text-[#171717]">
       <Container>
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-xs uppercase font-bold tracking-widest text-[#d4af37] bg-[#8b1528]/30 px-3.5 py-1.5 rounded-full inline-block mb-4 border border-[#8b1528]/60">
+          <span className="text-xs uppercase font-bold tracking-widest text-[#6A1423] bg-[#6A1423]/10 px-3.5 py-1.5 rounded-full inline-block mb-4 border border-[#6A1423]/20">
             Quality & Compliance
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold text-white font-serif mb-4">
+          <h2 className="text-3xl md:text-5xl font-bold text-[#171717] font-serif mb-4">
             Brand Standards & Label Transparency
           </h2>
-          <p className="text-slate-300 text-base sm:text-lg font-light leading-relaxed">
+          <p className="text-slate-700 text-base sm:text-lg font-normal leading-relaxed">
             We believe wellness is built on factual clarity. Explore our foundational commitments to formulation accuracy and regulatory compliance.
           </p>
         </div>
@@ -56,16 +53,16 @@ export const BrandStandardsSection: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="glass-card p-8 rounded-2xl border border-white/15 hover:border-[#d4af37]/50 transition-colors flex gap-6"
+                className="bg-[#FCFBF8] p-8 rounded-2xl border border-[#EBE7DF] shadow-subtle-card hover:shadow-elevated-card hover:border-[#6A1423]/40 transition-all duration-300 flex gap-6"
               >
-                <div className="shrink-0 w-14 h-14 rounded-xl bg-[#8b1528]/30 border border-[#8b1528]/60 flex items-center justify-center text-[#d4af37]">
+                <div className="shrink-0 w-14 h-14 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-[#6A1423]">
                   <Icon size={26} />
                 </div>
                 <div>
-                  <h3 className="text-xl text-white font-bold font-serif mb-2">
+                  <h3 className="text-xl text-[#171717] font-bold font-serif mb-2">
                     {standard.title}
                   </h3>
-                  <p className="text-slate-200 text-sm leading-relaxed font-normal">
+                  <p className="text-slate-700 text-sm leading-relaxed font-normal">
                     {standard.description}
                   </p>
                 </div>
@@ -80,13 +77,13 @@ export const BrandStandardsSection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-12 max-w-3xl mx-auto p-6 rounded-xl bg-white/5 border border-white/15 text-center"
+          className="mt-12 max-w-3xl mx-auto p-6 rounded-xl bg-[#FCFBF8] border border-[#EBE7DF] text-center shadow-sm"
         >
-          <div className="flex items-center justify-center gap-2 text-[#d4af37] font-semibold text-sm mb-2">
+          <div className="flex items-center justify-center gap-2 text-[#173C2B] font-bold text-sm mb-2">
             <CheckCircle2 size={18} />
             <span>Official Packaging & Regulatory Declaration</span>
           </div>
-          <p className="text-xs text-slate-300 leading-relaxed font-normal">
+          <p className="text-xs text-slate-700 leading-relaxed font-normal">
             Arogya Path dietary supplements are formulated for daily dietary support. Manufactured by Streamline Pharma Private Limited (Jagraon) and marketed by Arogyapath Marketing.
           </p>
         </motion.div>
