@@ -40,32 +40,29 @@ export const TrustSection: React.FC = () => {
   ];
 
   return (
-    <Section id="quality" padding="xl" className="bg-[#F7F4ED] border-b border-[#EBE7DF] text-[#171717]">
+    <Section id="quality" padding="xl" className="bg-[#F7F4ED] border-b border-[#EBE7DF] text-[#171717] opacity-100">
       <Container>
         <div className="text-center max-w-3xl mx-auto mb-16">
           <motion.span
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 1, y: 0 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
             className="text-xs uppercase font-bold tracking-widest text-[#6A1423] block mb-2"
           >
             Quality & Compliance
           </motion.span>
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 1, y: 0 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
             className="font-serif text-3xl sm:text-4xl font-bold text-[#171717] mb-4"
           >
             Factual Regulatory & Manufacturing Details
           </motion.h2>
           <motion.p
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 1, y: 0 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
             className="text-sm sm:text-base text-slate-700 leading-relaxed font-normal"
           >
             We operate with complete regulatory clarity so you can verify our compliance credentials and manufacturing details.
@@ -76,11 +73,10 @@ export const TrustSection: React.FC = () => {
           {pillars.map((item, idx) => (
             <motion.div
               key={idx}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 0 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.08 }}
-              className="bg-[#FCFBF8] rounded-2xl p-6 flex items-start gap-4 border border-[#EBE7DF] shadow-subtle-card hover:shadow-elevated-card hover:border-[#6A1423]/40 transition-all duration-300"
+              className="bg-[#FCFBF8] rounded-2xl p-6 flex items-start gap-4 border border-[#EBE7DF] shadow-subtle-card hover:shadow-elevated-card hover:border-[#6A1423]/40 transition-all duration-300 text-left"
             >
               <div className="shrink-0 p-3 bg-red-50 rounded-xl border border-red-100">
                 {item.icon}
@@ -89,7 +85,7 @@ export const TrustSection: React.FC = () => {
                 <h3 className="font-serif text-lg font-bold text-[#171717] mb-1">
                   {item.title}
                 </h3>
-                <p className="text-xs text-slate-700 leading-relaxed">
+                <p className="text-xs text-slate-700 leading-relaxed font-normal">
                   {item.desc}
                 </p>
               </div>

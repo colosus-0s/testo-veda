@@ -32,7 +32,7 @@ export const ProductSpotlightSection: React.FC = () => {
   ];
 
   return (
-    <Section padding="xl" className="bg-[#EBE7DF] border-b border-[#DCD6C8] text-[#171717]">
+    <Section padding="xl" className="bg-[#EBE7DF] border-b border-[#DCD6C8] text-[#171717] opacity-100">
       <Container>
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs uppercase font-bold tracking-widest text-[#6A1423] bg-[#6A1423]/10 px-3.5 py-1.5 rounded-full inline-block mb-3 border border-[#6A1423]/20">
@@ -50,11 +50,10 @@ export const ProductSpotlightSection: React.FC = () => {
           {highlights.map((item, idx) => (
             <motion.div
               key={idx}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 1, y: 0 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="bg-[#FCFBF8] rounded-2xl p-6 flex flex-col justify-between space-y-4 border border-[#DCD6C8] shadow-subtle-card hover:shadow-elevated-card hover:border-[#6A1423]/40 transition-all duration-300"
+              className="bg-[#FCFBF8] rounded-2xl p-6 flex flex-col justify-between space-y-4 border border-[#DCD6C8] shadow-subtle-card hover:shadow-elevated-card hover:border-[#6A1423]/40 transition-all duration-300 text-left"
             >
               <div className="p-3 bg-red-50 rounded-xl w-fit border border-red-100">
                 {item.icon}
