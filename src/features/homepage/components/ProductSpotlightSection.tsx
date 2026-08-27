@@ -17,7 +17,7 @@ export const ProductSpotlightSection: React.FC = () => {
     {
       icon: <Zap className="w-6 h-6 text-[#d4af37]" />,
       title: '100mg Tribulus / Gokhuru',
-      desc: 'Rich in natural steroidal saponins traditional used for physical endurance.',
+      desc: 'Rich in natural steroidal saponins traditionally used for physical endurance.',
     },
     {
       icon: <Award className="w-6 h-6 text-[#d4af37]" />,
@@ -27,22 +27,22 @@ export const ProductSpotlightSection: React.FC = () => {
     {
       icon: <ShieldCheck className="w-6 h-6 text-[#d4af37]" />,
       title: 'FSSAI License & ISO Certified',
-      desc: `Lic No. ${product.regulatory.fssaiLicense}. ISO 9001:2015 & GMP audit compliant.`,
+      desc: `Lic No. ${product.regulatory.fssaiLicense}. ISO 9001:2015 & GMP compliant.`,
     },
   ];
 
   return (
-    <Section padding="xl" dark className="bg-[#17171a] border-t border-neutral-800/80">
+    <Section padding="xl" dark className="bg-[#17171a] border-t border-white/10 text-white">
       <Container>
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-xs uppercase font-bold tracking-widest text-[#d4af37] block mb-2">
+          <span className="text-xs uppercase font-bold tracking-widest text-[#d4af37] bg-[#8b1528]/30 px-3.5 py-1.5 rounded-full inline-block mb-3 border border-[#8b1528]/60">
             Product Formulation Pillars
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white mb-4">
-            Standardized Botanicals & Mineral Complex
+            Botanical Formula & Mineral Complex
           </h2>
-          <p className="text-sm sm:text-base text-neutral-300 font-light">
-            Every dose is encapsulated in 100% vegetarian HPMC shells (E 464) designed for clean breakdown post-meals.
+          <p className="text-slate-300 text-base font-light">
+            Every dose is encapsulated in 100% vegetarian HPMC shells (E 464) designed for clean consumption post-meals.
           </p>
         </div>
 
@@ -54,16 +54,16 @@ export const ProductSpotlightSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="glass-card rounded-xl p-6 flex flex-col justify-between space-y-4 border border-white/10 hover:border-[#d4af37]/30 transition-colors"
+              className="glass-card rounded-xl p-6 flex flex-col justify-between space-y-4 border border-white/15 hover:border-[#d4af37]/40 transition-colors"
             >
-              <div className="p-3 bg-[#8b1528]/20 rounded-lg w-fit border border-[#8b1528]/40">
+              <div className="p-3 bg-[#8b1528]/30 rounded-lg w-fit border border-[#8b1528]/60">
                 {item.icon}
               </div>
               <div>
                 <h3 className="font-serif text-lg font-bold text-white mb-2">
                   {item.title}
                 </h3>
-                <p className="text-xs text-neutral-400 leading-relaxed">
+                <p className="text-xs text-slate-300 leading-relaxed font-normal">
                   {item.desc}
                 </p>
               </div>

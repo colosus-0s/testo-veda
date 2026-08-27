@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 
 export const FinalCTASection: React.FC = () => {
   return (
-    <Section padding="xl" dark className="bg-gradient-to-b from-[#8b1528]/30 via-[#0f0f11] to-[#0f0f11] border-t border-neutral-800/80 relative overflow-hidden">
+    <Section padding="xl" dark className="bg-gradient-to-b from-[#8b1528]/40 via-[#0f0f11] to-[#0f0f11] border-t border-white/10 relative overflow-hidden text-white">
       {/* Background Accent */}
       <div className="absolute inset-0 bg-radial-gradient from-[#8b1528]/20 via-transparent to-transparent pointer-events-none" />
 
@@ -18,7 +18,7 @@ export const FinalCTASection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-xs uppercase font-bold tracking-widest text-[#d4af37] block mb-3"
+          className="text-xs uppercase font-bold tracking-widest text-[#d4af37] bg-[#8b1528]/40 px-3.5 py-1.5 rounded-full inline-block mb-4 border border-[#8b1528]/80"
         >
           A Mindful Choice
         </motion.span>
@@ -38,9 +38,9 @@ export const FinalCTASection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-sm sm:text-lg text-neutral-300 mb-10 max-w-2xl mx-auto font-light"
+          className="text-base sm:text-lg text-slate-200 mb-10 max-w-2xl mx-auto font-light leading-relaxed"
         >
-          Discover TESTO Natural Power+ Capsules today. 100% Vegetarian, FSSAI Licensed (No. 12118441000654), ISO 9001:2015 & GMP Certified.
+          Explore TESTO Natural Power+ Capsules today. 100% Vegetarian, FSSAI License No. 12118441000654, ISO 9001:2015 & GMP Certified.
         </motion.p>
 
         <motion.div
@@ -62,14 +62,14 @@ export const FinalCTASection: React.FC = () => {
           </Link>
 
           <Link to="/shop" className="w-full sm:w-auto">
-            <Button variant="outline" size="lg" className="w-full sm:w-auto text-base border-white/20 hover:border-white/40">
+            <Button variant="outline" size="lg" className="w-full sm:w-auto text-base border-white/30 hover:border-white/60 text-white">
               Browse Full Storefront
             </Button>
           </Link>
         </motion.div>
 
         {/* Value Micro Badges */}
-        <div className="pt-8 border-t border-neutral-800/80 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-neutral-400">
+        <div className="pt-8 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-300 font-medium">
           <div className="flex items-center justify-center gap-2">
             <Truck className="w-4 h-4 text-emerald-400" />
             <span>Free Express Delivery Above ₹499</span>

@@ -118,7 +118,7 @@ export const FormulaSection: React.FC = () => {
             <p className="text-xs text-slate-900 font-medium">{product.directions.suggestedUse}</p>
           </div>
           <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-            <span className="text-[10px] uppercase font-bold text-[#8b1528] block mb-1">Best Results</span>
+            <span className="text-[10px] uppercase font-bold text-[#8b1528] block mb-1">Daily Usage</span>
             <p className="text-xs text-slate-900 font-medium">{product.directions.bestResultsDuration}</p>
           </div>
         </div>

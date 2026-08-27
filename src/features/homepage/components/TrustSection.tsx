@@ -9,18 +9,18 @@ export const TrustSection: React.FC = () => {
   const pillars = [
     {
       icon: <ShieldCheck className="w-7 h-7 text-[#8b1528]" />,
-      title: 'FSSAI License Compliant',
-      desc: `Registered under FSSAI License No. ${SITE_CONFIG.fssaiLicense} for dietary supplement marketing.`,
+      title: 'FSSAI License Compliance',
+      desc: `FSSAI License No. ${SITE_CONFIG.fssaiLicense} for dietary supplement marketing.`,
     },
     {
       icon: <Award className="w-7 h-7 text-[#8b1528]" />,
       title: 'ISO 9001:2015 & GMP Certified',
-      desc: 'Formulated in ISO 9001:2015 and GMP certified facilities as declared on product packaging.',
+      desc: 'Formulated in ISO 9001:2015 and GMP certified facilities as declared on packaging.',
     },
     {
       icon: <Leaf className="w-7 h-7 text-[#8b1528]" />,
       title: '100% Vegetarian Capsules',
-      desc: 'Encapsulated in vegetarian HPMC cellulose shells (E 464) using approved food colors.',
+      desc: 'Encapsulated in vegetarian HPMC cellulose shells (E 464) with approved food colors.',
     },
     {
       icon: <Factory className="w-7 h-7 text-[#8b1528]" />,
@@ -30,17 +30,17 @@ export const TrustSection: React.FC = () => {
     {
       icon: <FileText className="w-7 h-7 text-[#8b1528]" />,
       title: 'Full Label Disclosure',
-      desc: 'Transparent declaration of all 10 active botanical extracts and proprietary extract blend.',
+      desc: 'Transparent declaration of all active botanical extracts and proprietary blend ingredients.',
     },
     {
       icon: <CheckCircle2 className="w-7 h-7 text-[#8b1528]" />,
-      title: 'No Undisclosed Hormones',
-      desc: 'Formulated as a dietary botanical supplement without medicinal synthetic hormone additives.',
+      title: 'Botanical Dietary Formulation',
+      desc: 'Formulated as a dietary botanical supplement for daily wellness support.',
     },
   ];
 
   return (
-    <Section id="quality" padding="xl" className="bg-[#f5f5f7] border-y border-neutral-300 text-[#111115]">
+    <Section id="quality" padding="xl" className="bg-[#f5f5f7] border-y border-slate-200 text-[#111115]">
       <Container>
         <div className="text-center max-w-3xl mx-auto mb-16">
           <motion.span
@@ -50,7 +50,7 @@ export const TrustSection: React.FC = () => {
             transition={{ duration: 0.5 }}
             className="text-xs uppercase font-bold tracking-widest text-[#8b1528] block mb-2"
           >
-            Quality Assurance
+            Quality & Compliance
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -59,16 +59,16 @@ export const TrustSection: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="font-serif text-3xl sm:text-4xl font-bold text-[#111115] mb-4"
           >
-            Built on Factual Regulatory Integrity
+            Factual Regulatory & Manufacturing Details
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal"
+            className="text-sm sm:text-base text-slate-700 leading-relaxed font-normal"
           >
-            We operate with complete regulatory clarity so you can verify our safety standards, manufacturing protocols, and compliance credentials.
+            We operate with complete regulatory clarity so you can verify our compliance credentials and manufacturing details.
           </motion.p>
         </div>
 
@@ -89,7 +89,7 @@ export const TrustSection: React.FC = () => {
                 <h3 className="font-serif text-lg font-bold text-slate-900 mb-1">
                   {item.title}
                 </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-slate-700 leading-relaxed">
                   {item.desc}
                 </p>
               </div>

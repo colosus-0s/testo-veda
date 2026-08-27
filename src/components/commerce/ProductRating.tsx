@@ -11,11 +11,20 @@ export interface ProductRatingProps {
 
 export const ProductRating: React.FC<ProductRatingProps> = ({
   rating,
-  reviewCount,
+  reviewCount = 0,
   size = 'md',
   showCount = true,
   className = '',
 }) => {
+  // Rule #34: NO FAKE SOCIAL PROOF. If no authentic reviews exist, display pack info rather than 0 stars.
+  if (rating === 0 || reviewCount === 0) {
+    return (
+      <span className="text-[11px] text-[#f3e5ab] bg-[#8b1528]/30 border border-[#8b1528]/60 px-2 py-0.5 rounded font-medium">
+        30 Veg Caps
+      </span>
+    );
+  }
+
   const starSizes = {
     sm: 'w-3 h-3',
     md: 'w-4 h-4',
@@ -45,8 +54,8 @@ export const ProductRating: React.FC<ProductRatingProps> = ({
         ))}
       </div>
       {showCount && (
-        <span className={`text-neutral-400 font-medium ${textSizes[size]}`}>
-          {rating.toFixed(1)} {reviewCount !== undefined && `(${reviewCount})`}
+        <span className={`text-neutral-300 font-medium ${textSizes[size]}`}>
+          {rating.toFixed(1)} ({reviewCount})
         </span>
       )}
     </div>

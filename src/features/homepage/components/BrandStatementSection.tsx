@@ -34,7 +34,7 @@ export const BrandStatementSection: React.FC = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-base sm:text-lg text-slate-700 leading-relaxed font-normal"
         >
-          At Arogya Path, we reject inflated marketing hypes and artificial quick-fixes. Every formulation is engineered around clean, standardized botanical extracts—honoring centuries of Ayurvedic formulation principles while upholding modern analytical rigor.
+          At Arogya Path, we reject inflated marketing hypes and artificial quick-fixes. Every formulation is engineered around clean botanical extracts—honoring centuries of Ayurvedic formulation principles while upholding modern analytical rigor.
         </motion.p>
       </Container>
     </Section>

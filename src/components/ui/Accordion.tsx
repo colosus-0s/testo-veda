@@ -12,6 +12,7 @@ export interface AccordionProps {
   defaultOpenId?: string;
   allowMultiple?: boolean;
   className?: string;
+  dark?: boolean;
 }
 
 export const Accordion: React.FC<AccordionProps> = ({
@@ -19,6 +20,7 @@ export const Accordion: React.FC<AccordionProps> = ({
   defaultOpenId,
   allowMultiple = false,
   className = '',
+  dark = false,
 }) => {
   const [openIds, setOpenIds] = useState<string[]>(defaultOpenId ? [defaultOpenId] : []);
 
@@ -33,25 +35,33 @@ export const Accordion: React.FC<AccordionProps> = ({
   };
 
   return (
-    <div className={`divide-y divide-neutral-800/80 border-y border-neutral-800/80 ${className}`}>
+    <div className={`divide-y ${dark ? 'divide-neutral-800' : 'divide-slate-200'} ${className}`}>
       {items.map((item) => {
         const isOpen = openIds.includes(item.id);
         return (
           <div key={item.id} className="py-4 transition-colors">
             <button
               onClick={() => toggle(item.id)}
-              className="w-full flex items-center justify-between text-left font-serif-display text-lg text-white hover:text-[#d4af37] focus:outline-none focus:text-[#d4af37] transition-colors py-1"
+              className={`w-full flex items-center justify-between text-left font-serif text-base sm:text-lg font-bold ${
+                dark
+                  ? 'text-white hover:text-[#d4af37]'
+                  : 'text-slate-900 hover:text-[#8b1528]'
+              } focus:outline-none transition-colors py-2 gap-4`}
               aria-expanded={isOpen}
             >
-              <span>{item.title}</span>
-              <ChevronDown
-                className={`w-5 h-5 text-neutral-400 shrink-0 transition-transform duration-300 ${
-                  isOpen ? 'rotate-180 text-[#d4af37]' : ''
-                }`}
-              />
+              <span className="leading-snug">{item.title}</span>
+              <div className={`p-1.5 rounded-full shrink-0 transition-transform duration-300 ${
+                dark
+                  ? (isOpen ? 'bg-[#8b1528] text-white rotate-180' : 'bg-white/10 text-neutral-400')
+                  : (isOpen ? 'bg-[#8b1528] text-white rotate-180' : 'bg-slate-100 text-slate-600')
+              }`}>
+                <ChevronDown className="w-4 h-4" />
+              </div>
             </button>
             {isOpen && (
-              <div className="mt-3 text-sm text-neutral-300 leading-relaxed pr-6 animate-fadeIn">
+              <div className={`mt-3 text-sm leading-relaxed pr-2 sm:pr-6 ${
+                dark ? 'text-neutral-300' : 'text-slate-700'
+              }`}>
                 {item.content}
               </div>
             )}

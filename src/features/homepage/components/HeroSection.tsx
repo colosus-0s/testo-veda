@@ -40,12 +40,12 @@ export const HeroSection: React.FC = () => {
       <div className="hero-glow top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none" />
 
       {/* Hero Content Box */}
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-20 pb-16">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-20 pb-16">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#8b1528]/30 border border-[#8b1528]/60 text-xs font-semibold text-[#f3e5ab] mb-6 backdrop-blur-md"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#8b1528]/40 border border-[#8b1528]/80 text-xs font-semibold text-[#f3e5ab] mb-6 backdrop-blur-md"
         >
           <ShieldCheck className="w-4 h-4 text-emerald-400" />
           <span>{HERO_CONFIG.trustBadgeText}</span>
@@ -55,17 +55,17 @@ export const HeroSection: React.FC = () => {
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="font-serif text-3xl sm:text-5xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 drop-shadow-2xl"
+          className="font-serif text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 drop-shadow-2xl"
         >
-          THE PATH TO NATURAL <br className="hidden sm:inline" />
-          <span className="gold-gradient-text">VITALITY & POWER</span>
+          AROGYA PATH <br className="hidden sm:inline" />
+          <span className="gold-gradient-text">THE PATH TO WELLNESS</span>
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-base sm:text-xl text-neutral-300 max-w-3xl mx-auto font-normal leading-relaxed mb-10 text-shadow"
+          className="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto font-normal leading-relaxed mb-10 text-shadow"
         >
           {HERO_CONFIG.subheadline}
         </motion.p>
@@ -88,7 +88,7 @@ export const HeroSection: React.FC = () => {
           </Link>
 
           <a href={HERO_CONFIG.secondaryCtaLink} className="w-full sm:w-auto">
-            <Button variant="outline" size="lg" className="w-full sm:w-auto text-base border-white/20 hover:border-white/40">
+            <Button variant="outline" size="lg" className="w-full sm:w-auto text-base border-white/30 hover:border-white/60 text-white">
               {HERO_CONFIG.secondaryCtaText}
             </Button>
           </a>
