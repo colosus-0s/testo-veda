@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ShieldCheck, ArrowRight, ChevronDown } from 'lucide-react';
 import { HERO_CONFIG } from '../config/homepageConfig';
 import { Button } from '@/components/ui/Button';
 
 export const HeroSection: React.FC = () => {
   const [videoFailed, setVideoFailed] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="relative min-h-[85vh] sm:min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#0f0f11]">
+    <section className="relative min-h-[90vh] sm:min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#0f0f11] pt-16">
       {/* Background Media Stage */}
       <div className="absolute inset-0 z-0">
-        {!videoFailed ? (
+        {!videoFailed && !shouldReduceMotion ? (
           <video
             autoPlay
             loop
@@ -35,30 +37,50 @@ export const HeroSection: React.FC = () => {
       </div>
 
       {/* Atmospheric Glow Overlay */}
-      <div className="hero-glow top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0" />
+      <div className="hero-glow top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none" />
 
       {/* Hero Content Box */}
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-20 pb-16">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8b1528]/30 border border-[#8b1528]/60 text-xs font-semibold text-[#f3e5ab] mb-6 backdrop-blur-md">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#8b1528]/30 border border-[#8b1528]/60 text-xs font-semibold text-[#f3e5ab] mb-6 backdrop-blur-md"
+        >
           <ShieldCheck className="w-4 h-4 text-emerald-400" />
           <span>{HERO_CONFIG.trustBadgeText}</span>
-        </div>
+        </motion.div>
 
-        <h1 className="font-serif-display text-3xl sm:text-5xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 drop-shadow-2xl">
+        <motion.h1
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="font-serif text-3xl sm:text-5xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 drop-shadow-2xl"
+        >
           THE PATH TO NATURAL <br className="hidden sm:inline" />
           <span className="gold-gradient-text">VITALITY & POWER</span>
-        </h1>
+        </motion.h1>
 
-        <p className="text-base sm:text-xl text-neutral-300 max-w-3xl mx-auto font-normal leading-relaxed mb-10 text-shadow">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="text-base sm:text-xl text-neutral-300 max-w-3xl mx-auto font-normal leading-relaxed mb-10 text-shadow"
+        >
           {HERO_CONFIG.subheadline}
-        </p>
+        </motion.p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto"
+        >
           <Link to={HERO_CONFIG.primaryCtaLink} className="w-full sm:w-auto">
             <Button
               variant="gold"
               size="lg"
-              className="w-full sm:w-auto text-base"
+              className="w-full sm:w-auto text-base shadow-lg shadow-[#d4af37]/20"
               rightIcon={<ArrowRight className="w-5 h-5" />}
             >
               {HERO_CONFIG.primaryCtaText}
@@ -66,11 +88,11 @@ export const HeroSection: React.FC = () => {
           </Link>
 
           <a href={HERO_CONFIG.secondaryCtaLink} className="w-full sm:w-auto">
-            <Button variant="outline" size="lg" className="w-full sm:w-auto text-base">
+            <Button variant="outline" size="lg" className="w-full sm:w-auto text-base border-white/20 hover:border-white/40">
               {HERO_CONFIG.secondaryCtaText}
             </Button>
           </a>
-        </div>
+        </motion.div>
       </div>
 
       {/* Scroll Indicator */}

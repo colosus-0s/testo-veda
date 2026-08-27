@@ -1,18 +1,25 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { ASSET_REGISTRY } from '@/config/assets';
 
 export const LifestyleSection: React.FC = () => {
   return (
-    <Section padding="xl" dark className="border-y border-neutral-800/80 overflow-hidden">
+    <Section padding="xl" dark className="bg-[#17171a] border-y border-neutral-800/80 overflow-hidden">
       <Container>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-6 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="lg:col-span-6 space-y-6"
+          >
             <span className="text-xs uppercase font-bold tracking-widest text-[#d4af37] block">
               Modern Vitality & Purpose
             </span>
-            <h2 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
               Engineered for Men Who Demand Uncompromised Performance
             </h2>
             <p className="text-sm sm:text-base text-neutral-300 leading-relaxed font-light">
@@ -20,28 +27,34 @@ export const LifestyleSection: React.FC = () => {
             </p>
 
             <div className="space-y-4 pt-2">
-              <div className="glass-card p-4 rounded-lg border-l-4 border-l-[#8b1528]">
-                <h4 className="font-serif-display text-base font-bold text-white mb-1">
-                  Resilience & Endurance
+              <div className="glass-card p-4 rounded-lg border-l-4 border-l-[#8b1528] border-white/10">
+                <h4 className="font-serif text-base font-bold text-white mb-1">
+                  Resilience & Daily Stamina
                 </h4>
                 <p className="text-xs text-neutral-400">
-                  Adaptogenic Ashwagandha and Shilajit support stamina under high daily workload.
+                  Adaptogenic Ashwagandha and Shilajit support energy management under high physical demands.
                 </p>
               </div>
 
-              <div className="glass-card p-4 rounded-lg border-l-4 border-l-[#d4af37]">
-                <h4 className="font-serif-display text-base font-bold text-white mb-1">
-                  Clean Standardized Extraction
+              <div className="glass-card p-4 rounded-lg border-l-4 border-l-[#d4af37] border-white/10">
+                <h4 className="font-serif text-base font-bold text-white mb-1">
+                  Clean Standardized Formulations
                 </h4>
                 <p className="text-xs text-neutral-400">
-                  Zero hidden synthetic hormones, zero unlisted fillers, 100% vegetarian capsules.
+                  Zero synthetic hormones, zero unlisted fillers, 100% vegetarian capsule shells.
                 </p>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="lg:col-span-6 relative">
-            <div className="relative glass-card rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-square shadow-2xl group">
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="lg:col-span-6 relative"
+          >
+            <div className="relative glass-card rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-square shadow-2xl group border border-white/10">
               <img
                 src={ASSET_REGISTRY.lifestyle[0]}
                 alt="Arogya Path Lifestyle Vitality"
@@ -49,7 +62,7 @@ export const LifestyleSection: React.FC = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f11] via-transparent to-transparent opacity-60" />
             </div>
-          </div>
+          </motion.div>
         </div>
       </Container>
     </Section>

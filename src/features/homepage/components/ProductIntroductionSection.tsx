@@ -1,23 +1,29 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowRight, CheckCircle2, ShieldAlert, Award } from 'lucide-react';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { ProductPrice } from '@/components/commerce/ProductPrice';
-import { ProductRating } from '@/components/commerce/ProductRating';
 import { INITIAL_PRODUCTS } from '@/features/products/data/initialProducts';
 
 export const ProductIntroductionSection: React.FC = () => {
   const product = INITIAL_PRODUCTS[0];
 
   return (
-    <Section padding="xl">
+    <Section padding="xl" dark className="bg-[#0f0f11] border-b border-neutral-800/80">
       <Container>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Stage: 3D Render & Bottle Highlight */}
-          <div className="lg:col-span-6 relative">
-            <div className="relative glass-card rounded-2xl p-8 overflow-hidden flex items-center justify-center min-h-[420px]">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="lg:col-span-6 relative"
+          >
+            <div className="relative glass-card rounded-2xl p-8 overflow-hidden flex items-center justify-center min-h-[420px] border border-white/10">
               <div className="absolute inset-0 bg-gradient-to-tr from-[#8b1528]/20 via-transparent to-[#d4af37]/10 pointer-events-none" />
               <img
                 src={product.images.render3d}
@@ -25,27 +31,31 @@ export const ProductIntroductionSection: React.FC = () => {
                 className="w-full max-w-sm h-auto object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
               />
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Content: Product Overview & Spec Badges */}
-          <div className="lg:col-span-6 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="lg:col-span-6 space-y-6"
+          >
             <div>
-              <span className="text-xs uppercase font-bold tracking-widest text-[#8b1528] bg-[#8b1528]/10 px-3 py-1 rounded-full inline-block mb-3 border border-[#8b1528]/30">
-                Hero Supplement
+              <span className="text-xs uppercase font-bold tracking-widest text-[#d4af37] bg-[#8b1528]/30 px-3.5 py-1 rounded-full inline-block mb-3 border border-[#8b1528]/60">
+                Hero Dietary Supplement
               </span>
-              <h2 className="font-serif-display text-3xl sm:text-4xl font-bold text-white tracking-tight mb-2">
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white tracking-tight mb-2">
                 {product.name}
               </h2>
-              <p className="text-sm font-medium text-[#d4af37]">
-                {product.subtitle}
-              </p>
             </div>
 
-            <div className="flex items-center gap-4">
-              <ProductRating rating={product.rating} reviewCount={product.reviewCount} size="md" />
-              <span className="text-neutral-700">|</span>
-              <span className="text-xs text-emerald-400 font-semibold uppercase tracking-wider">
-                100% Vegetarian Capsule
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-xs text-emerald-400 font-semibold uppercase tracking-wider bg-emerald-950/40 border border-emerald-800/40 px-3 py-1 rounded-md flex items-center gap-1.5">
+                <CheckCircle2 size={14} /> 100% Vegetarian Capsule
+              </span>
+              <span className="text-xs text-amber-300 font-semibold uppercase tracking-wider bg-amber-950/40 border border-amber-800/40 px-3 py-1 rounded-md flex items-center gap-1.5">
+                <Award size={14} /> FSSAI Approved
               </span>
             </div>
 
@@ -84,12 +94,12 @@ export const ProductIntroductionSection: React.FC = () => {
               <ProductPrice price={product.price} compareAtPrice={product.compareAtPrice} size="xl" />
 
               <Link to={`/products/${product.slug}`}>
-                <Button variant="gold" size="lg" className="w-full sm:w-auto" rightIcon={<ArrowRight className="w-5 h-5" />}>
-                  View Product Details
+                <Button variant="gold" size="lg" className="w-full sm:w-auto shadow-lg shadow-[#d4af37]/15" rightIcon={<ArrowRight className="w-5 h-5" />}>
+                  Explore TESTO
                 </Button>
               </Link>
             </div>
-          </div>
+          </motion.div>
         </div>
       </Container>
     </Section>

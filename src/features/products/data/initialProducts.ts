@@ -7,10 +7,9 @@ export const INITIAL_PRODUCTS: Product[] = [
     slug: 'testo-natural-power-plus',
     sku: 'AP-TESTO-30V',
     name: 'TESTO Natural Power+ Capsules',
-    subtitle: 'Known as Testosterone Booster Supplement',
-    shortDescription: 'Synergistic dietary supplement formulated with high-potency botanical extracts including Ashwagandha, Gokhuru, Shilajit, Safed Musli, and Saffron to support natural vitality, stamina, and physical endurance.',
-    description: `Arogya Path TESTO Natural Power+ Capsules represent a modern dietary supplement crafted to complement an active lifestyle. Integrating standardized extracts of traditional botanicals—Ashwagandha, Tribulus Terrestris (Gokhuru), Safed Musli, and Purified Shilajit—with essential nutrient catalysts like Saffron and Sea Buckthorn. 
-
+    subtitle: 'Botanical Dietary Supplement',
+    shortDescription: 'Synergistic dietary supplement formulated with botanical extracts including Ashwagandha, Gokhuru, Shilajit, Safed Musli, and Saffron to support natural vitality, stamina, and physical endurance.',
+    description: `Arogya Path TESTO Natural Power+ Capsules represent a modern dietary supplement crafted to complement an active lifestyle. Integrating standardized extracts of traditional botanicals—Ashwagandha, Tribulus Terrestris (Gokhuru), Safed Musli, and Purified Shilajit—with botanical nutrient catalysts like Saffron and Sea Buckthorn. 
 Formulated in 100% vegetarian capsule shells (E 464) without medicinal synthetic hormones or undisclosed additives. Each batch is manufactured in ISO 9001:2015 & GMP certified facilities in compliance with FSSAI dietary supplement safety standards.`,
     category: 'Men\'s Wellness',
     collections: ['mens-wellness', 'vitality', 'best-sellers'],
@@ -155,8 +154,8 @@ Formulated in 100% vegetarian capsule shells (E 464) without medicinal synthetic
     },
 
     badges: ['FSSAI Approved', '100% Veg', 'ISO 9001:2015', 'GMP Certified'],
-    rating: 4.8,
-    reviewCount: 142,
+    rating: 0,
+    reviewCount: 0,
     featured: true,
     bestSeller: true,
     newArrival: false,
