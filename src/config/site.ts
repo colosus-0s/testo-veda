@@ -14,7 +14,7 @@ export const SITE_CONFIG = {
     enabled: true,
     text: 'Free Express Shipping Across India on Orders Above ₹499 | 100% Authentic & FSSAI Compliant',
     ctaText: 'Shop TESTO Power+',
-    ctaLink: '/products/testo-natural-power-plus',
+    ctaLink: '/testo',
   },
 
   socialLinks: {
@@ -26,43 +26,37 @@ export const SITE_CONFIG = {
 
   navigation: [
     { label: 'Shop All', href: '/shop' },
-    { label: 'TESTO Power+', href: '/products/testo-natural-power-plus' },
-    { label: 'Formula & Ingredients', href: '#formula' },
-    { label: 'Quality & Trust', href: '#quality' },
-    { label: 'Our Story', href: '/about' },
+    { label: 'TESTO Power+', href: '/testo' },
+    { label: 'Formula & Ingredients', href: '/formula-ingredients' },
+    { label: 'Quality & Trust', href: '/quality-trust' },
+    { label: 'Our Story', href: '/our-story' },
     { label: 'FAQ', href: '/faq' },
   ],
 
   footerLinks: {
     shop: [
-      { label: 'TESTO Natural Power+ (30 Caps)', href: '/products/testo-natural-power-plus' },
-      { label: 'Men\'s Wellness Collection', href: '/collections/mens-wellness' },
-      { label: 'Vitality & Stamina', href: '/collections/vitality' },
-      { label: 'New Arrivals', href: '/shop?filter=new' },
+      { label: 'TESTO Natural Power+ (30 Caps)', href: '/testo' },
+      { label: 'Shop All Formulations', href: '/shop' },
+      { label: 'Vitality & Stamina Collection', href: '/shop?category=vitality' },
     ],
     company: [
-      { label: 'About Arogya Path', href: '/about' },
-      { label: 'Quality & Ingredient Standards', href: '/about#quality' },
-      { label: 'Contact Us', href: '/contact' },
-      { label: 'Store Locator', href: '/contact#stores' },
+      { label: 'Our Story & Heritage', href: '/our-story' },
+      { label: 'Quality & Trust Standards', href: '/quality-trust' },
+      { label: 'Formula & Ingredients', href: '/formula-ingredients' },
     ],
     support: [
       { label: 'Help & FAQ', href: '/faq' },
-      { label: 'Shipping & Delivery', href: '/shipping' },
-      { label: 'Return & Refund Policy', href: '/returns' },
-      { label: 'Track Your Order', href: '/account/orders' },
+      { label: 'Customer Support', href: '/faq#support' },
     ],
     legal: [
-      { label: 'Privacy Policy', href: '/privacy' },
-      { label: 'Terms & Conditions', href: '/terms' },
-      { label: 'Dietary Supplement Disclaimer', href: '/disclaimer' },
-      { label: 'FSSAI License Info', href: '/fssai-info' },
+      { label: 'FSSAI License Info', href: '/quality-trust' },
+      { label: 'Dietary Supplement Disclaimer', href: '/quality-trust' },
     ],
   },
   
   seoDefaults: {
-    title: 'Arogya Path — The Path to Wellness | Premium Supplement Store',
-    description: 'Discover science-backed natural dietary supplements formulated with botanical extracts like Ashwagandha, Shilajit, Gokhuru, and Saffron.',
+    title: 'Arogya Path — The Path to Wellness | Premium Ayurvedic Storefront',
+    description: 'Discover premium natural dietary supplements formulated with botanical extracts like Ashwagandha, Shilajit, Gokhuru, and Saffron.',
     ogImage: '/static/og-arogyapath.jpg',
   },
 } as const;
