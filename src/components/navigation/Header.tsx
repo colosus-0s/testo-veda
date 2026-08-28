@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, ShoppingBag, User, Menu, ShieldCheck } from 'lucide-react';
+import { Search, ShoppingBag, User, Menu, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { SITE_CONFIG } from '@/config/site';
 import { Drawer } from '@/components/ui/Drawer';
+import { useAuth } from '@/context/AuthContext';
 
 export interface HeaderProps {
   cartItemCount?: number;
@@ -18,6 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { isAuthenticated, isAdmin } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="w-10 h-10 rounded-full bg-[#6A1423] border border-[#C7A33A]/40 flex items-center justify-center font-serif font-black text-xl text-white shadow-md group-hover:scale-105 transition-transform">
               AP
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col text-left">
               <span className="font-serif text-xl font-extrabold tracking-wider text-[#171717] group-hover:text-[#6A1423] transition-colors">
                 {SITE_CONFIG.brandName.toUpperCase()}
               </span>
@@ -95,6 +97,15 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Header Action Icons */}
           <div className="flex items-center space-x-2 sm:space-x-3">
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="hidden sm:flex items-center gap-1 bg-[#6A1423]/10 border border-[#6A1423] px-2.5 py-1 rounded-md text-xs font-bold text-[#6A1423] hover:bg-[#6A1423] hover:text-white transition-all"
+              >
+                <ShieldAlert size={14} /> Admin
+              </Link>
+            )}
+
             <button
               onClick={onOpenSearch}
               className="p-2 text-[#171717] hover:text-[#6A1423] transition-colors focus:outline-none"
@@ -103,7 +114,11 @@ export const Header: React.FC<HeaderProps> = ({
               <Search className="w-5 h-5" />
             </button>
 
-            <Link to="/account" className="p-2 text-[#171717] hover:text-[#6A1423] transition-colors">
+            <Link
+              to={isAuthenticated ? '/account' : '/login'}
+              className="p-2 text-[#171717] hover:text-[#6A1423] transition-colors"
+              aria-label="User Account"
+            >
               <User className="w-5 h-5" />
             </Link>
 
@@ -114,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <ShoppingBag className="w-6 h-6" />
               {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#6A1423] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
+                <span className="absolute -top-1 -right-1 bg-[#6A1423] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
                   {cartItemCount}
                 </span>
               )}
@@ -130,12 +145,20 @@ export const Header: React.FC<HeaderProps> = ({
         title="Navigation"
         position="left"
       >
-        <div className="flex flex-col space-y-6 pt-2 text-[#171717]">
-          <div className="pb-4 border-b border-slate-200 flex items-center gap-3">
-            <ShieldCheck className="w-5 h-5 text-emerald-600" />
-            <span className="text-xs font-semibold text-slate-700">
-              FSSAI Lic. #{SITE_CONFIG.fssaiLicense}
+        <div className="flex flex-col space-y-6 pt-2 text-[#171717] text-left">
+          <div className="pb-4 border-b border-slate-200 flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-700 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" /> Lic. #{SITE_CONFIG.fssaiLicense}
             </span>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-xs font-bold text-[#6A1423] underline"
+              >
+                Admin Panel
+              </Link>
+            )}
           </div>
 
           <nav className="flex flex-col space-y-4">
@@ -154,6 +177,14 @@ export const Header: React.FC<HeaderProps> = ({
                 </Link>
               );
             })}
+
+            <Link
+              to={isAuthenticated ? '/account' : '/login'}
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-lg font-serif font-bold text-[#6A1423] pt-2 border-t border-slate-200"
+            >
+              {isAuthenticated ? 'My Account' : 'Sign In / Register'}
+            </Link>
           </nav>
 
           <div className="pt-6 border-t border-slate-200 space-y-3 text-xs text-slate-600">

@@ -19,13 +19,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onAddToCart,
   className = '',
 }) => {
-  const { addItem } = useCart();
+  const { addToCart } = useCart();
 
-  const handleCartClick = () => {
+  const handleAction = () => {
     if (onAddToCart) {
       onAddToCart(product);
     } else {
-      addItem(product, product.variants[0], 1);
+      addToCart(product);
     }
   };
 
@@ -91,9 +91,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             size="sm"
             className="w-full shadow-sm font-bold"
             leftIcon={<ShoppingBag className="w-4 h-4" />}
-            onClick={handleCartClick}
+            onClick={handleAction}
           >
-            Add To Cart • ₹999
+            Explore TESTO
           </Button>
         </div>
       </div>

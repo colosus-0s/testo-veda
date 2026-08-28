@@ -1,132 +1,138 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { CartItem } from '@/types/cart';
+import type { CartItem, CartSummary } from '@/types/cart';
 import type { Product, ProductVariant } from '@/types/product';
 import { INITIAL_PRODUCTS } from '@/features/products/data/initialProducts';
 
-interface CartContextType {
-  items: CartItem[];
-  cartOpen: boolean;
+export interface CartContextType {
+  cartItems: CartItem[];
+  cartSummary: CartSummary;
+  isCartOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
-  addItem: (product: Product, variant: ProductVariant, quantity?: number) => void;
-  removeItem: (cartItemId: string) => void;
-  updateQuantity: (cartItemId: string, delta: number) => void;
+  addToCart: (product: Product, variant?: ProductVariant, quantity?: number) => void;
+  removeFromCart: (itemId: string) => void;
+  updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
-  subtotal: number;
-  shippingFee: number;
-  total: number;
-  itemCount: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_KEY = 'arogyapath_cart_v1';
+const LOCAL_STORAGE_CART_KEY = 'arogyapath_cart_v1';
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [cartOpen, setCartOpen] = useState(false);
-  const [items, setItems] = useState<CartItem[]>(() => {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     try {
-      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
+      const saved = localStorage.getItem(LOCAL_STORAGE_CART_KEY);
+      if (saved) {
+        return JSON.parse(saved);
       }
-    } catch (err) {
-      console.warn('Failed to parse cart from localStorage:', err);
+    } catch (e) {
+      console.warn('Failed to restore cart from localStorage', e);
     }
-    // Baseline sample item if empty on fresh install
+    const defaultProd = INITIAL_PRODUCTS[0];
     return [
       {
-        id: 'default-item-1',
-        productId: INITIAL_PRODUCTS[0].id,
-        variantId: INITIAL_PRODUCTS[0].variants[0].id,
-        product: INITIAL_PRODUCTS[0],
-        variant: INITIAL_PRODUCTS[0].variants[0],
+        id: `cart_${defaultProd.id}_${defaultProd.variants[0].id}`,
+        productId: defaultProd.id,
+        variantId: defaultProd.variants[0].id,
         quantity: 1,
+        product: defaultProd,
+        variant: defaultProd.variants[0],
       },
     ];
   });
 
   useEffect(() => {
     try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(items));
-    } catch (err) {
-      console.warn('Failed to save cart to localStorage:', err);
+      localStorage.setItem(LOCAL_STORAGE_CART_KEY, JSON.stringify(cartItems));
+    } catch (e) {
+      console.warn('Failed to persist cart to localStorage', e);
     }
-  }, [items]);
+  }, [cartItems]);
 
-  const openCart = () => setCartOpen(true);
-  const closeCart = () => setCartOpen(false);
+  const openCart = () => setIsCartOpen(true);
+  const closeCart = () => setIsCartOpen(false);
 
-  const addItem = (product: Product, variant: ProductVariant, quantity = 1) => {
-    setItems((prevItems) => {
-      const existingIndex = prevItems.findIndex(
-        (item) => item.productId === product.id && item.variantId === variant.id
-      );
+  const addToCart = (product: Product, variant?: ProductVariant, quantity = 1) => {
+    const targetVariant = variant || product.variants[0];
+    const itemId = `cart_${product.id}_${targetVariant.id}`;
 
-      if (existingIndex > -1) {
-        const updated = [...prevItems];
-        updated[existingIndex].quantity += quantity;
-        return updated;
+    setCartItems((prev) => {
+      const existing = prev.find((item) => item.id === itemId);
+      if (existing) {
+        return prev.map((item) =>
+          item.id === itemId
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
       }
-
-      const newItem: CartItem = {
-        id: `cart-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
-        productId: product.id,
-        variantId: variant.id,
-        product,
-        variant,
-        quantity,
-      };
-
-      return [...prevItems, newItem];
+      return [
+        ...prev,
+        {
+          id: itemId,
+          productId: product.id,
+          variantId: targetVariant.id,
+          quantity,
+          product,
+          variant: targetVariant,
+        },
+      ];
     });
 
-    setCartOpen(true);
+    setIsCartOpen(true);
   };
 
-  const removeItem = (cartItemId: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== cartItemId));
+  const removeFromCart = (itemId: string) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== itemId));
   };
 
-  const updateQuantity = (cartItemId: string, delta: number) => {
-    setItems((prev) =>
-      prev
-        .map((item) => {
-          if (item.id === cartItemId) {
-            const newQty = item.quantity + delta;
-            return newQty > 0 ? { ...item, quantity: newQty } : null;
-          }
-          return item;
-        })
-        .filter(Boolean) as CartItem[]
+  const updateQuantity = (itemId: string, quantity: number) => {
+    if (quantity <= 0) {
+      removeFromCart(itemId);
+      return;
+    }
+    setCartItems((prev) =>
+      prev.map((item) => (item.id === itemId ? { ...item, quantity } : item))
     );
   };
 
   const clearCart = () => {
-    setItems([]);
+    setCartItems([]);
   };
 
-  const subtotal = items.reduce((sum, item) => sum + item.variant.price * item.quantity, 0);
-  const shippingFee = subtotal >= 499 || items.length === 0 ? 0 : 50;
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.variant.price * item.quantity,
+    0
+  );
+  const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const freeShippingThreshold = 499;
+  const shippingFee = subtotal >= freeShippingThreshold || itemCount === 0 ? 0 : 99;
   const total = subtotal + shippingFee;
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  const cartSummary: CartSummary = {
+    subtotal,
+    discount: 0,
+    shippingFee,
+    freeShippingThreshold,
+    total,
+    itemCount,
+  };
 
   return (
     <CartContext.Provider
       value={{
-        items,
-        cartOpen,
+        cartItems,
+        cartSummary,
+        isCartOpen,
         openCart,
         closeCart,
-        addItem,
-        removeItem,
+        addToCart,
+        removeFromCart,
         updateQuantity,
         clearCart,
-        subtotal,
-        shippingFee,
-        total,
-        itemCount,
       }}
     >
       {children}
@@ -134,7 +140,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useCart = () => {
+export const useCart = (): CartContextType => {
   const context = useContext(CartContext);
   if (!context) {
     throw new Error('useCart must be used within a CartProvider');

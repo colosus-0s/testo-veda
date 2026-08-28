@@ -12,13 +12,12 @@ import { INITIAL_PRODUCTS } from '@/features/products/data/initialProducts';
 import { Badge } from '@/components/ui/Badge';
 import { Accordion } from '@/components/ui/Accordion';
 import { ProductCard } from '@/components/commerce/ProductCard';
-
 import { useCart } from '@/context/CartContext';
 
 export const ProductDetailPage: React.FC = () => {
+  const { addToCart } = useCart();
   const { slug } = useParams<{ slug: string }>();
   const product = INITIAL_PRODUCTS.find((p) => p.slug === slug) || INITIAL_PRODUCTS[0];
-  const { addItem } = useCart();
   
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
   const [quantity, setQuantity] = useState(1);
@@ -176,7 +175,7 @@ export const ProductDetailPage: React.FC = () => {
                   size="lg"
                   className="flex-1 shadow-md font-bold text-base"
                   leftIcon={<ShoppingBag className="w-5 h-5" />}
-                  onClick={() => addItem(product, selectedVariant, quantity)}
+                  onClick={() => addToCart(product, selectedVariant, quantity)}
                 >
                   Buy Now • ₹{(selectedVariant.price * quantity).toLocaleString('en-IN')}
                 </Button>

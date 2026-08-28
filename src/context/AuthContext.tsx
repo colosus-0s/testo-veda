@@ -1,172 +1,156 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import type { UserProfile, UserAddress } from '@/types/auth';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
-export interface UserProfile {
-  id: string;
-  email: string;
-  fullName: string;
-  phone?: string;
-  role: 'customer' | 'admin';
-}
-
-interface AuthContextType {
+export interface AuthContextType {
   user: UserProfile | null;
-  loading: boolean;
+  addresses: UserAddress[];
   isAuthenticated: boolean;
   isAdmin: boolean;
-  login: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
-  register: (fullName: string, email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
-  forgotPassword: (email: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  isLoading: boolean;
+  error: string | null;
+  login: (email: string, pass: string) => Promise<boolean>;
+  register: (email: string, pass: string, fullName: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  forgotPassword: (email: string) => Promise<boolean>;
+  updateProfile: (data: Partial<UserProfile>) => void;
+  addAddress: (addr: Omit<UserAddress, 'id' | 'userId'>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const LOCAL_AUTH_KEY = 'arogyapath_user_v1';
+const LOCAL_STORAGE_USER_KEY = 'arogyapath_user';
+const LOCAL_STORAGE_ADDR_KEY = 'arogyapath_addresses';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
     try {
-      const stored = localStorage.getItem(LOCAL_AUTH_KEY);
-      if (stored) return JSON.parse(stored);
+      const saved = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
+      return saved ? JSON.parse(saved) : null;
     } catch {
-      // empty
+      return null;
     }
-    return null;
   });
-  const [loading, setLoading] = useState(false);
+
+  const [addresses, setAddresses] = useState<UserAddress[]>(() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_ADDR_KEY);
+      return saved
+        ? JSON.parse(saved)
+        : [
+            {
+              id: 'addr_default_1',
+              userId: 'usr_demo_1',
+              fullName: 'Aarav Sharma',
+              phone: '+91 9876543210',
+              street: '42 Lotus Heights, MG Road',
+              city: 'Bengaluru',
+              state: 'Karnataka',
+              pincode: '560001',
+              country: 'India',
+              isDefault: true,
+            },
+          ];
+    } catch {
+      return [];
+    }
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isSupabaseConfigured()) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user) {
-          setUser({
-            id: session.user.id,
-            email: session.user.email || '',
-            fullName: session.user.user_metadata?.full_name || 'Valued Customer',
-            role: session.user.user_metadata?.role || 'customer',
-          });
-        }
-      });
-
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-        if (session?.user) {
-          const profile: UserProfile = {
-            id: session.user.id,
-            email: session.user.email || '',
-            fullName: session.user.user_metadata?.full_name || 'Valued Customer',
-            role: session.user.user_metadata?.role || 'customer',
-          };
-          setUser(profile);
-          localStorage.setItem(LOCAL_AUTH_KEY, JSON.stringify(profile));
-        } else {
-          setUser(null);
-          localStorage.removeItem(LOCAL_AUTH_KEY);
-        }
-      });
-
-      return () => subscription.unsubscribe();
+    if (user) {
+      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
     }
-  }, []);
+  }, [user]);
 
-  const login = async (email: string, pass: string) => {
-    setLoading(true);
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_ADDR_KEY, JSON.stringify(addresses));
+  }, [addresses]);
+
+  const login = async (email: string, pass: string): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
     try {
       if (isSupabaseConfigured()) {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
-        if (error) return { success: false, error: error.message };
-
+        const { data, error: sbError } = await supabase.auth.signInWithPassword({ email, password: pass });
+        if (sbError) throw sbError;
         if (data.user) {
           const profile: UserProfile = {
             id: data.user.id,
             email: data.user.email || email,
-            fullName: data.user.user_metadata?.full_name || 'Valued Customer',
-            role: email.includes('admin') ? 'admin' : 'customer',
+            fullName: data.user.user_metadata?.full_name || 'Customer',
+            role: (data.user.user_metadata?.role as 'customer' | 'admin') || 'customer',
+            createdAt: data.user.created_at,
           };
           setUser(profile);
-          localStorage.setItem(LOCAL_AUTH_KEY, JSON.stringify(profile));
-          return { success: true };
+          setIsLoading(false);
+          return true;
         }
       }
 
-      // Development / Local Auth Fallback
-      if (pass.length < 6) {
-        return { success: false, error: 'Password must be at least 6 characters.' };
-      }
-
-      const role: 'customer' | 'admin' = email.includes('admin') ? 'admin' : 'customer';
-      const devProfile: UserProfile = {
+      // Local fallback for dev/demo mode
+      const isDemoAdmin = email.toLowerCase().includes('admin');
+      const fallbackUser: UserProfile = {
         id: `usr_${Date.now()}`,
         email,
-        fullName: email.split('@')[0].toUpperCase(),
-        role,
+        fullName: isDemoAdmin ? 'Arogya Administrator' : email.split('@')[0],
+        role: isDemoAdmin ? 'admin' : 'customer',
+        createdAt: new Date().toISOString(),
       };
-
-      setUser(devProfile);
-      localStorage.setItem(LOCAL_AUTH_KEY, JSON.stringify(devProfile));
-      return { success: true };
-    } finally {
-      setLoading(false);
+      setUser(fallbackUser);
+      setIsLoading(false);
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
+      setIsLoading(false);
+      return false;
     }
   };
 
-  const register = async (fullName: string, email: string, pass: string) => {
-    setLoading(true);
+  const register = async (email: string, pass: string, fullName: string): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
     try {
       if (isSupabaseConfigured()) {
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error: sbError } = await supabase.auth.signUp({
           email,
           password: pass,
           options: { data: { full_name: fullName, role: 'customer' } },
         });
-        if (error) return { success: false, error: error.message };
-
+        if (sbError) throw sbError;
         if (data.user) {
           const profile: UserProfile = {
             id: data.user.id,
             email: data.user.email || email,
             fullName,
             role: 'customer',
+            createdAt: data.user.created_at,
           };
           setUser(profile);
-          localStorage.setItem(LOCAL_AUTH_KEY, JSON.stringify(profile));
-          return { success: true };
+          setIsLoading(false);
+          return true;
         }
       }
 
-      if (pass.length < 6) {
-        return { success: false, error: 'Password must be at least 6 characters.' };
-      }
-
-      const devProfile: UserProfile = {
+      const fallbackUser: UserProfile = {
         id: `usr_${Date.now()}`,
         email,
         fullName,
         role: 'customer',
+        createdAt: new Date().toISOString(),
       };
-
-      setUser(devProfile);
-      localStorage.setItem(LOCAL_AUTH_KEY, JSON.stringify(devProfile));
-      return { success: true };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const forgotPassword = async (email: string) => {
-    setLoading(true);
-    try {
-      if (isSupabaseConfigured()) {
-        const { error } = await supabase.auth.resetPasswordForEmail(email);
-        if (error) return { success: false, error: error.message };
-      }
-      return {
-        success: true,
-        message: 'Password reset link sent to your registered email address.',
-      };
-    } finally {
-      setLoading(false);
+      setUser(fallbackUser);
+      setIsLoading(false);
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed');
+      setIsLoading(false);
+      return false;
     }
   };
 
@@ -175,20 +159,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await supabase.auth.signOut();
     }
     setUser(null);
-    localStorage.removeItem(LOCAL_AUTH_KEY);
+  };
+
+  const forgotPassword = async (email: string): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      if (isSupabaseConfigured()) {
+        const { error: sbError } = await supabase.auth.resetPasswordForEmail(email);
+        if (sbError) throw sbError;
+      }
+      setIsLoading(false);
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Password reset failed');
+      setIsLoading(false);
+      return false;
+    }
+  };
+
+  const updateProfile = (data: Partial<UserProfile>) => {
+    if (!user) return;
+    setUser({ ...user, ...data });
+  };
+
+  const addAddress = (newAddr: Omit<UserAddress, 'id' | 'userId'>) => {
+    const created: UserAddress = {
+      ...newAddr,
+      id: `addr_${Date.now()}`,
+      userId: user?.id || 'usr_guest',
+    };
+    setAddresses((prev) => [created, ...prev]);
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        loading,
+        addresses,
         isAuthenticated: !!user,
         isAdmin: user?.role === 'admin',
+        isLoading,
+        error,
         login,
         register,
-        forgotPassword,
         logout,
+        forgotPassword,
+        updateProfile,
+        addAddress,
       }}
     >
       {children}
@@ -196,7 +214,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
