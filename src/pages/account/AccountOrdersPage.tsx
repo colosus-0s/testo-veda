@@ -11,13 +11,17 @@ export const AccountOrdersPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  const filteredOrders = orders.filter((o) => {
+  const filteredOrders = (orders || []).filter((o) => {
+    const orderNum = o.orderNumber || '';
+    const items = o.items || [];
+    const status = o.orderStatus || 'pending';
+
     const matchesSearch =
-      o.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.items.some((item) => item.productName.toLowerCase().includes(searchQuery.toLowerCase()));
+      orderNum.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      items.some((item) => (item.productName || '').toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesStatus =
-      statusFilter === 'all' || o.orderStatus.toLowerCase() === statusFilter.toLowerCase();
+      statusFilter === 'all' || status.toLowerCase() === statusFilter.toLowerCase();
 
     return matchesSearch && matchesStatus;
   });
@@ -95,19 +99,19 @@ export const AccountOrdersPage: React.FC = () => {
                 <div>
                   <div className="flex items-center gap-3">
                     <span className="font-serif font-black text-lg text-[#171717]">
-                      Order #{ord.orderNumber}
+                      Order #{ord.orderNumber || 'AP-000000'}
                     </span>
-                    <Badge variant="maroon">{ord.orderStatus.toUpperCase()}</Badge>
-                    <Badge variant="green">{ord.paymentStatus.toUpperCase()}</Badge>
+                    <Badge variant="maroon">{(ord.orderStatus || 'pending').toUpperCase()}</Badge>
+                    <Badge variant="green">{(ord.paymentStatus || 'pending').toUpperCase()}</Badge>
                   </div>
                   <span className="text-xs text-slate-500 block mt-0.5">
-                    Placed on {new Date(ord.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    Placed on {new Date(ord.createdAt || '2026-01-01').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <span className="font-serif font-extrabold text-xl text-[#6A1423]">
-                    ₹{ord.total.toLocaleString('en-IN')}
+                    ₹{(ord.total || 0).toLocaleString('en-IN')}
                   </span>
                   <Link to={`/account/orders/${ord.id}`}>
                     <Button variant="outline" size="sm" rightIcon={<ChevronRight size={14} />}>
@@ -119,7 +123,7 @@ export const AccountOrdersPage: React.FC = () => {
 
               {/* Items List */}
               <div className="p-5 space-y-3 divide-y divide-[#EBE7DF]">
-                {ord.items.map((item) => (
+                {(ord.items || []).map((item) => (
                   <div key={item.id} className="pt-3 flex items-center justify-between gap-4 text-xs">
                     <div className="flex items-center gap-3">
                       <img
@@ -138,7 +142,7 @@ export const AccountOrdersPage: React.FC = () => {
                     </div>
 
                     <span className="font-bold text-[#171717] font-serif text-sm">
-                      ₹{item.subtotal.toLocaleString('en-IN')}
+                      ₹{(item.subtotal || 0).toLocaleString('en-IN')}
                     </span>
                   </div>
                 ))}
@@ -147,10 +151,10 @@ export const AccountOrdersPage: React.FC = () => {
               {/* Card Footer */}
               <div className="px-5 py-3 bg-[#FCFBF8] border-t border-[#EBE7DF] flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-600 gap-2">
                 <span>
-                  Ship to: <strong>{ord.shippingAddress.fullName}</strong> ({ord.shippingAddress.city}, {ord.shippingAddress.state})
+                  Ship to: <strong>{ord.shippingAddress?.fullName || 'Customer'}</strong> ({ord.shippingAddress?.city || 'City'}, {ord.shippingAddress?.state || 'State'})
                 </span>
                 <span className="capitalize text-slate-800 font-semibold">
-                  Payment: {ord.paymentProvider} ({ord.paymentStatus})
+                  Payment: {ord.paymentProvider || 'Standard'} ({ord.paymentStatus || 'pending'})
                 </span>
               </div>
             </div>

@@ -17,12 +17,18 @@ export const AdminOrdersPage: React.FC = () => {
     }
   };
 
-  const filteredOrders = orders.filter(
-    (o) =>
-      o.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.customerEmail.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredOrders = (orders || []).filter((o) => {
+    const orderNum = o.orderNumber || '';
+    const name = o.customerName || '';
+    const email = o.customerEmail || '';
+    const q = searchQuery.toLowerCase();
+
+    return (
+      orderNum.toLowerCase().includes(q) ||
+      name.toLowerCase().includes(q) ||
+      email.toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div className="space-y-6 text-left">
@@ -55,15 +61,15 @@ export const AdminOrdersPage: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#EBE7DF] pb-3">
                 <div className="space-y-1">
                   <span className="font-serif font-black text-base text-[#6A1423]">
-                    Order #{ord.orderNumber}
+                    Order #{ord.orderNumber || 'AP-000000'}
                   </span>
-                  <span className="text-slate-500 block">Placed on {new Date(ord.createdAt).toLocaleString('en-IN')}</span>
+                  <span className="text-slate-500 block">Placed on {new Date(ord.createdAt || '2026-01-01').toLocaleString('en-IN')}</span>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <label className="font-bold text-[#171717]">Order Status:</label>
                   <select
-                    value={ord.orderStatus}
+                    value={ord.orderStatus || 'pending'}
                     onChange={(e) => handleStatusChange(ord.id, e.target.value as OrderStatus)}
                     className="p-1.5 bg-[#FCFBF8] border border-[#EBE7DF] rounded text-xs font-bold text-[#171717]"
                   >
@@ -85,22 +91,22 @@ export const AdminOrdersPage: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-slate-800">
                 <div>
                   <span className="font-bold text-[#171717] block mb-1">Customer Info</span>
-                  <p className="font-semibold">{ord.customerName}</p>
-                  <p>{ord.customerEmail}</p>
-                  <p>{ord.customerPhone}</p>
+                  <p className="font-semibold">{ord.customerName || 'Customer'}</p>
+                  <p>{ord.customerEmail || ''}</p>
+                  <p>{ord.customerPhone || ''}</p>
                 </div>
 
                 <div>
                   <span className="font-bold text-[#171717] block mb-1">Shipping Address Snapshot</span>
-                  <p>{ord.shippingAddress.street}</p>
-                  <p>{ord.shippingAddress.city}, {ord.shippingAddress.state} - {ord.shippingAddress.pincode}</p>
+                  <p>{ord.shippingAddress?.street || ''}</p>
+                  <p>{ord.shippingAddress?.city || ''}, {ord.shippingAddress?.state || ''} - {ord.shippingAddress?.pincode || ''}</p>
                 </div>
 
                 <div>
                   <span className="font-bold text-[#171717] block mb-1">Payment Details</span>
-                  <p className="font-bold text-[#6A1423]">Total: ₹{ord.total.toLocaleString('en-IN')}</p>
-                  <p>Provider: {ord.paymentProvider}</p>
-                  <p>Status: <Badge variant="green">{ord.paymentStatus}</Badge></p>
+                  <p className="font-bold text-[#6A1423]">Total: ₹{(ord.total || 0).toLocaleString('en-IN')}</p>
+                  <p>Provider: {ord.paymentProvider || 'Standard'}</p>
+                  <p>Status: <Badge variant="green">{(ord.paymentStatus || 'pending').toUpperCase()}</Badge></p>
                 </div>
               </div>
             </div>

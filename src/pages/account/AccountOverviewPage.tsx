@@ -24,16 +24,16 @@ export const AccountOverviewPage: React.FC = () => {
     },
     {
       title: 'Saved Addresses',
-      count: addresses.length,
-      label: `${addresses.length} Saved Location${addresses.length === 1 ? '' : 's'}`,
+      count: addresses ? addresses.length : 0,
+      label: `${addresses ? addresses.length : 0} Saved Location${addresses && addresses.length === 1 ? '' : 's'}`,
       icon: MapPin,
       href: '/account/addresses',
       color: 'bg-blue-50 text-blue-700 border-blue-200',
     },
     {
       title: 'Wishlist',
-      count: wishlistProductIds.length,
-      label: `${wishlistProductIds.length} Saved Formulation${wishlistProductIds.length === 1 ? '' : 's'}`,
+      count: wishlistProductIds ? wishlistProductIds.length : 0,
+      label: `${wishlistProductIds ? wishlistProductIds.length : 0} Saved Formulation${wishlistProductIds && wishlistProductIds.length === 1 ? '' : 's'}`,
       icon: Heart,
       href: '/account/wishlist',
       color: 'bg-rose-50 text-rose-700 border-rose-200',
@@ -48,7 +48,7 @@ export const AccountOverviewPage: React.FC = () => {
     },
   ];
 
-  const recentOrder = orders[0];
+  const recentOrder = orders && orders.length > 0 ? orders[0] : null;
 
   return (
     <div className="space-y-8 text-left">
@@ -93,7 +93,7 @@ export const AccountOverviewPage: React.FC = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between border-b border-[#EBE7DF] pb-3">
           <h3 className="font-serif text-xl font-bold text-[#171717]">Recent Order</h3>
-          {orders.length > 0 && (
+          {orders && orders.length > 0 && (
             <Link to="/account/orders" className="text-xs font-bold text-[#6A1423] hover:underline flex items-center gap-1">
               View All Orders ({orders.length}) <ChevronRight size={14} />
             </Link>
@@ -105,20 +105,20 @@ export const AccountOverviewPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#EBE7DF] pb-3">
               <div>
                 <span className="font-serif font-black text-base text-[#6A1423]">
-                  Order #{recentOrder.orderNumber}
+                  Order #{recentOrder.orderNumber || 'AP-000000'}
                 </span>
                 <span className="text-xs text-slate-500 block">
-                  Placed on {new Date(recentOrder.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  Placed on {new Date(recentOrder.createdAt || '2026-01-01').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="maroon">{recentOrder.orderStatus.toUpperCase()}</Badge>
-                <Badge variant="green">{recentOrder.paymentStatus.toUpperCase()}</Badge>
+                <Badge variant="maroon">{(recentOrder.orderStatus || 'pending').toUpperCase()}</Badge>
+                <Badge variant="green">{(recentOrder.paymentStatus || 'pending').toUpperCase()}</Badge>
               </div>
             </div>
 
             <div className="space-y-3">
-              {recentOrder.items.slice(0, 2).map((item) => (
+              {recentOrder.items && recentOrder.items.slice(0, 2).map((item) => (
                 <div key={item.id} className="flex items-center justify-between gap-4 text-xs">
                   <div className="flex items-center gap-3">
                     <img
@@ -131,14 +131,14 @@ export const AccountOverviewPage: React.FC = () => {
                       <span className="text-slate-500 font-semibold">{item.packSize} • Qty: {item.quantity}</span>
                     </div>
                   </div>
-                  <span className="font-bold text-[#171717]">₹{item.subtotal.toLocaleString('en-IN')}</span>
+                  <span className="font-bold text-[#171717]">₹{(item.subtotal || 0).toLocaleString('en-IN')}</span>
                 </div>
               ))}
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-[#EBE7DF]">
               <span className="font-serif font-extrabold text-lg text-[#171717]">
-                Total: <span className="text-[#6A1423]">₹{recentOrder.total.toLocaleString('en-IN')}</span>
+                Total: <span className="text-[#6A1423]">₹{(recentOrder.total || 0).toLocaleString('en-IN')}</span>
               </span>
               <Link to={`/account/orders/${recentOrder.id}`}>
                 <Button variant="primary" size="sm" rightIcon={<ArrowRight size={14} />}>
@@ -168,7 +168,7 @@ export const AccountOverviewPage: React.FC = () => {
       <div className="bg-[#F7F4ED] p-6 rounded-2xl border border-[#EBE7DF] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
         <div>
           <span className="font-bold text-[#171717] block mb-1">Registered Account Email</span>
-          <p className="text-slate-700">{user?.email}</p>
+          <p className="text-slate-700">{user?.email || 'customer@example.com'}</p>
         </div>
         <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
           <ShieldCheck size={18} /> Verified Account Profile

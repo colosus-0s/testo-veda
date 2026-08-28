@@ -17,19 +17,19 @@ export const AdminCustomersPage: React.FC = () => {
           <div className="flex items-center justify-between border-b border-[#EBE7DF] pb-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#6A1423] text-white flex items-center justify-center font-bold">
-                {user.fullName.charAt(0)}
+                {user.fullName ? user.fullName.charAt(0) : 'U'}
               </div>
               <div>
-                <h3 className="font-serif font-bold text-sm text-[#171717]">{user.fullName}</h3>
+                <h3 className="font-serif font-bold text-sm text-[#171717]">{user.fullName || 'Customer'}</h3>
                 <span className="text-slate-500">{user.email}</span>
               </div>
             </div>
-            <Badge variant="gold">{user.role.toUpperCase()}</Badge>
+            <Badge variant="gold">{(user.role || 'customer').toUpperCase()}</Badge>
           </div>
 
           <div className="space-y-2">
-            <span className="font-bold text-[#171717] block">Saved Shipping Addresses ({addresses.length})</span>
-            {addresses.map((a) => (
+            <span className="font-bold text-[#171717] block">Saved Shipping Addresses ({addresses ? addresses.length : 0})</span>
+            {(addresses || []).map((a) => (
               <div key={a.id} className="bg-[#FCFBF8] p-3 rounded-xl border border-[#EBE7DF] text-slate-700">
                 <p className="font-semibold text-[#171717]">{a.fullName} ({a.phone})</p>
                 <p>{a.street}, {a.city}, {a.state} - {a.pincode}</p>

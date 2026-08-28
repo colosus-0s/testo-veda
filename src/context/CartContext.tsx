@@ -25,9 +25,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_CART_KEY);
-      if (saved) {
-        return JSON.parse(saved);
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const saved = window.localStorage.getItem(LOCAL_STORAGE_CART_KEY);
+        if (saved) {
+          return JSON.parse(saved);
+        }
       }
     } catch (e) {
       console.warn('Failed to restore cart from localStorage', e);
@@ -47,7 +49,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     try {
-      localStorage.setItem(LOCAL_STORAGE_CART_KEY, JSON.stringify(cartItems));
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(LOCAL_STORAGE_CART_KEY, JSON.stringify(cartItems));
+      }
     } catch (e) {
       console.warn('Failed to persist cart to localStorage', e);
     }

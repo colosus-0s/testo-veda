@@ -33,7 +33,7 @@ export const AdminOrderDetailPage: React.FC = () => {
     const updated = await updateOrderStatus(order.id, newStatus);
     if (updated) {
       setOrder(updated);
-      setStatusMessage(`Fulfillment status updated to ${newStatus.toUpperCase()}`);
+      setStatusMessage(`Fulfillment status updated to ${(newStatus || 'pending').toUpperCase()}`);
       setTimeout(() => setStatusMessage(null), 3000);
     }
   };
@@ -48,13 +48,13 @@ export const AdminOrderDetailPage: React.FC = () => {
           </Link>
           <div className="flex items-center gap-3">
             <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#171717]">
-              Order #{order.orderNumber}
+              Order #{order.orderNumber || 'AP-000000'}
             </h2>
-            <Badge variant="maroon">{order.orderStatus.toUpperCase()}</Badge>
-            <Badge variant="green">{order.paymentStatus.toUpperCase()}</Badge>
+            <Badge variant="maroon">{(order.orderStatus || 'pending').toUpperCase()}</Badge>
+            <Badge variant="green">{(order.paymentStatus || 'pending').toUpperCase()}</Badge>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Registered on {new Date(order.createdAt).toLocaleString('en-IN')}
+            Registered on {new Date(order.createdAt || '2026-01-01').toLocaleString('en-IN')}
           </p>
         </div>
 
@@ -62,7 +62,7 @@ export const AdminOrderDetailPage: React.FC = () => {
         <div className="flex items-center gap-3 bg-[#F7F4ED] p-3 rounded-2xl border border-[#EBE7DF]">
           <label className="text-xs font-bold text-[#171717]">Update Order Status:</label>
           <select
-            value={order.orderStatus}
+            value={order.orderStatus || 'pending'}
             onChange={(e) => handleStatusUpdate(e.target.value as OrderStatus)}
             className="p-2 bg-[#FCFBF8] border border-[#EBE7DF] rounded-xl text-xs font-bold text-[#171717] focus:outline-none focus:border-[#6A1423]"
           >
@@ -88,37 +88,37 @@ export const AdminOrderDetailPage: React.FC = () => {
           <span className="font-bold text-[#171717] flex items-center gap-1.5 border-b border-[#EBE7DF] pb-2 text-sm font-serif">
             <User size={16} className="text-[#6A1423]" /> Customer Identity
           </span>
-          <p className="font-bold text-[#171717] text-sm pt-1">{order.customerName}</p>
-          <p className="text-slate-700">{order.customerEmail}</p>
-          <p className="text-slate-700">{order.customerPhone}</p>
+          <p className="font-bold text-[#171717] text-sm pt-1">{order.customerName || 'Customer'}</p>
+          <p className="text-slate-700">{order.customerEmail || ''}</p>
+          <p className="text-slate-700">{order.customerPhone || ''}</p>
         </div>
 
         <div className="bg-[#F7F4ED] p-6 rounded-2xl border border-[#EBE7DF] space-y-2 text-xs">
           <span className="font-bold text-[#171717] flex items-center gap-1.5 border-b border-[#EBE7DF] pb-2 text-sm font-serif">
             <MapPin size={16} className="text-[#6A1423]" /> Shipping Address
           </span>
-          <p className="font-bold text-[#171717]">{order.shippingAddress.fullName}</p>
-          <p className="text-slate-700">{order.shippingAddress.street}</p>
-          <p className="text-slate-700">{order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.pincode}</p>
+          <p className="font-bold text-[#171717]">{order.shippingAddress?.fullName || order.customerName}</p>
+          <p className="text-slate-700">{order.shippingAddress?.street || ''}</p>
+          <p className="text-slate-700">{order.shippingAddress?.city || ''}, {order.shippingAddress?.state || ''} - {order.shippingAddress?.pincode || ''}</p>
         </div>
 
         <div className="bg-[#F7F4ED] p-6 rounded-2xl border border-[#EBE7DF] space-y-2 text-xs">
           <span className="font-bold text-[#171717] flex items-center gap-1.5 border-b border-[#EBE7DF] pb-2 text-sm font-serif">
             <CreditCard size={16} className="text-[#173C2B]" /> Payment Snapshot
           </span>
-          <p className="font-serif font-extrabold text-base text-[#6A1423]">₹{order.total.toLocaleString('en-IN')}</p>
-          <p className="text-slate-700 capitalize">Provider: {order.paymentProvider}</p>
-          <p className="text-slate-700 capitalize">Payment Status: <Badge variant="green">{order.paymentStatus}</Badge></p>
+          <p className="font-serif font-extrabold text-base text-[#6A1423]">₹{(order.total || 0).toLocaleString('en-IN')}</p>
+          <p className="text-slate-700 capitalize">Provider: {order.paymentProvider || 'Standard'}</p>
+          <p className="text-slate-700 capitalize">Payment Status: <Badge variant="green">{(order.paymentStatus || 'pending').toUpperCase()}</Badge></p>
         </div>
       </div>
 
       {/* Items Snapshot */}
       <div className="bg-[#FCFBF8] rounded-2xl border border-[#EBE7DF] p-6 space-y-4">
         <h3 className="font-serif font-bold text-lg text-[#171717] border-b border-[#EBE7DF] pb-3">
-          Order Items Snapshot ({order.items.length})
+          Order Items Snapshot ({order.items ? order.items.length : 0})
         </h3>
         <div className="divide-y divide-[#EBE7DF] space-y-3">
-          {order.items.map((item) => (
+          {(order.items || []).map((item) => (
             <div key={item.id} className="pt-3 flex items-center justify-between gap-4 text-xs">
               <div className="flex items-center gap-3">
                 <img src={item.productImage} alt={item.productName} className="w-12 h-12 object-contain bg-[#F7F4ED] rounded-xl p-1 border border-[#EBE7DF]" />
@@ -128,7 +128,7 @@ export const AdminOrderDetailPage: React.FC = () => {
                 </div>
               </div>
               <span className="font-serif font-bold text-sm text-[#171717]">
-                ₹{item.subtotal.toLocaleString('en-IN')}
+                ₹{(item.subtotal || 0).toLocaleString('en-IN')}
               </span>
             </div>
           ))}

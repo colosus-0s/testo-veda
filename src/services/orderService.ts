@@ -53,7 +53,38 @@ export const getStoredOrders = (): Order[] => {
   try {
     const saved = localStorage.getItem(LOCAL_STORAGE_ORDERS_KEY);
     if (saved) {
-      return JSON.parse(saved);
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map((ord: Partial<Order>) => ({
+          id: ord.id || `ord_${Date.now()}`,
+          orderNumber: ord.orderNumber || 'AP-000000',
+          userId: ord.userId,
+          customerName: ord.customerName || 'Valued Customer',
+          customerEmail: ord.customerEmail || 'customer@example.com',
+          customerPhone: ord.customerPhone || '',
+          shippingAddress: ord.shippingAddress || {
+            fullName: ord.customerName || 'Customer',
+            phone: ord.customerPhone || '',
+            email: ord.customerEmail || '',
+            street: 'Address Line',
+            city: 'City',
+            state: 'State',
+            pincode: '000000',
+            country: 'India',
+          },
+          subtotal: typeof ord.subtotal === 'number' ? ord.subtotal : 0,
+          shippingFee: typeof ord.shippingFee === 'number' ? ord.shippingFee : 0,
+          discount: typeof ord.discount === 'number' ? ord.discount : 0,
+          total: typeof ord.total === 'number' ? ord.total : 0,
+          currency: ord.currency || 'INR',
+          orderStatus: (ord.orderStatus || 'pending') as OrderStatus,
+          paymentStatus: (ord.paymentStatus || 'pending') as PaymentStatus,
+          paymentProvider: ord.paymentProvider || 'Standard',
+          items: Array.isArray(ord.items) ? ord.items : [],
+          createdAt: ord.createdAt || new Date().toISOString(),
+          updatedAt: ord.updatedAt || new Date().toISOString(),
+        }));
+      }
     }
   } catch {
     // Ignore parse errors

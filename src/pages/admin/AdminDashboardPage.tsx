@@ -7,12 +7,12 @@ import { DollarSign, ShoppingBag, Package, ChevronRight, Boxes } from 'lucide-re
 
 export const AdminDashboardPage: React.FC = () => {
   const orders = getStoredOrders();
-  const totalRevenue = orders.reduce((sum, ord) => sum + ord.total, 0);
-  const pendingOrders = orders.filter((o) => o.orderStatus === 'pending' || o.orderStatus === 'processing');
+  const totalRevenue = (orders || []).reduce((sum, ord) => sum + (ord.total || 0), 0);
+  const pendingOrders = (orders || []).filter((o) => o.orderStatus === 'pending' || o.orderStatus === 'processing');
 
   const kpis = [
     { label: 'Total Revenue', value: `₹${totalRevenue.toLocaleString('en-IN')}`, icon: DollarSign, color: 'text-emerald-700' },
-    { label: 'Total Orders', value: orders.length.toString(), icon: ShoppingBag, color: 'text-[#6A1423]' },
+    { label: 'Total Orders', value: (orders ? orders.length : 0).toString(), icon: ShoppingBag, color: 'text-[#6A1423]' },
     { label: 'Pending Fulfillment', value: pendingOrders.length.toString(), icon: Boxes, color: 'text-amber-700' },
     { label: 'Active Catalog', value: INITIAL_PRODUCTS.length.toString(), icon: Package, color: 'text-blue-700' },
   ];
@@ -45,11 +45,11 @@ export const AdminDashboardPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <h3 className="font-serif text-lg font-bold text-[#171717]">Recent Customer Orders</h3>
           <Link to="/admin/orders" className="text-xs font-bold text-[#6A1423] hover:underline flex items-center gap-1">
-            View All Orders ({orders.length}) <ChevronRight size={14} />
+            View All Orders ({orders ? orders.length : 0}) <ChevronRight size={14} />
           </Link>
         </div>
 
-        {orders.length === 0 ? (
+        {!orders || orders.length === 0 ? (
           <div className="py-10 text-center text-slate-500 text-xs bg-[#F7F4ED] rounded-2xl border border-[#EBE7DF]">
             No customer orders registered yet. Orders created via checkout will appear here.
           </div>
@@ -70,12 +70,12 @@ export const AdminDashboardPage: React.FC = () => {
               <tbody className="divide-y divide-[#EBE7DF]">
                 {orders.slice(0, 5).map((ord) => (
                   <tr key={ord.id} className="hover:bg-[#F7F4ED]/50">
-                    <td className="p-3.5 font-bold text-[#6A1423]">#{ord.orderNumber}</td>
-                    <td className="p-3.5 font-semibold text-[#171717]">{ord.customerName}</td>
-                    <td className="p-3.5 font-bold">₹{ord.total.toLocaleString('en-IN')}</td>
-                    <td className="p-3.5"><Badge variant="green">{ord.paymentStatus.toUpperCase()}</Badge></td>
-                    <td className="p-3.5"><Badge variant="maroon">{ord.orderStatus.toUpperCase()}</Badge></td>
-                    <td className="p-3.5 text-slate-500">{new Date(ord.createdAt).toLocaleDateString('en-IN')}</td>
+                    <td className="p-3.5 font-bold text-[#6A1423]">#{ord.orderNumber || 'AP-000000'}</td>
+                    <td className="p-3.5 font-semibold text-[#171717]">{ord.customerName || 'Customer'}</td>
+                    <td className="p-3.5 font-bold">₹{(ord.total || 0).toLocaleString('en-IN')}</td>
+                    <td className="p-3.5"><Badge variant="green">{(ord.paymentStatus || 'pending').toUpperCase()}</Badge></td>
+                    <td className="p-3.5"><Badge variant="maroon">{(ord.orderStatus || 'pending').toUpperCase()}</Badge></td>
+                    <td className="p-3.5 text-slate-500">{new Date(ord.createdAt || '2026-01-01').toLocaleDateString('en-IN')}</td>
                     <td className="p-3.5 text-right">
                       <Link to={`/admin/orders/${ord.id}`} className="font-bold text-[#6A1423] hover:underline">
                         Details →
