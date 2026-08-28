@@ -6,6 +6,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 export interface AuthContextType {
   user: UserProfile | null;
   addresses: UserAddress[];
+  wishlistProductIds: string[];
   isAuthenticated: boolean;
   isAdmin: boolean;
   isLoading: boolean;
@@ -14,14 +15,23 @@ export interface AuthContextType {
   register: (email: string, pass: string, fullName: string) => Promise<boolean>;
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<boolean>;
+  changePassword: (newPass: string) => Promise<boolean>;
   updateProfile: (data: Partial<UserProfile>) => void;
   addAddress: (addr: Omit<UserAddress, 'id' | 'userId'>) => void;
+  updateAddress: (id: string, data: Partial<UserAddress>) => void;
+  deleteAddress: (id: string) => void;
+  setDefaultAddress: (id: string) => void;
+  addToWishlist: (productId: string) => void;
+  removeFromWishlist: (productId: string) => void;
+  isInWishlist: (productId: string) => boolean;
+  toggleWishlist: (productId: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_USER_KEY = 'arogyapath_user';
 const LOCAL_STORAGE_ADDR_KEY = 'arogyapath_addresses';
+const LOCAL_STORAGE_WISHLIST_KEY = 'arogyapath_wishlist';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
@@ -49,11 +59,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               state: 'Karnataka',
               pincode: '560001',
               country: 'India',
+              label: 'Home',
               isDefault: true,
             },
           ];
     } catch {
       return [];
+    }
+  });
+
+  const [wishlistProductIds, setWishlistProductIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_WISHLIST_KEY);
+      return saved ? JSON.parse(saved) : ['prod_testo_power_1'];
+    } catch {
+      return ['prod_testo_power_1'];
     }
   });
 
@@ -71,6 +91,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_ADDR_KEY, JSON.stringify(addresses));
   }, [addresses]);
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_WISHLIST_KEY, JSON.stringify(wishlistProductIds));
+  }, [wishlistProductIds]);
 
   const login = async (email: string, pass: string): Promise<boolean> => {
     setIsLoading(true);
@@ -178,6 +202,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const changePassword = async (newPass: string): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      if (isSupabaseConfigured()) {
+        const { error: sbError } = await supabase.auth.updateUser({ password: newPass });
+        if (sbError) throw sbError;
+      }
+      setIsLoading(false);
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update password');
+      setIsLoading(false);
+      return false;
+    }
+  };
+
   const updateProfile = (data: Partial<UserProfile>) => {
     if (!user) return;
     setUser({ ...user, ...data });
@@ -188,8 +229,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...newAddr,
       id: `addr_${Date.now()}`,
       userId: user?.id || 'usr_guest',
+      label: newAddr.label || 'Home',
     };
+    if (created.isDefault) {
+      setAddresses((prev) => prev.map((a) => ({ ...a, isDefault: false })));
+    }
     setAddresses((prev) => [created, ...prev]);
+  };
+
+  const updateAddress = (id: string, data: Partial<UserAddress>) => {
+    setAddresses((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, ...data } : a))
+    );
+  };
+
+  const deleteAddress = (id: string) => {
+    setAddresses((prev) => prev.filter((a) => a.id !== id));
+  };
+
+  const setDefaultAddress = (id: string) => {
+    setAddresses((prev) =>
+      prev.map((a) => ({ ...a, isDefault: a.id === id }))
+    );
+  };
+
+  const addToWishlist = (productId: string) => {
+    if (!wishlistProductIds.includes(productId)) {
+      setWishlistProductIds((prev) => [...prev, productId]);
+    }
+  };
+
+  const removeFromWishlist = (productId: string) => {
+    setWishlistProductIds((prev) => prev.filter((id) => id !== productId));
+  };
+
+  const isInWishlist = (productId: string) => wishlistProductIds.includes(productId);
+
+  const toggleWishlist = (productId: string) => {
+    if (isInWishlist(productId)) {
+      removeFromWishlist(productId);
+    } else {
+      addToWishlist(productId);
+    }
   };
 
   return (
@@ -197,16 +278,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         user,
         addresses,
+        wishlistProductIds,
         isAuthenticated: !!user,
-        isAdmin: user?.role === 'admin',
+        isAdmin: user?.role === 'admin' || user?.role === 'superadmin',
         isLoading,
         error,
         login,
         register,
         logout,
         forgotPassword,
+        changePassword,
         updateProfile,
         addAddress,
+        updateAddress,
+        deleteAddress,
+        setDefaultAddress,
+        addToWishlist,
+        removeFromWishlist,
+        isInWishlist,
+        toggleWishlist,
       }}
     >
       {children}

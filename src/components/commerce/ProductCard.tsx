@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { ShoppingBag, ShieldCheck, CheckCircle2, Heart } from 'lucide-react';
 import type { Product } from '@/types/product';
 import { ProductPrice } from './ProductPrice';
 import { ProductRating } from './ProductRating';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 
 export interface ProductCardProps {
   product: Product;
@@ -20,6 +21,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   className = '',
 }) => {
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useAuth();
+  const isWishlisted = isInWishlist(product.id);
 
   const handleAction = () => {
     if (onAddToCart) {
@@ -38,6 +41,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         {product.bestSeller && <Badge variant="maroon" size="sm">Featured Formulation</Badge>}
         {product.regulatory.isVegetarian && <Badge variant="veg" size="sm">100% Veg</Badge>}
       </div>
+
+      {/* Wishlist Heart Button */}
+      <button
+        onClick={() => toggleWishlist(product.id)}
+        className="absolute top-3 right-3 z-10 p-2 rounded-full bg-[#FCFBF8]/80 backdrop-blur-sm border border-[#EBE7DF] hover:bg-white transition-all shadow-sm"
+        aria-label="Toggle Wishlist"
+      >
+        <Heart
+          size={16}
+          className={isWishlisted ? 'fill-rose-600 text-rose-600' : 'text-slate-400 hover:text-rose-600'}
+        />
+      </button>
 
       {/* Product Image Stage */}
       <Link

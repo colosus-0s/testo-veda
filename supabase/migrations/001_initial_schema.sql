@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS public.addresses (
   state TEXT NOT NULL,
   pincode TEXT NOT NULL,
   country TEXT NOT NULL DEFAULT 'India',
+  label TEXT NOT NULL DEFAULT 'Home',
   is_default BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -84,7 +85,16 @@ CREATE TABLE IF NOT EXISTS public.cart_items (
   UNIQUE(user_id, product_id, variant_id)
 );
 
--- 6. ORDERS TABLE (Order Lifecycle & Address Snapshots)
+-- 6. WISHLIST ITEMS TABLE
+CREATE TABLE IF NOT EXISTS public.wishlist_items (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(user_id, product_id)
+);
+
+-- 7. ORDERS TABLE (Order Lifecycle & Address Snapshots)
 CREATE TABLE IF NOT EXISTS public.orders (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   order_number TEXT NOT NULL UNIQUE,
@@ -114,7 +124,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 7. ORDER ITEMS TABLE (Purchased Product Snapshots)
+-- 8. ORDER ITEMS TABLE (Purchased Product Snapshots)
 CREATE TABLE IF NOT EXISTS public.order_items (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   order_id UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
@@ -129,7 +139,7 @@ CREATE TABLE IF NOT EXISTS public.order_items (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 8. PAYMENTS TABLE
+-- 9. PAYMENTS TABLE
 CREATE TABLE IF NOT EXISTS public.payments (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   order_id UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
@@ -145,7 +155,7 @@ CREATE TABLE IF NOT EXISTS public.payments (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 9. PAYMENT EVENTS TABLE (Idempotent Webhook Log)
+-- 10. PAYMENT EVENTS TABLE (Idempotent Webhook Log)
 CREATE TABLE IF NOT EXISTS public.payment_events (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   payment_id UUID REFERENCES public.payments(id) ON DELETE CASCADE,
@@ -154,7 +164,7 @@ CREATE TABLE IF NOT EXISTS public.payment_events (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 10. ADMIN USERS TABLE
+-- 11. ADMIN USERS TABLE
 CREATE TABLE IF NOT EXISTS public.admin_users (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL UNIQUE REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -172,6 +182,7 @@ ALTER TABLE public.addresses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.product_variants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.wishlist_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
@@ -191,10 +202,21 @@ CREATE POLICY "Users access own addresses" ON public.addresses FOR ALL USING (au
 -- Cart Items: Users access own cart
 CREATE POLICY "Users access own cart" ON public.cart_items FOR ALL USING (auth.uid() = user_id);
 
+-- Wishlist Items: Users access own wishlist
+CREATE POLICY "Users access own wishlist" ON public.wishlist_items FOR ALL USING (auth.uid() = user_id);
+
 -- Orders: Users read own orders
 CREATE POLICY "Users read own orders" ON public.orders FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users read own order items" ON public.order_items FOR SELECT USING (
   EXISTS (SELECT 1 FROM public.orders WHERE orders.id = order_items.order_id AND orders.user_id = auth.uid())
+);
+
+-- Admin Policy: Admins have full access
+CREATE POLICY "Admins full access profiles" ON public.profiles FOR ALL USING (
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'superadmin'))
+);
+CREATE POLICY "Admins full access orders" ON public.orders FOR ALL USING (
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'superadmin'))
 );
 
 -- Triggers for Auth Registration Profile Creation
@@ -206,7 +228,7 @@ BEGIN
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'full_name', 'Customer'),
-    'customer'
+    COALESCE(NEW.raw_user_meta_data->>'role', 'customer')
   );
   RETURN NEW;
 END;

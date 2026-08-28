@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getStoredOrders, updateOrderStatus } from '@/services/orderService';
 import type { Order, OrderStatus } from '@/types/order';
 import { Badge } from '@/components/ui/Badge';
-import { Search } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Search, ChevronRight } from 'lucide-react';
 
 export const AdminOrdersPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>(getStoredOrders());
@@ -23,7 +25,7 @@ export const AdminOrdersPage: React.FC = () => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-left">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="font-serif text-2xl font-bold text-[#171717]">Order Management</h2>
@@ -71,6 +73,12 @@ export const AdminOrdersPage: React.FC = () => {
                     <option value="delivered">Delivered</option>
                     <option value="cancelled">Cancelled</option>
                   </select>
+
+                  <Link to={`/admin/orders/${ord.id}`}>
+                    <Button variant="outline" size="sm" rightIcon={<ChevronRight size={14} />}>
+                      Details
+                    </Button>
+                  </Link>
                 </div>
               </div>
 

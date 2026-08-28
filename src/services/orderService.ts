@@ -24,6 +24,11 @@ export const saveOrdersToStorage = (orders: Order[]) => {
   }
 };
 
+export const getOrderById = (orderId: string): Order | null => {
+  const orders = getStoredOrders();
+  return orders.find((o) => o.id === orderId || o.orderNumber === orderId) || null;
+};
+
 export interface CreateOrderParams {
   userId?: string;
   customerName: string;

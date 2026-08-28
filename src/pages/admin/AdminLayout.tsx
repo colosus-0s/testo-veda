@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
-import { LayoutDashboard, ShoppingBag, Package, Users, Settings, LogOut, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Users, Settings, LogOut, ArrowLeft, Boxes } from 'lucide-react';
 
 export const AdminLayout: React.FC = () => {
   const { user, logout } = useAuth();
@@ -13,6 +13,7 @@ export const AdminLayout: React.FC = () => {
     { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { label: 'Orders', href: '/admin/orders', icon: ShoppingBag },
     { label: 'Products', href: '/admin/products', icon: Package },
+    { label: 'Inventory', href: '/admin/inventory', icon: Boxes },
     { label: 'Customers', href: '/admin/customers', icon: Users },
     { label: 'Settings', href: '/admin/settings', icon: Settings },
   ];

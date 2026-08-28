@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, ShoppingBag, User, Menu, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { Search, ShoppingBag, Menu, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { SITE_CONFIG } from '@/config/site';
 import { Drawer } from '@/components/ui/Drawer';
 import { useAuth } from '@/context/AuthContext';
+import { AccountPopover } from './AccountPopover';
 
 export interface HeaderProps {
   cartItemCount?: number;
@@ -114,13 +115,8 @@ export const Header: React.FC<HeaderProps> = ({
               <Search className="w-5 h-5" />
             </button>
 
-            <Link
-              to={isAuthenticated ? '/account' : '/login'}
-              className="p-2 text-[#171717] hover:text-[#6A1423] transition-colors"
-              aria-label="User Account"
-            >
-              <User className="w-5 h-5" />
-            </Link>
+            {/* Account Popover Menu */}
+            <AccountPopover />
 
             <button
               onClick={onOpenCart}
