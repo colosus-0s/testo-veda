@@ -27,10 +27,10 @@ export const CollectionPreviewSection: React.FC = () => {
           <div>
             <Link to="/shop">
               <Button
-                variant="outline"
+                variant="primary"
                 size="md"
-                className="border-slate-800 text-[#171717] bg-white hover:bg-[#6A1423] hover:text-white hover:border-[#6A1423] shadow-sm font-bold"
-                rightIcon={<ArrowRight className="w-4 h-4" />}
+                className="bg-[#6A1423] text-white border border-[#6A1423] hover:bg-[#3D0B15] hover:border-[#3D0B15] font-semibold opacity-100 shadow-md transition-colors duration-200"
+                rightIcon={<ArrowRight className="w-4 h-4 text-white shrink-0" />}
               >
                 View Full Storefront
               </Button>
