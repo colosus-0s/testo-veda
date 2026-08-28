@@ -47,8 +47,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', authUserId)
         .single();
 
-      if (profileError || !profileData || profileData.registration_completed !== true) {
-        return null; // Profile uninitialized or registration uncompleted
+      if (profileError) {
+        console.warn('[Supabase Profile Debug] Error fetching profile:', profileError.message);
+      }
+
+      if (!profileData || profileData.registration_completed !== true) {
+        console.warn('[Supabase Profile Debug] Profile missing or registration_completed is not true:', profileData);
+        return null;
       }
 
       const userProf: UserProfile = {
@@ -70,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       return userProf;
     } catch (err) {
-      console.error('Error fetching profile from Supabase:', err);
+      console.error('[Supabase Profile Debug] Exception while fetching profile:', err);
       return null;
     }
   };
@@ -127,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const genericErrorMessage = "We couldn't sign you in. Please register for an Arogya Path account first or check your credentials.";
 
     if (!isSupabaseConfigured()) {
-      setError(genericErrorMessage);
+      setError('Database services are currently unavailable. Please verify your environment configuration.');
       setIsLoading(false);
       return false;
     }
@@ -139,6 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (sbError || !data.user) {
+        console.warn('[Supabase Auth Debug] signInWithPassword error:', sbError?.message || 'User object missing');
         setError(genericErrorMessage);
         setIsLoading(false);
         return false;
@@ -147,6 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Verify that registration_completed === true in profiles
       const profile = await loadProfile(data.user.id, data.user.email || email);
       if (!profile || profile.registrationCompleted !== true) {
+        console.warn('[Supabase Auth Debug] Rejecting login: Profile uncompleted or missing');
         // Reject session and sign out immediately
         await supabase.auth.signOut();
         setUser(null);
@@ -158,7 +165,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(profile);
       setIsLoading(false);
       return true;
-    } catch {
+    } catch (err) {
+      console.error('[Supabase Auth Debug] Exception during login:', err);
       setError(genericErrorMessage);
       setIsLoading(false);
       return false;
@@ -176,7 +184,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
 
     if (!isSupabaseConfigured()) {
-      setError('Database services are currently unavailable. Please try again later.');
+      setError('Database services are currently unavailable. Please configure VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in environment.');
       setIsLoading(false);
       return false;
     }
@@ -196,6 +204,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (sbError || !data.user) {
+        console.error('[Supabase Auth Debug] signUp error:', sbError?.message);
         setError(sbError?.message || 'Registration failed. Please check your information.');
         setIsLoading(false);
         return false;
@@ -208,7 +217,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (rpcError) {
-        console.warn('RPC complete_storefront_registration warning:', rpcError.message);
+        console.warn('[Supabase Auth Debug] RPC complete_storefront_registration warning/fallback:', rpcError.message);
+        // Direct upsert fallback if RPC is not deployed yet in Supabase
+        await supabase.from('profiles').upsert({
+          id: data.user.id,
+          email: formattedEmail,
+          full_name: fullName,
+          phone: phone || null,
+          role: 'customer',
+          registration_completed: true,
+          updated_at: new Date().toISOString(),
+        });
       }
 
       const profile = await loadProfile(data.user.id, formattedEmail);
@@ -229,6 +248,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
       return true;
     } catch (err) {
+      console.error('[Supabase Auth Debug] Exception during registration:', err);
       setError(err instanceof Error ? err.message : 'Registration failed.');
       setIsLoading(false);
       return false;

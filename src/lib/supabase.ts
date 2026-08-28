@@ -12,10 +12,20 @@ const getEnvVar = (key: string): string | undefined => {
   return undefined;
 };
 
-const supabaseUrl =
+// URL Sanitization: Strip accidental /rest/v1/ suffix or trailing slashes
+const sanitizeSupabaseUrl = (rawUrl: string | undefined): string => {
+  if (!rawUrl) return 'https://placeholder.supabase.co';
+  let cleaned = rawUrl.trim();
+  cleaned = cleaned.replace(/\/rest\/v1\/?$/i, '');
+  cleaned = cleaned.replace(/\/$/, '');
+  return cleaned;
+};
+
+const rawUrl =
   getEnvVar('VITE_SUPABASE_URL') ||
-  getEnvVar('VITE_SUPABASE_PROJECT_URL') ||
-  'https://placeholder.supabase.co';
+  getEnvVar('VITE_SUPABASE_PROJECT_URL');
+
+const supabaseUrl = sanitizeSupabaseUrl(rawUrl);
 
 const supabasePublishableKey =
   getEnvVar('VITE_SUPABASE_PUBLISHABLE_KEY') ||
@@ -23,9 +33,11 @@ const supabasePublishableKey =
   'placeholder-anon-key';
 
 export const isSupabaseConfigured = (): boolean => {
-  const url = getEnvVar('VITE_SUPABASE_URL') || getEnvVar('VITE_SUPABASE_PROJECT_URL');
-  const key = getEnvVar('VITE_SUPABASE_PUBLISHABLE_KEY') || getEnvVar('VITE_SUPABASE_ANON_KEY');
-  return Boolean(url) && Boolean(key) && url !== 'https://placeholder.supabase.co';
+  const url = rawUrl;
+  const key =
+    getEnvVar('VITE_SUPABASE_PUBLISHABLE_KEY') ||
+    getEnvVar('VITE_SUPABASE_ANON_KEY');
+  return Boolean(url) && Boolean(key) && sanitizeSupabaseUrl(url) !== 'https://placeholder.supabase.co';
 };
 
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
