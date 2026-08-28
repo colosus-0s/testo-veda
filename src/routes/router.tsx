@@ -11,6 +11,7 @@ import { FormulaIngredientsPage } from '@/pages/FormulaIngredientsPage';
 import { QualityTrustPage } from '@/pages/QualityTrustPage';
 import { OurStoryPage } from '@/pages/OurStoryPage';
 import { FAQPage } from '@/pages/FAQPage';
+import { RouteErrorBoundary } from '@/components/common/RouteErrorBoundary';
 
 // Auth Pages
 import { LoginPage } from '@/pages/auth/LoginPage';
@@ -47,7 +48,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <StoreLayout />,
-    errorElement: <NotFoundPage />,
+    errorElement: <RouteErrorBoundary />,
     children: [
       { index: true, element: <HomePage /> },
       { path: 'shop', element: <ShopPage /> },
@@ -76,6 +77,7 @@ export const router = createBrowserRouter([
         ),
         children: [
           { index: true, element: <AccountOverviewPage /> },
+          { path: 'overview', element: <AccountOverviewPage /> },
           { path: 'orders', element: <AccountOrdersPage /> },
           { path: 'orders/:orderId', element: <AccountOrderDetailPage /> },
           { path: 'addresses', element: <AccountAddressesPage /> },
@@ -84,13 +86,17 @@ export const router = createBrowserRouter([
           { path: 'wishlist', element: <AccountWishlistPage /> },
         ],
       },
-      { path: '*', element: <NotFoundPage /> },
     ],
   },
+
+  // Dedicated Admin Login Portal (Independent of StoreLayout)
   {
     path: '/admin/login',
     element: <AdminLoginPage />,
+    errorElement: <RouteErrorBoundary />,
   },
+
+  // Admin Portal Layout & Sub-Routes
   {
     path: '/admin',
     element: (
@@ -98,6 +104,7 @@ export const router = createBrowserRouter([
         <AdminLayout />
       </AdminRoute>
     ),
+    errorElement: <RouteErrorBoundary />,
     children: [
       { index: true, element: <AdminDashboardPage /> },
       { path: 'orders', element: <AdminOrdersPage /> },
@@ -108,5 +115,11 @@ export const router = createBrowserRouter([
       { path: 'settings', element: <AdminSettingsPage /> },
       { path: '*', element: <Navigate to="/admin" replace /> },
     ],
+  },
+
+  // Catch-all 404 fallback at the very top level
+  {
+    path: '*',
+    element: <NotFoundPage />,
   },
 ]);
