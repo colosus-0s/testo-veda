@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getProducts, deactivateProduct } from '@/repositories/productRepository';
+import { getProducts, deactivateProduct, reactivateProduct } from '@/repositories/productRepository';
 import type { Product } from '@/types/product';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Plus, Edit2, Archive, Search, Package } from 'lucide-react';
+import { Plus, Edit2, Archive, Search, Package, RefreshCw } from 'lucide-react';
 
 export const AdminProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>(getProducts());
@@ -15,6 +15,11 @@ export const AdminProductsPage: React.FC = () => {
       await deactivateProduct(id);
       setProducts(getProducts());
     }
+  };
+
+  const handleReactivate = async (id: string) => {
+    await reactivateProduct(id);
+    setProducts(getProducts());
   };
 
   const filteredProducts = (products || []).filter(
@@ -117,13 +122,17 @@ export const AdminProductsPage: React.FC = () => {
                   </td>
 
                   <td className="p-4 font-bold text-[#171717]">
-                    <span className={prod.stock <= (prod.regulatory ? 10 : 5) ? 'text-amber-700 font-extrabold' : ''}>
+                    <span className={prod.stock <= 15 ? 'text-amber-700 font-extrabold' : ''}>
                       {prod.stock} units
                     </span>
                   </td>
 
                   <td className="p-4">
-                    {prod.stock > 0 ? (
+                    {prod.active === false ? (
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700 border border-slate-300 uppercase">
+                        DEACTIVATED
+                      </span>
+                    ) : prod.stock > 0 ? (
                       <Badge variant="green">ACTIVE</Badge>
                     ) : (
                       <Badge variant="maroon">OUT OF STOCK</Badge>
@@ -138,15 +147,27 @@ export const AdminProductsPage: React.FC = () => {
                         </Button>
                       </Link>
 
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeactivate(prod.id)}
-                        className="text-red-700 hover:bg-red-50"
-                        title="Deactivate / Archive Product"
-                      >
-                        <Archive size={14} />
-                      </Button>
+                      {prod.active === false ? (
+                        <Button
+                          variant="gold"
+                          size="sm"
+                          onClick={() => handleReactivate(prod.id)}
+                          className="font-bold text-xs"
+                          leftIcon={<RefreshCw size={12} />}
+                        >
+                          Reactivate
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeactivate(prod.id)}
+                          className="text-red-700 hover:bg-red-50"
+                          title="Deactivate / Archive Product"
+                        >
+                          <Archive size={14} />
+                        </Button>
+                      )}
                     </div>
                   </td>
                 </tr>

@@ -3,6 +3,68 @@ import { INITIAL_PRODUCTS } from '@/features/products/data/initialProducts';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 const LOCAL_STORAGE_PRODUCTS_KEY = 'arogyapath_products_v2';
+const LOCAL_STORAGE_MOVEMENTS_KEY = 'arogyapath_inventory_movements_v1';
+
+export interface InventoryMovement {
+  id: string;
+  productId: string;
+  productName: string;
+  quantityChange: number;
+  previousStock: number;
+  newStock: number;
+  type: 'initial' | 'purchase' | 'restock' | 'manual_adjustment' | 'damaged_removed';
+  reason?: string;
+  timestamp: string;
+}
+
+export const getInventoryMovements = (productId?: string): InventoryMovement[] => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const saved = window.localStorage.getItem(LOCAL_STORAGE_MOVEMENTS_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          if (productId) return parsed.filter((m) => m.productId === productId);
+          return parsed;
+        }
+      }
+    }
+  } catch {
+    // Fallback
+  }
+  return [];
+};
+
+export const recordInventoryMovement = (
+  productId: string,
+  productName: string,
+  quantityChange: number,
+  previousStock: number,
+  newStock: number,
+  type: InventoryMovement['type'],
+  reason?: string
+) => {
+  try {
+    const existing = getInventoryMovements();
+    const movement: InventoryMovement = {
+      id: `mov_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      productId,
+      productName,
+      quantityChange,
+      previousStock,
+      newStock,
+      type,
+      reason: reason || type,
+      timestamp: new Date().toISOString(),
+    };
+    const updated = [movement, ...existing];
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(LOCAL_STORAGE_MOVEMENTS_KEY, JSON.stringify(updated));
+    }
+  } catch {
+    // Ignore storage errors
+  }
+};
 
 export const getProducts = (): Product[] => {
   try {
@@ -80,6 +142,7 @@ export const createProduct = async (productData: Partial<Product>): Promise<Prod
     packSize: productData.packSize || '30 Veg Capsules (500mg)',
     servings: 30,
     capsuleCount: productData.capsuleCount || 30,
+    active: true,
     variants: productData.variants && productData.variants.length > 0 ? productData.variants : [defaultVariant],
     supplementFacts: productData.supplementFacts || {
       servingSize: '1 Capsule Daily',
@@ -132,6 +195,7 @@ export const createProduct = async (productData: Partial<Product>): Promise<Prod
 
   const updatedProducts = [newProduct, ...existing];
   saveProductsToStorage(updatedProducts);
+  recordInventoryMovement(newProduct.id, newProduct.name, newProduct.stock, 0, newProduct.stock, 'initial', 'Product Created');
 
   if (isSupabaseConfigured()) {
     try {
@@ -148,7 +212,7 @@ export const createProduct = async (productData: Partial<Product>): Promise<Prod
         images_json: newProduct.images,
       });
     } catch {
-      // Fallback to repository
+      // Fallback
     }
   }
 
@@ -164,6 +228,7 @@ export const updateProduct = async (id: string, productData: Partial<Product>): 
       updatedProduct = {
         ...p,
         ...productData,
+        active: productData.active !== undefined ? productData.active : p.active,
         images: {
           ...p.images,
           ...(productData.images || {}),
@@ -205,28 +270,73 @@ export const updateProduct = async (id: string, productData: Partial<Product>): 
 
 export const deactivateProduct = async (id: string): Promise<boolean> => {
   const existing = getProducts();
+  let prevStock = 0;
+  let prodName = '';
   const updatedList = existing.map((p) => {
     if (p.id === id || p.slug === id) {
+      prevStock = p.stock;
+      prodName = p.name;
       return { ...p, active: false, stock: 0, featured: false };
     }
     return p;
   });
   saveProductsToStorage(updatedList);
+  if (prodName) {
+    recordInventoryMovement(id, prodName, -prevStock, prevStock, 0, 'damaged_removed', 'Product Deactivated/Archived');
+  }
   return true;
 };
 
-export const updateStock = async (id: string, newStock: number): Promise<Product | null> => {
+export const reactivateProduct = async (id: string): Promise<Product | null> => {
   const existing = getProducts();
   let updated: Product | null = null;
+  let prevStock = 0;
+
   const updatedList = existing.map((p) => {
     if (p.id === id || p.slug === id) {
-      updated = { ...p, stock: Math.max(0, newStock) };
+      prevStock = p.stock;
+      const targetStock = p.stock > 0 ? p.stock : 50;
+      updated = { ...p, active: true, stock: targetStock, featured: true };
       return updated;
     }
     return p;
   });
+
   if (updated) {
+    const prod: Product = updated;
     saveProductsToStorage(updatedList);
+    recordInventoryMovement(prod.id, prod.name, prod.stock - prevStock, prevStock, prod.stock, 'restock', 'Product Reactivated');
+  }
+  return updated;
+};
+
+export const updateStock = async (id: string, newStock: number, reason?: string): Promise<Product | null> => {
+  const existing = getProducts();
+  let updated: Product | null = null;
+  let prevStock = 0;
+
+  const updatedList = existing.map((p) => {
+    if (p.id === id || p.slug === id) {
+      prevStock = p.stock;
+      const clampedStock = Math.max(0, newStock);
+      updated = { ...p, stock: clampedStock, active: clampedStock > 0 ? p.active : p.active };
+      return updated;
+    }
+    return p;
+  });
+
+  if (updated) {
+    const prod: Product = updated;
+    saveProductsToStorage(updatedList);
+    recordInventoryMovement(
+      prod.id,
+      prod.name,
+      prod.stock - prevStock,
+      prevStock,
+      prod.stock,
+      prod.stock > prevStock ? 'restock' : 'manual_adjustment',
+      reason || 'Stock Adjustment'
+    );
   }
   return updated;
 };

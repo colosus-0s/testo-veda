@@ -1,15 +1,39 @@
 import type { HomepageSectionConfig, HeroConfig } from '@/types/homepage';
 import { ASSET_REGISTRY } from '@/config/assets';
 
+const LOCAL_STORAGE_FEATURED_PRODUCT_KEY = 'arogyapath_featured_product_id_v1';
+
+export const getFeaturedProductId = (): string => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const saved = window.localStorage.getItem(LOCAL_STORAGE_FEATURED_PRODUCT_KEY);
+      if (saved) return saved;
+    }
+  } catch {
+    // Ignore storage errors
+  }
+  return 'prod_testo_power_1';
+};
+
+export const setFeaturedProductId = (id: string) => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(LOCAL_STORAGE_FEATURED_PRODUCT_KEY, id);
+    }
+  } catch {
+    // Ignore storage errors
+  }
+};
+
 export const HERO_CONFIG: HeroConfig = {
   type: 'video',
   videoUrl: ASSET_REGISTRY.hero.video,
   posterUrl: ASSET_REGISTRY.hero.poster,
   fallbackImageUrl: ASSET_REGISTRY.hero.fallbackImage,
   headline: 'THE PATH TO WELLNESS',
-  subheadline: 'Arogya Path TESTO Natural Power+ Capsules represent a botanical dietary supplement formulated with Ashwagandha, Shilajit, Gokhuru, Safed Musli, and Saffron to support daily vitality.',
-  primaryCtaText: 'Explore TESTO Power+',
-  primaryCtaLink: '/products/testo-natural-power-plus',
+  subheadline: 'Arogya Path botanical formulations represent dietary supplements formulated with classical herbs to support daily vitality.',
+  primaryCtaText: 'Explore Formulations',
+  primaryCtaLink: '/shop',
   secondaryCtaText: 'Discover The Formula',
   secondaryCtaLink: '#formula',
   trustBadgeText: 'FSSAI License No. 12118441000654 • 100% Veg Capsules',

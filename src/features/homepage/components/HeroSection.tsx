@@ -2,19 +2,22 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ShieldCheck, ArrowRight, ChevronDown } from 'lucide-react';
-import { HERO_CONFIG } from '../config/homepageConfig';
-import { getActiveProducts } from '@/repositories/productRepository';
+import { HERO_CONFIG, getFeaturedProductId } from '../config/homepageConfig';
+import { getActiveProducts, getProductById, getProductBySlug } from '@/repositories/productRepository';
 import { Button } from '@/components/ui/Button';
 
 export const HeroSection: React.FC = () => {
   const [videoFailed, setVideoFailed] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  
   const activeProducts = getActiveProducts();
-  const featuredProduct = activeProducts.find((p) => p.featured) || activeProducts[0];
+  const targetId = getFeaturedProductId();
+  const featuredProduct = getProductById(targetId) || getProductBySlug(targetId) || activeProducts.find((p) => p.featured) || activeProducts[0];
 
   const primaryCtaLink = featuredProduct ? `/products/${featuredProduct.slug}` : HERO_CONFIG.primaryCtaLink;
   const primaryCtaText = featuredProduct ? `Explore ${featuredProduct.name}` : HERO_CONFIG.primaryCtaText;
-  const subheadline = featuredProduct ? featuredProduct.shortDescription : HERO_CONFIG.subheadline;
+  const subheadline = featuredProduct ? (featuredProduct.shortDescription || featuredProduct.description) : HERO_CONFIG.subheadline;
+  const featuredPrice = featuredProduct ? ` ₹${featuredProduct.price}` : '';
 
   return (
     <section className="relative min-h-[75vh] sm:min-h-[85vh] w-full flex items-center justify-center overflow-hidden bg-[#0f0f11] pt-12 opacity-100">
@@ -62,7 +65,9 @@ export const HeroSection: React.FC = () => {
           className="font-serif text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 drop-shadow-2xl"
         >
           AROGYA PATH <br className="hidden sm:inline" />
-          <span className="gold-gradient-text">THE PATH TO WELLNESS</span>
+          <span className="gold-gradient-text">
+            {featuredProduct ? featuredProduct.name.toUpperCase() : 'THE PATH TO WELLNESS'}
+          </span>
         </motion.h1>
 
         <motion.p
@@ -86,7 +91,7 @@ export const HeroSection: React.FC = () => {
               className="w-full sm:w-auto text-sm sm:text-base font-bold px-6 py-3.5 shadow-xl shadow-[#C7A33A]/20 whitespace-normal sm:whitespace-nowrap leading-snug"
               rightIcon={<ArrowRight className="w-5 h-5 shrink-0" />}
             >
-              {primaryCtaText}
+              {primaryCtaText}{featuredPrice ? ` • ${featuredPrice}` : ''}
             </Button>
           </Link>
 

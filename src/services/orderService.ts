@@ -51,39 +51,41 @@ const INITIAL_DEMO_ORDERS: Order[] = [
 
 export const getStoredOrders = (): Order[] => {
   try {
-    const saved = localStorage.getItem(LOCAL_STORAGE_ORDERS_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map((ord: Partial<Order>) => ({
-          id: ord.id || `ord_${Date.now()}`,
-          orderNumber: ord.orderNumber || 'AP-000000',
-          userId: ord.userId,
-          customerName: ord.customerName || 'Valued Customer',
-          customerEmail: ord.customerEmail || 'customer@example.com',
-          customerPhone: ord.customerPhone || '',
-          shippingAddress: ord.shippingAddress || {
-            fullName: ord.customerName || 'Customer',
-            phone: ord.customerPhone || '',
-            email: ord.customerEmail || '',
-            street: 'Address Line',
-            city: 'City',
-            state: 'State',
-            pincode: '000000',
-            country: 'India',
-          },
-          subtotal: typeof ord.subtotal === 'number' ? ord.subtotal : 0,
-          shippingFee: typeof ord.shippingFee === 'number' ? ord.shippingFee : 0,
-          discount: typeof ord.discount === 'number' ? ord.discount : 0,
-          total: typeof ord.total === 'number' ? ord.total : 0,
-          currency: ord.currency || 'INR',
-          orderStatus: (ord.orderStatus || 'pending') as OrderStatus,
-          paymentStatus: (ord.paymentStatus || 'pending') as PaymentStatus,
-          paymentProvider: ord.paymentProvider || 'Standard',
-          items: Array.isArray(ord.items) ? ord.items : [],
-          createdAt: ord.createdAt || new Date().toISOString(),
-          updatedAt: ord.updatedAt || new Date().toISOString(),
-        }));
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const saved = window.localStorage.getItem(LOCAL_STORAGE_ORDERS_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((ord: Partial<Order>) => ({
+            id: ord.id || `ord_${Date.now()}`,
+            orderNumber: ord.orderNumber || 'AP-000000',
+            userId: ord.userId,
+            customerName: ord.customerName || 'Valued Customer',
+            customerEmail: ord.customerEmail || 'customer@example.com',
+            customerPhone: ord.customerPhone || '',
+            shippingAddress: ord.shippingAddress || {
+              fullName: ord.customerName || 'Customer',
+              phone: ord.customerPhone || '',
+              email: ord.customerEmail || '',
+              street: 'Address Line',
+              city: 'City',
+              state: 'State',
+              pincode: '000000',
+              country: 'India',
+            },
+            subtotal: typeof ord.subtotal === 'number' ? ord.subtotal : 0,
+            shippingFee: typeof ord.shippingFee === 'number' ? ord.shippingFee : 0,
+            discount: typeof ord.discount === 'number' ? ord.discount : 0,
+            total: typeof ord.total === 'number' ? ord.total : 0,
+            currency: ord.currency || 'INR',
+            orderStatus: (ord.orderStatus || 'pending') as OrderStatus,
+            paymentStatus: (ord.paymentStatus || 'pending') as PaymentStatus,
+            paymentProvider: ord.paymentProvider || 'Standard',
+            items: Array.isArray(ord.items) ? ord.items : [],
+            createdAt: ord.createdAt || new Date().toISOString(),
+            updatedAt: ord.updatedAt || new Date().toISOString(),
+          }));
+        }
       }
     }
   } catch {
@@ -94,7 +96,9 @@ export const getStoredOrders = (): Order[] => {
 
 export const saveOrdersToStorage = (orders: Order[]) => {
   try {
-    localStorage.setItem(LOCAL_STORAGE_ORDERS_KEY, JSON.stringify(orders));
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(LOCAL_STORAGE_ORDERS_KEY, JSON.stringify(orders));
+    }
   } catch {
     // Ignore storage errors
   }
@@ -234,7 +238,7 @@ export const updateOrderStatus = async (
   let updatedOrder: Order | null = null;
 
   const updatedOrders = existing.map((ord) => {
-    if (ord.id === orderId) {
+    if (ord.id === orderId || ord.orderNumber === orderId) {
       updatedOrder = {
         ...ord,
         orderStatus,
