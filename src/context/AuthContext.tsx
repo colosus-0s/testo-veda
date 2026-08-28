@@ -12,6 +12,8 @@ export interface AuthContextType {
   isLoading: boolean;
   error: string | null;
   login: (email: string, pass: string) => Promise<boolean>;
+  loginAsDemoAdmin: () => void;
+  loginAsDemoCustomer: () => void;
   register: (email: string, pass: string, fullName: string) => Promise<boolean>;
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<boolean>;
@@ -33,13 +35,31 @@ const LOCAL_STORAGE_USER_KEY = 'arogyapath_user';
 const LOCAL_STORAGE_ADDR_KEY = 'arogyapath_addresses';
 const LOCAL_STORAGE_WISHLIST_KEY = 'arogyapath_wishlist';
 
+const DEMO_CUSTOMER_USER: UserProfile = {
+  id: 'usr_demo_aarav_1',
+  email: 'aarav.sharma@example.com',
+  fullName: 'Aarav Sharma',
+  role: 'customer',
+  createdAt: '2026-01-15T10:00:00.000Z',
+};
+
+const DEMO_ADMIN_USER: UserProfile = {
+  id: 'usr_demo_admin_1',
+  email: 'admin@arogyapath.com',
+  fullName: 'Arogya Administrator',
+  role: 'admin',
+  createdAt: '2026-01-01T08:00:00.000Z',
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
-      return saved ? JSON.parse(saved) : null;
+      if (saved) return JSON.parse(saved);
+      // Default to active demo customer session for instant accessibility without setup friction
+      return DEMO_CUSTOMER_USER;
     } catch {
-      return null;
+      return DEMO_CUSTOMER_USER;
     }
   });
 
@@ -51,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         : [
             {
               id: 'addr_default_1',
-              userId: 'usr_demo_1',
+              userId: 'usr_demo_aarav_1',
               fullName: 'Aarav Sharma',
               phone: '+91 9876543210',
               street: '42 Lotus Heights, MG Road',
@@ -96,6 +116,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem(LOCAL_STORAGE_WISHLIST_KEY, JSON.stringify(wishlistProductIds));
   }, [wishlistProductIds]);
 
+  const loginAsDemoCustomer = () => {
+    setUser(DEMO_CUSTOMER_USER);
+  };
+
+  const loginAsDemoAdmin = () => {
+    setUser(DEMO_ADMIN_USER);
+  };
+
   const login = async (email: string, pass: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
@@ -117,7 +145,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
 
-      // Local fallback for dev/demo mode
+      // Dev mode fallback
       const isDemoAdmin = email.toLowerCase().includes('admin');
       const fallbackUser: UserProfile = {
         id: `usr_${Date.now()}`,
@@ -284,6 +312,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         error,
         login,
+        loginAsDemoAdmin,
+        loginAsDemoCustomer,
         register,
         logout,
         forgotPassword,

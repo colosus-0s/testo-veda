@@ -4,6 +4,51 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 const LOCAL_STORAGE_ORDERS_KEY = 'arogyapath_orders_v1';
 
+const INITIAL_DEMO_ORDERS: Order[] = [
+  {
+    id: 'ord_demo_sample_1',
+    orderNumber: 'AP-849201',
+    userId: 'usr_demo_aarav_1',
+    customerName: 'Aarav Sharma',
+    customerEmail: 'aarav.sharma@example.com',
+    customerPhone: '+91 9876543210',
+    shippingAddress: {
+      fullName: 'Aarav Sharma',
+      phone: '+91 9876543210',
+      email: 'aarav.sharma@example.com',
+      street: '42 Lotus Heights, MG Road',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pincode: '560001',
+      country: 'India',
+    },
+    subtotal: 999,
+    shippingFee: 0,
+    discount: 0,
+    total: 999,
+    currency: 'INR',
+    orderStatus: 'delivered',
+    paymentStatus: 'completed',
+    paymentProvider: 'Razorpay (Simulated)',
+    items: [
+      {
+        id: 'item_demo_1',
+        orderId: 'ord_demo_sample_1',
+        productId: 'prod_testo_power_1',
+        productName: 'TESTO Natural Power+ Capsules',
+        productImage: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=800&auto=format&fit=crop',
+        variantId: 'var_testo_30',
+        packSize: '30 Veg Capsules (500mg)',
+        unitPrice: 999,
+        quantity: 1,
+        subtotal: 999,
+      },
+    ],
+    createdAt: '2026-02-10T14:30:00.000Z',
+    updatedAt: '2026-02-12T09:15:00.000Z',
+  },
+];
+
 export const getStoredOrders = (): Order[] => {
   try {
     const saved = localStorage.getItem(LOCAL_STORAGE_ORDERS_KEY);
@@ -13,7 +58,7 @@ export const getStoredOrders = (): Order[] => {
   } catch {
     // Ignore parse errors
   }
-  return [];
+  return INITIAL_DEMO_ORDERS;
 };
 
 export const saveOrdersToStorage = (orders: Order[]) => {

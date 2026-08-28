@@ -5,18 +5,23 @@ import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle, Zap } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
 
-  const { login, isLoading, error: authError } = useAuth();
+  const { login, loginAsDemoCustomer, isLoading, error: authError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = (location.state as { from?: { pathname?: string } })?.from?.pathname || '/account';
+
+  const handleDemoCustomerLogin = () => {
+    loginAsDemoCustomer();
+    navigate('/account', { replace: true });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +42,7 @@ export const LoginPage: React.FC = () => {
     <div className="w-full bg-[#F7F4ED] text-[#171717] min-h-screen">
       <Section padding="lg" background="ivory">
         <Container size="narrow">
-          <Breadcrumb items={[{ label: 'Customer Login' }]} className="mb-8 text-slate-700" />
+          <Breadcrumb items={[{ label: 'Customer Login' }]} className="mb-8 text-slate-700 text-left" />
 
           <div className="bg-[#FCFBF8] rounded-3xl p-8 sm:p-12 border border-[#EBE7DF] shadow-subtle-card max-w-md mx-auto">
             <div className="text-center mb-8">
@@ -52,15 +57,41 @@ export const LoginPage: React.FC = () => {
               </p>
             </div>
 
+            {/* Demo Access Button */}
+            <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-2 text-left">
+              <div className="flex items-center justify-between text-xs font-bold text-emerald-900">
+                <span className="flex items-center gap-1.5"><Zap size={16} className="text-emerald-600" /> Demo Account Access</span>
+                <span className="text-[10px] bg-emerald-200 px-2 py-0.5 rounded uppercase">Instant</span>
+              </div>
+              <p className="text-[11px] text-slate-600">
+                Sign in with our sample customer profile to review order history and account management.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleDemoCustomerLogin}
+                className="w-full bg-[#173C2B] text-white border-[#173C2B] hover:bg-[#2E6B4A] font-bold text-xs shadow-sm mt-1"
+              >
+                ⚡ Sign In As Demo Customer
+              </Button>
+            </div>
+
+            <div className="relative flex py-2 items-center mb-6">
+              <div className="flex-grow border-t border-[#EBE7DF]"></div>
+              <span className="flex-shrink mx-4 text-slate-400 text-[10px] font-bold uppercase tracking-widest">Or Sign In With Password</span>
+              <div className="flex-grow border-t border-[#EBE7DF]"></div>
+            </div>
+
             {(formError || authError) && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-xs text-red-900 font-semibold">
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-xs text-red-900 font-semibold text-left">
                 <AlertCircle className="w-4 h-4 text-[#6A1423] shrink-0 mt-0.5" />
                 <span>{formError || authError}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
+              <div className="text-left">
                 <label className="text-xs font-bold text-[#171717] block mb-1.5 uppercase tracking-wider">
                   Email Address
                 </label>
@@ -77,7 +108,7 @@ export const LoginPage: React.FC = () => {
                 </div>
               </div>
 
-              <div>
+              <div className="text-left">
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="text-xs font-bold text-[#171717] uppercase tracking-wider">
                     Password
