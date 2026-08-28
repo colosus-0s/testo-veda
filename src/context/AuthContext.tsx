@@ -145,7 +145,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (sbError || !data.user) {
         console.warn('[Supabase Auth Debug] signInWithPassword error:', sbError?.message || 'User object missing');
-        setError(genericErrorMessage);
+        const isRateLimit = sbError?.message?.toLowerCase().includes('rate limit') || (sbError as { status?: number })?.status === 429;
+        if (isRateLimit) {
+          setError('Too many sign in attempts have been requested. Please wait a little while and try again.');
+        } else {
+          setError(genericErrorMessage);
+        }
         setIsLoading(false);
         return false;
       }
@@ -166,13 +171,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     } catch (err) {
       console.error('[Supabase Auth Debug] Exception during login:', err);
-      setError(genericErrorMessage);
+      const errMsg = err instanceof Error ? err.message.toLowerCase() : '';
+      if (errMsg.includes('rate limit')) {
+        setError('Too many sign in attempts have been requested. Please wait a little while and try again.');
+      } else {
+        setError(genericErrorMessage);
+      }
       setIsLoading(false);
       return false;
     }
   };
 
-  // Storefront Registration Function: Detects Duplicate Signups & Forces Manual Sign-In
+  // Storefront Registration Function: Single signUp() request per submit & User-Friendly Rate Limit Handling
   const register = async (
     email: string,
     pass: string,
@@ -190,6 +200,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       const formattedEmail = email.trim().toLowerCase();
+      // Single EXACT signUp() request per user submit action
       const { data, error: sbError } = await supabase.auth.signUp({
         email: formattedEmail,
         password: pass,
@@ -202,6 +213,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       });
 
+      if (sbError) {
+        console.error('[Supabase Auth Debug] signUp error:', sbError.message);
+        const isRateLimit = sbError.message.toLowerCase().includes('rate limit') || (sbError as { status?: number })?.status === 429;
+        if (isRateLimit) {
+          setError('Too many verification emails have been requested. Please wait a little while and try again.');
+        } else {
+          setError(sbError.message || 'Registration failed. Please check your information.');
+        }
+        setIsLoading(false);
+        return false;
+      }
+
       // DUPLICATE SIGNUP DETECTION: Supabase returns identities: [] when user already exists
       if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
         console.warn('[Supabase Auth Debug] Duplicate registration attempt detected for email:', formattedEmail);
@@ -210,14 +233,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
 
-      if (sbError || !data?.user) {
-        console.error('[Supabase Auth Debug] signUp error:', sbError?.message);
-        setError(sbError?.message || 'Registration failed. Please check your information.');
+      if (!data?.user) {
+        setError('Registration failed. Please check your information.');
         setIsLoading(false);
         return false;
       }
 
-      // Call complete_storefront_registration RPC if needed for extra payload synchronization
+      // Call complete_storefront_registration RPC if needed
       const { error: rpcError } = await supabase.rpc('complete_storefront_registration', {
         p_full_name: fullName,
         p_phone: phone || null,
@@ -235,7 +257,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     } catch (err) {
       console.error('[Supabase Auth Debug] Exception during registration:', err);
-      setError(err instanceof Error ? err.message : 'Registration failed.');
+      const errMsg = err instanceof Error ? err.message.toLowerCase() : '';
+      if (errMsg.includes('rate limit')) {
+        setError('Too many verification emails have been requested. Please wait a little while and try again.');
+      } else {
+        setError(err instanceof Error ? err.message : 'Registration failed.');
+      }
       setIsLoading(false);
       return false;
     }
