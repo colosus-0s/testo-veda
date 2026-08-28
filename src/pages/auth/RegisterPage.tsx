@@ -13,6 +13,7 @@ export const RegisterPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { register, isLoading, error: authError } = useAuth();
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ export const RegisterPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
+
+    if (isSubmitting || isLoading) return;
 
     if (!fullName || !email || !password) {
       setFormError('Please complete all required fields.');
@@ -36,9 +39,18 @@ export const RegisterPage: React.FC = () => {
       return;
     }
 
-    const success = await register(email, password, fullName);
-    if (success) {
-      navigate('/account');
+    setIsSubmitting(true);
+    try {
+      const success = await register(email, password, fullName);
+      if (success) {
+        // Redirect to /login after successful registration with success banner state
+        navigate('/login', {
+          replace: true,
+          state: { message: 'Account created successfully. Please sign in to continue.' },
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -62,14 +74,14 @@ export const RegisterPage: React.FC = () => {
             </div>
 
             {(formError || authError) && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-xs text-red-900 font-semibold">
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-xs text-red-900 font-semibold text-left">
                 <AlertCircle className="w-4 h-4 text-[#6A1423] shrink-0 mt-0.5" />
                 <span>{formError || authError}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
+              <div className="text-left">
                 <label className="text-xs font-bold text-[#171717] block mb-1.5 uppercase tracking-wider">
                   Full Name
                 </label>
@@ -86,7 +98,7 @@ export const RegisterPage: React.FC = () => {
                 </div>
               </div>
 
-              <div>
+              <div className="text-left">
                 <label className="text-xs font-bold text-[#171717] block mb-1.5 uppercase tracking-wider">
                   Email Address
                 </label>
@@ -103,7 +115,7 @@ export const RegisterPage: React.FC = () => {
                 </div>
               </div>
 
-              <div>
+              <div className="text-left">
                 <label className="text-xs font-bold text-[#171717] block mb-1.5 uppercase tracking-wider">
                   Password
                 </label>
@@ -120,7 +132,7 @@ export const RegisterPage: React.FC = () => {
                 </div>
               </div>
 
-              <div>
+              <div className="text-left">
                 <label className="text-xs font-bold text-[#171717] block mb-1.5 uppercase tracking-wider">
                   Confirm Password
                 </label>
@@ -142,10 +154,10 @@ export const RegisterPage: React.FC = () => {
                 variant="primary"
                 size="lg"
                 className="w-full shadow-md font-bold text-sm mt-2"
-                disabled={isLoading}
+                disabled={isLoading || isSubmitting}
                 rightIcon={<ArrowRight className="w-4 h-4" />}
               >
-                {isLoading ? 'Creating Account...' : 'Register Account'}
+                {isLoading || isSubmitting ? 'Creating Account...' : 'Register Account'}
               </Button>
             </form>
 

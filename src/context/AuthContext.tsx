@@ -154,7 +154,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const profile = await loadProfile(data.user.id, data.user.email || email);
       if (!profile || profile.registrationCompleted !== true) {
         console.warn('[Supabase Auth Debug] Rejecting login: Profile uncompleted or missing');
-        // Reject session and sign out immediately
         await supabase.auth.signOut();
         setUser(null);
         setError(genericErrorMessage);
@@ -173,7 +172,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Storefront Registration Function: SignUp + complete_storefront_registration RPC
+  // Storefront Registration Function: Detects Duplicate Signups & Forces Manual Sign-In
   const register = async (
     email: string,
     pass: string,
@@ -184,7 +183,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
 
     if (!isSupabaseConfigured()) {
-      setError('Database services are currently unavailable. Please configure VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in environment.');
+      setError('Database services are currently unavailable. Please configure environment variables.');
       setIsLoading(false);
       return false;
     }
@@ -203,47 +202,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       });
 
-      if (sbError || !data.user) {
+      // DUPLICATE SIGNUP DETECTION: Supabase returns identities: [] when user already exists
+      if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        console.warn('[Supabase Auth Debug] Duplicate registration attempt detected for email:', formattedEmail);
+        setError('An account with this email already exists. Please sign in instead.');
+        setIsLoading(false);
+        return false;
+      }
+
+      if (sbError || !data?.user) {
         console.error('[Supabase Auth Debug] signUp error:', sbError?.message);
         setError(sbError?.message || 'Registration failed. Please check your information.');
         setIsLoading(false);
         return false;
       }
 
-      // Complete Storefront Registration via SECURITY DEFINER RPC
+      // Call complete_storefront_registration RPC if needed for extra payload synchronization
       const { error: rpcError } = await supabase.rpc('complete_storefront_registration', {
         p_full_name: fullName,
         p_phone: phone || null,
       });
 
       if (rpcError) {
-        console.warn('[Supabase Auth Debug] RPC complete_storefront_registration warning/fallback:', rpcError.message);
-        // Direct upsert fallback if RPC is not deployed yet in Supabase
-        await supabase.from('profiles').upsert({
-          id: data.user.id,
-          email: formattedEmail,
-          full_name: fullName,
-          phone: phone || null,
-          role: 'customer',
-          registration_completed: true,
-          updated_at: new Date().toISOString(),
-        });
+        console.warn('[Supabase Auth Debug] RPC complete_storefront_registration warning:', rpcError.message);
       }
 
-      const profile = await loadProfile(data.user.id, formattedEmail);
-      if (profile) {
-        setUser(profile);
-      } else {
-        setUser({
-          id: data.user.id,
-          email: formattedEmail,
-          fullName,
-          phone,
-          role: 'customer',
-          registrationCompleted: true,
-          createdAt: new Date().toISOString(),
-        });
-      }
+      // FORCED SIGN-OUT: Registration must NOT auto-login user into /account
+      await supabase.auth.signOut();
+      setUser(null);
 
       setIsLoading(false);
       return true;

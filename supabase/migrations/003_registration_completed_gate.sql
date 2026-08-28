@@ -14,21 +14,28 @@ BEGIN
   END IF;
 END $$;
 
--- 2. Update handle_new_user trigger to default registration_completed = false
+-- 2. Trigger: Automatically Create Profile on Auth Registration (Preserving Existing Roles)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, full_name, phone, role, registration_completed)
-  VALUES (
+  INSERT INTO public.profiles (
+    id, email, full_name, phone, role, registration_completed, created_at, updated_at
+  ) VALUES (
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'full_name', 'Valued Customer'),
     NEW.raw_user_meta_data->>'phone',
     'customer',
-    FALSE -- Default FALSE. Storefront /register calls complete_storefront_registration RPC.
+    TRUE,
+    NOW(),
+    NOW()
   )
   ON CONFLICT (id) DO UPDATE SET
     email = EXCLUDED.email,
+    full_name = COALESCE(EXCLUDED.full_name, public.profiles.full_name),
+    phone = COALESCE(EXCLUDED.phone, public.profiles.phone),
+    role = public.profiles.role, -- PRESERVE EXISTING ROLE (NEVER DOWNGRADE ADMINS/SUPERADMINS)
+    registration_completed = COALESCE(public.profiles.registration_completed, TRUE),
     updated_at = NOW();
   RETURN NEW;
 END;
@@ -81,7 +88,7 @@ BEGIN
   ON CONFLICT (id) DO UPDATE SET
     full_name = EXCLUDED.full_name,
     phone = COALESCE(EXCLUDED.phone, public.profiles.phone),
-    role = 'customer', -- FORCED CUSTOMER ROLE
+    role = public.profiles.role, -- PRESERVE EXISTING ROLE (NEVER DOWNGRADE ADMINS/SUPERADMINS)
     registration_completed = TRUE,
     updated_at = NOW();
 
