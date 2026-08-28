@@ -1,15 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getStoredOrders } from '@/services/orderService';
+import { getStoredOrders, subscribeToOrders } from '@/services/orderService';
 import type { Order } from '@/types/order';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Search, Package, ArrowRight, ChevronRight } from 'lucide-react';
 
 export const AccountOrdersPage: React.FC = () => {
-  const [orders] = useState<Order[]>(getStoredOrders());
+  const [orders, setOrders] = useState<Order[]>(getStoredOrders());
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+
+  useEffect(() => {
+    // Realtime Order Subscription
+    const unsubscribe = subscribeToOrders((updatedOrder) => {
+      setOrders((prev) =>
+        prev.map((o) => (o.id === updatedOrder.id || o.orderNumber === updatedOrder.orderNumber ? { ...o, ...updatedOrder } : o))
+      );
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const filteredOrders = (orders || []).filter((o) => {
     const orderNum = o.orderNumber || '';

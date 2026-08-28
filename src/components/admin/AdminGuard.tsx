@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { isDevPreviewActive } from '@/config/devPreview';
+import { isSupabaseConfigured } from '@/lib/supabase';
 import { ShieldAlert, ArrowLeft, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -21,8 +22,8 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
     );
   }
 
-  // If development preview is active, allow local testing without altering AuthContext/database roles
-  if (devPreview) {
+  // If development preview is active AND Supabase is not configured, allow local testing
+  if (devPreview && !isSupabaseConfigured()) {
     return <>{children}</>;
   }
 

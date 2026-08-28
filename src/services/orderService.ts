@@ -1,6 +1,7 @@
 import type { Order, OrderItem, ShippingAddressSnapshot, OrderStatus, PaymentStatus } from '@/types/order';
 import type { CartItem } from '@/types/cart';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { logAdminActivity } from '@/services/auditService';
 
 const LOCAL_STORAGE_ORDERS_KEY = 'arogyapath_orders_v1';
 
@@ -134,7 +135,70 @@ export const createOrder = async (params: CreateOrderParams): Promise<Order> => 
     throw new Error('Cannot create an order with an empty cart.');
   }
 
-  // Calculate trusted subtotal from unit prices
+  // 1. Supabase Atomic Checkout RPC execution if configured
+  if (isSupabaseConfigured()) {
+    try {
+      const itemsPayload = cartItems.map((item) => ({
+        product_id: item.productId,
+        quantity: item.quantity,
+      }));
+
+      const { data, error } = await supabase.rpc('create_customer_order', {
+        p_customer_name: customerName,
+        p_customer_email: customerEmail,
+        p_customer_phone: customerPhone,
+        p_shipping_address: shippingAddress,
+        p_items: itemsPayload,
+        p_payment_provider: paymentProvider,
+      });
+
+      if (!error && data) {
+        const orderId = data.id;
+        const orderNumber = data.order_number;
+        const total = data.total;
+
+        const createdOrder: Order = {
+          id: orderId,
+          orderNumber,
+          userId,
+          customerName,
+          customerEmail,
+          customerPhone,
+          shippingAddress,
+          subtotal: total,
+          shippingFee: 0,
+          discount: 0,
+          total,
+          currency: 'INR',
+          orderStatus: 'pending',
+          paymentStatus: 'pending',
+          paymentProvider,
+          items: cartItems.map((item, idx) => ({
+            id: `item-${orderId}-${idx + 1}`,
+            orderId,
+            productId: item.productId,
+            productName: item.product.name,
+            productImage: item.product.images.primary,
+            variantId: item.variantId,
+            packSize: item.variant.packSize,
+            unitPrice: item.variant.price,
+            quantity: item.quantity,
+            subtotal: item.variant.price * item.quantity,
+          })),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+
+        const existingOrders = getStoredOrders();
+        saveOrdersToStorage([createdOrder, ...existingOrders]);
+        return createdOrder;
+      }
+    } catch (err) {
+      console.warn('Atomic checkout RPC error, falling back to local creation:', err);
+    }
+  }
+
+  // 2. Local Fallback Creation
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.variant.price * item.quantity,
     0
@@ -147,7 +211,6 @@ export const createOrder = async (params: CreateOrderParams): Promise<Order> => 
   const orderId = `ord-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
   const orderNumber = `AP-${Math.floor(100000 + Math.random() * 900000)}`;
 
-  // Create immutable snapshot of items
   const items: OrderItem[] = cartItems.map((item, idx) => ({
     id: `item-${orderId}-${idx + 1}`,
     orderId,
@@ -182,49 +245,8 @@ export const createOrder = async (params: CreateOrderParams): Promise<Order> => 
     updatedAt: new Date().toISOString(),
   };
 
-  // 1. Local Storage Sync
   const existingOrders = getStoredOrders();
   saveOrdersToStorage([newOrder, ...existingOrders]);
-
-  // 2. Supabase DB Insertion (if credentials configured)
-  if (isSupabaseConfigured()) {
-    try {
-      await supabase.from('orders').insert({
-        id: newOrder.id,
-        order_number: newOrder.orderNumber,
-        user_id: userId || null,
-        customer_name: customerName,
-        customer_email: customerEmail,
-        customer_phone: customerPhone,
-        shipping_address_json: shippingAddress,
-        subtotal: newOrder.subtotal,
-        shipping_fee: newOrder.shippingFee,
-        discount: newOrder.discount,
-        total: newOrder.total,
-        currency: newOrder.currency,
-        order_status: newOrder.orderStatus,
-        payment_status: newOrder.paymentStatus,
-        payment_provider: paymentProvider,
-      });
-
-      const orderItemRows = items.map((item) => ({
-        order_id: item.orderId,
-        product_id: item.productId,
-        product_name_snapshot: item.productName,
-        product_image_snapshot: item.productImage,
-        variant_id: item.variantId,
-        pack_size_snapshot: item.packSize,
-        unit_price_snapshot: item.unitPrice,
-        quantity: item.quantity,
-        subtotal: item.subtotal,
-      }));
-
-      await supabase.from('order_items').insert(orderItemRows);
-    } catch {
-      // Graceful fallback to local state
-    }
-  }
-
   return newOrder;
 };
 
@@ -259,15 +281,65 @@ export const updateOrderStatus = async (
         .from('orders')
         .update({
           order_status: orderStatus,
-          payment_status: paymentStatus,
-          provider_payment_id: providerPaymentId,
+          payment_status: paymentStatus || undefined,
+          provider_payment_id: providerPaymentId || undefined,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', orderId);
+        .or(`id.eq.${orderId},order_number.eq.${orderId}`);
     } catch {
       // Graceful fallback
     }
   }
 
+  await logAdminActivity({
+    action: 'UPDATE_ORDER_STATUS',
+    entityType: 'order',
+    entityId: orderId,
+    details: { orderStatus, paymentStatus, providerPaymentId },
+  });
+
   return updatedOrder;
+};
+
+// Realtime Order Subscription helper
+export const subscribeToOrders = (onUpdate: (order: Order) => void) => {
+  if (!isSupabaseConfigured()) return () => {};
+
+  const channel = supabase
+    .channel('public:orders')
+    .on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'orders' },
+      (payload) => {
+        const row = payload.new;
+        if (row) {
+          const updated: Order = {
+            id: row.id,
+            orderNumber: row.order_number,
+            userId: row.user_id,
+            customerName: row.customer_name,
+            customerEmail: row.customer_email,
+            customerPhone: row.customer_phone,
+            shippingAddress: row.shipping_address_json,
+            subtotal: row.subtotal,
+            shippingFee: row.shipping_fee,
+            discount: row.discount,
+            total: row.total,
+            currency: row.currency,
+            orderStatus: row.order_status as OrderStatus,
+            paymentStatus: row.payment_status as PaymentStatus,
+            paymentProvider: row.payment_provider,
+            items: [],
+            createdAt: row.created_at,
+            updatedAt: row.updated_at,
+          };
+          onUpdate(updated);
+        }
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
 };

@@ -2,6 +2,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { UserProfile, UserAddress } from '@/types/auth';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { fetchUserAddresses } from '@/services/addressService';
+import { fetchUserWishlist } from '@/services/wishlistService';
 
 export interface AuthContextType {
   user: UserProfile | null;
@@ -14,11 +16,11 @@ export interface AuthContextType {
   login: (email: string, pass: string) => Promise<boolean>;
   loginAsDemoAdmin: () => void;
   loginAsDemoCustomer: () => void;
-  register: (email: string, pass: string, fullName: string) => Promise<boolean>;
+  register: (email: string, pass: string, fullName: string, phone?: string) => Promise<boolean>;
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<boolean>;
   changePassword: (newPass: string) => Promise<boolean>;
-  updateProfile: (data: Partial<UserProfile>) => void;
+  updateProfile: (data: Partial<UserProfile>) => Promise<void>;
   addAddress: (addr: Omit<UserAddress, 'id' | 'userId'>) => void;
   updateAddress: (id: string, data: Partial<UserAddress>) => void;
   deleteAddress: (id: string) => void;
@@ -32,8 +34,6 @@ export interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_USER_KEY = 'arogyapath_user';
-const LOCAL_STORAGE_ADDR_KEY = 'arogyapath_addresses';
-const LOCAL_STORAGE_WISHLIST_KEY = 'arogyapath_wishlist';
 
 const DEMO_CUSTOMER_USER: UserProfile = {
   id: 'usr_demo_aarav_1',
@@ -53,75 +53,117 @@ const DEMO_ADMIN_USER: UserProfile = {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
+    if (isSupabaseConfigured()) {
+      return null;
+    }
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
       if (saved) return JSON.parse(saved);
-      // Default to active demo customer session for instant accessibility without setup friction
       return DEMO_CUSTOMER_USER;
     } catch {
       return DEMO_CUSTOMER_USER;
     }
   });
 
-  const [addresses, setAddresses] = useState<UserAddress[]>(() => {
-    try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_ADDR_KEY);
-      return saved
-        ? JSON.parse(saved)
-        : [
-            {
-              id: 'addr_default_1',
-              userId: 'usr_demo_aarav_1',
-              fullName: 'Aarav Sharma',
-              phone: '+91 9876543210',
-              street: '42 Lotus Heights, MG Road',
-              city: 'Bengaluru',
-              state: 'Karnataka',
-              pincode: '560001',
-              country: 'India',
-              label: 'Home',
-              isDefault: true,
-            },
-          ];
-    } catch {
-      return [];
-    }
-  });
-
-  const [wishlistProductIds, setWishlistProductIds] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_WISHLIST_KEY);
-      return saved ? JSON.parse(saved) : ['prod_testo_power_1'];
-    } catch {
-      return ['prod_testo_power_1'];
-    }
-  });
-
-  const [isLoading, setIsLoading] = useState(false);
+  const [addresses, setAddresses] = useState<UserAddress[]>([]);
+  const [wishlistProductIds, setWishlistProductIds] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(() => isSupabaseConfigured());
   const [error, setError] = useState<string | null>(null);
 
+  // Synchronize with Supabase Auth session & DB profile
   useEffect(() => {
-    if (user) {
-      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(user));
-    } else {
-      localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+    if (!isSupabaseConfigured()) {
+      return;
+    }
+
+    const loadProfile = async (authUserId: string, authEmail: string) => {
+      try {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', authUserId)
+          .single();
+
+        if (profileError || !profileData) {
+          // Profile fallback
+          setUser({
+            id: authUserId,
+            email: authEmail,
+            fullName: 'Valued Customer',
+            role: 'customer',
+            createdAt: new Date().toISOString(),
+          });
+        } else {
+          setUser({
+            id: profileData.id,
+            email: profileData.email,
+            fullName: profileData.full_name,
+            phone: profileData.phone || undefined,
+            role: profileData.role as 'customer' | 'admin' | 'superadmin',
+            createdAt: profileData.created_at,
+          });
+        }
+
+        // Fetch addresses & wishlist for logged in user
+        const userAddrs = await fetchUserAddresses(authUserId);
+        setAddresses(userAddrs);
+
+        const userWish = await fetchUserWishlist(authUserId);
+        setWishlistProductIds(userWish);
+      } catch (err) {
+        console.error('Error loading Supabase profile:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Initialize session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        loadProfile(session.user.id, session.user.email || '');
+      } else {
+        setUser(null);
+        setIsLoading(false);
+      }
+    });
+
+    // Listen to Auth State Changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        loadProfile(session.user.id, session.user.email || '');
+      } else {
+        setUser(null);
+        setAddresses([]);
+        setWishlistProductIds([]);
+        setIsLoading(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) {
+      if (user) {
+        localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(user));
+      } else {
+        localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+      }
     }
   }, [user]);
 
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_ADDR_KEY, JSON.stringify(addresses));
-  }, [addresses]);
-
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_WISHLIST_KEY, JSON.stringify(wishlistProductIds));
-  }, [wishlistProductIds]);
-
   const loginAsDemoCustomer = () => {
-    setUser(DEMO_CUSTOMER_USER);
+    if (!isSupabaseConfigured()) {
+      setUser(DEMO_CUSTOMER_USER);
+    }
   };
 
   const loginAsDemoAdmin = () => {
-    setUser(DEMO_ADMIN_USER);
+    if (!isSupabaseConfigured()) {
+      setUser(DEMO_ADMIN_USER);
+    }
   };
 
   const login = async (email: string, pass: string): Promise<boolean> => {
@@ -132,14 +174,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { data, error: sbError } = await supabase.auth.signInWithPassword({ email, password: pass });
         if (sbError) throw sbError;
         if (data.user) {
-          const profile: UserProfile = {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', data.user.id)
+            .single();
+
+          setUser({
             id: data.user.id,
             email: data.user.email || email,
-            fullName: data.user.user_metadata?.full_name || 'Customer',
-            role: (data.user.user_metadata?.role as 'customer' | 'admin') || 'customer',
+            fullName: profile?.full_name || 'Customer',
+            phone: profile?.phone || undefined,
+            role: (profile?.role as 'customer' | 'admin' | 'superadmin') || 'customer',
             createdAt: data.user.created_at,
-          };
-          setUser(profile);
+          });
           setIsLoading(false);
           return true;
         }
@@ -164,7 +212,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (email: string, pass: string, fullName: string): Promise<boolean> => {
+  const register = async (
+    email: string,
+    pass: string,
+    fullName: string,
+    phone?: string
+  ): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
     try {
@@ -172,18 +225,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { data, error: sbError } = await supabase.auth.signUp({
           email,
           password: pass,
-          options: { data: { full_name: fullName, role: 'customer' } },
+          options: {
+            data: {
+              full_name: fullName,
+              phone,
+              role: 'customer', // STRICTLY DEFAULT TO CUSTOMER
+            },
+          },
         });
         if (sbError) throw sbError;
+
         if (data.user) {
-          const profile: UserProfile = {
+          // Ensure profile is inserted
+          await supabase.from('profiles').upsert({
             id: data.user.id,
-            email: data.user.email || email,
+            email,
+            full_name: fullName,
+            phone: phone || null,
+            role: 'customer', // STRICTLY ENFORCE CUSTOMER ROLE
+          });
+
+          setUser({
+            id: data.user.id,
+            email,
             fullName,
+            phone,
             role: 'customer',
             createdAt: data.user.created_at,
-          };
-          setUser(profile);
+          });
           setIsLoading(false);
           return true;
         }
@@ -193,6 +262,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: `usr_${Date.now()}`,
         email,
         fullName,
+        phone,
         role: 'customer',
         createdAt: new Date().toISOString(),
       };
@@ -211,6 +281,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await supabase.auth.signOut();
     }
     setUser(null);
+    setAddresses([]);
+    setWishlistProductIds([]);
   };
 
   const forgotPassword = async (email: string): Promise<boolean> => {
@@ -247,9 +319,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateProfile = (data: Partial<UserProfile>) => {
+  const updateProfile = async (data: Partial<UserProfile>) => {
     if (!user) return;
-    setUser({ ...user, ...data });
+    const safeData = { ...data };
+    delete (safeData as Partial<UserProfile> & { role?: string }).role;
+
+    if (isSupabaseConfigured()) {
+      try {
+        await supabase
+          .from('profiles')
+          .update({
+            full_name: safeData.fullName || user.fullName,
+            phone: safeData.phone || user.phone,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', user.id);
+      } catch (err) {
+        console.error('Error updating profile in Supabase:', err);
+      }
+    }
+    setUser((prev) => (prev ? { ...prev, ...safeData } : null));
   };
 
   const addAddress = (newAddr: Omit<UserAddress, 'id' | 'userId'>) => {

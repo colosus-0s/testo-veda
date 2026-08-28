@@ -1,6 +1,7 @@
 import type { Product } from '@/types/product';
 import { INITIAL_PRODUCTS } from '@/features/products/data/initialProducts';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { logAdminActivity } from '@/services/auditService';
 
 const LOCAL_STORAGE_PRODUCTS_KEY = 'arogyapath_products_v2';
 const LOCAL_STORAGE_MOVEMENTS_KEY = 'arogyapath_inventory_movements_v1';
@@ -12,7 +13,7 @@ export interface InventoryMovement {
   quantityChange: number;
   previousStock: number;
   newStock: number;
-  type: 'initial' | 'purchase' | 'restock' | 'manual_adjustment' | 'damaged_removed';
+  type: 'initial' | 'purchase' | 'restock' | 'manual_adjustment' | 'damaged' | 'deactivated';
   reason?: string;
   timestamp: string;
 }
@@ -202,19 +203,30 @@ export const createProduct = async (productData: Partial<Product>): Promise<Prod
       await supabase.from('products').insert({
         id: newProduct.id,
         slug: newProduct.slug,
+        sku: newProduct.sku,
         name: newProduct.name,
         price: newProduct.price,
         compare_at_price: newProduct.compareAtPrice,
         stock: newProduct.stock,
-        sku: newProduct.sku,
         category: newProduct.category,
         primary_image: newProduct.images.primary,
         images_json: newProduct.images,
+        badges_json: newProduct.badges,
+        short_description: newProduct.shortDescription,
+        description: newProduct.description,
+        is_active: true,
       });
     } catch {
       // Fallback
     }
   }
+
+  await logAdminActivity({
+    action: 'CREATE_PRODUCT',
+    entityType: 'product',
+    entityId: newProduct.id,
+    details: { name: newProduct.name, sku: newProduct.sku, price: newProduct.price, stock: newProduct.stock },
+  });
 
   return newProduct;
 };
@@ -257,12 +269,21 @@ export const updateProduct = async (id: string, productData: Partial<Product>): 
             compare_at_price: prodToSave.compareAtPrice,
             stock: prodToSave.stock,
             category: prodToSave.category,
+            is_active: prodToSave.active !== false,
+            updated_at: new Date().toISOString(),
           })
           .eq('id', id);
       } catch {
         // Fallback
       }
     }
+
+    await logAdminActivity({
+      action: 'UPDATE_PRODUCT',
+      entityType: 'product',
+      entityId: id,
+      details: { name: prodToSave.name, price: prodToSave.price, stock: prodToSave.stock },
+    });
   }
 
   return updatedProduct;
@@ -282,8 +303,27 @@ export const deactivateProduct = async (id: string): Promise<boolean> => {
   });
   saveProductsToStorage(updatedList);
   if (prodName) {
-    recordInventoryMovement(id, prodName, -prevStock, prevStock, 0, 'damaged_removed', 'Product Deactivated/Archived');
+    recordInventoryMovement(id, prodName, -prevStock, prevStock, 0, 'damaged', 'Product Deactivated/Archived');
   }
+
+  if (isSupabaseConfigured()) {
+    try {
+      await supabase
+        .from('products')
+        .update({ is_active: false, stock: 0, updated_at: new Date().toISOString() })
+        .eq('id', id);
+    } catch {
+      // Fallback
+    }
+  }
+
+  await logAdminActivity({
+    action: 'DEACTIVATE_PRODUCT',
+    entityType: 'product',
+    entityId: id,
+    details: { name: prodName, previousStock: prevStock },
+  });
+
   return true;
 };
 
@@ -306,6 +346,24 @@ export const reactivateProduct = async (id: string): Promise<Product | null> => 
     const prod: Product = updated;
     saveProductsToStorage(updatedList);
     recordInventoryMovement(prod.id, prod.name, prod.stock - prevStock, prevStock, prod.stock, 'restock', 'Product Reactivated');
+
+    if (isSupabaseConfigured()) {
+      try {
+        await supabase
+          .from('products')
+          .update({ is_active: true, stock: prod.stock, updated_at: new Date().toISOString() })
+          .eq('id', id);
+      } catch {
+        // Fallback
+      }
+    }
+
+    await logAdminActivity({
+      action: 'REACTIVATE_PRODUCT',
+      entityType: 'product',
+      entityId: id,
+      details: { name: prod.name, stock: prod.stock },
+    });
   }
   return updated;
 };
@@ -319,7 +377,7 @@ export const updateStock = async (id: string, newStock: number, reason?: string)
     if (p.id === id || p.slug === id) {
       prevStock = p.stock;
       const clampedStock = Math.max(0, newStock);
-      updated = { ...p, stock: clampedStock, active: clampedStock > 0 ? p.active : p.active };
+      updated = { ...p, stock: clampedStock };
       return updated;
     }
     return p;
@@ -327,16 +385,38 @@ export const updateStock = async (id: string, newStock: number, reason?: string)
 
   if (updated) {
     const prod: Product = updated;
+    const delta = prod.stock - prevStock;
     saveProductsToStorage(updatedList);
     recordInventoryMovement(
       prod.id,
       prod.name,
-      prod.stock - prevStock,
+      delta,
       prevStock,
       prod.stock,
-      prod.stock > prevStock ? 'restock' : 'manual_adjustment',
+      delta >= 0 ? 'restock' : 'manual_adjustment',
       reason || 'Stock Adjustment'
     );
+
+    if (isSupabaseConfigured()) {
+      try {
+        // Call atomic update_product_stock RPC in PostgreSQL
+        await supabase.rpc('update_product_stock', {
+          p_product_id: id,
+          p_delta: delta,
+          p_movement_type: delta >= 0 ? 'restock' : 'manual_adjustment',
+          p_notes: reason || 'Stock Adjustment',
+        });
+      } catch (err) {
+        console.warn('Supabase update_product_stock RPC fallback:', err);
+      }
+    }
+
+    await logAdminActivity({
+      action: 'UPDATE_STOCK',
+      entityType: 'product',
+      entityId: id,
+      details: { previousStock: prevStock, newStock: prod.stock, delta, reason },
+    });
   }
   return updated;
 };
