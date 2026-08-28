@@ -8,7 +8,7 @@ import { ProductPrice } from '@/components/commerce/ProductPrice';
 import { ProductRating } from '@/components/commerce/ProductRating';
 import { QuantitySelector } from '@/components/commerce/QuantitySelector';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { INITIAL_PRODUCTS } from '@/features/products/data/initialProducts';
+import { getProductBySlug, getProducts } from '@/repositories/productRepository';
 import { Badge } from '@/components/ui/Badge';
 import { Accordion } from '@/components/ui/Accordion';
 import { ProductCard } from '@/components/commerce/ProductCard';
@@ -17,7 +17,7 @@ import { useCart } from '@/context/CartContext';
 export const ProductDetailPage: React.FC = () => {
   const { addToCart } = useCart();
   const { slug } = useParams<{ slug: string }>();
-  const product = INITIAL_PRODUCTS.find((p) => p.slug === slug) || INITIAL_PRODUCTS[0];
+  const product = getProductBySlug(slug || '') || getProducts()[0];
   
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
   const [quantity, setQuantity] = useState(1);

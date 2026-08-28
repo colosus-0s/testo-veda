@@ -3,11 +3,18 @@ import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ShieldCheck, ArrowRight, ChevronDown } from 'lucide-react';
 import { HERO_CONFIG } from '../config/homepageConfig';
+import { getActiveProducts } from '@/repositories/productRepository';
 import { Button } from '@/components/ui/Button';
 
 export const HeroSection: React.FC = () => {
   const [videoFailed, setVideoFailed] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const activeProducts = getActiveProducts();
+  const featuredProduct = activeProducts.find((p) => p.featured) || activeProducts[0];
+
+  const primaryCtaLink = featuredProduct ? `/products/${featuredProduct.slug}` : HERO_CONFIG.primaryCtaLink;
+  const primaryCtaText = featuredProduct ? `Explore ${featuredProduct.name}` : HERO_CONFIG.primaryCtaText;
+  const subheadline = featuredProduct ? featuredProduct.shortDescription : HERO_CONFIG.subheadline;
 
   return (
     <section className="relative min-h-[75vh] sm:min-h-[85vh] w-full flex items-center justify-center overflow-hidden bg-[#0f0f11] pt-12 opacity-100">
@@ -27,8 +34,8 @@ export const HeroSection: React.FC = () => {
           </video>
         ) : (
           <img
-            src={HERO_CONFIG.fallbackImageUrl}
-            alt="Arogya Path TESTO Natural Power+"
+            src={featuredProduct?.images?.primary || HERO_CONFIG.fallbackImageUrl}
+            alt={featuredProduct?.name || 'Arogya Path Botanical Formulation'}
             className="w-full h-full object-cover object-center opacity-45"
           />
         )}
@@ -63,7 +70,7 @@ export const HeroSection: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto font-normal leading-relaxed mb-10 drop-shadow"
         >
-          {HERO_CONFIG.subheadline}
+          {subheadline}
         </motion.p>
 
         <motion.div
@@ -71,14 +78,14 @@ export const HeroSection: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto"
         >
-          <Link to={HERO_CONFIG.primaryCtaLink} className="w-full sm:w-auto">
+          <Link to={primaryCtaLink} className="w-full sm:w-auto">
             <Button
               variant="gold"
               size="lg"
               className="w-full sm:w-auto text-base shadow-xl shadow-[#C7A33A]/20"
               rightIcon={<ArrowRight className="w-5 h-5" />}
             >
-              {HERO_CONFIG.primaryCtaText}
+              {primaryCtaText}
             </Button>
           </Link>
 

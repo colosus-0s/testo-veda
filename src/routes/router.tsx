@@ -31,7 +31,7 @@ import { AccountWishlistPage } from '@/pages/account/AccountWishlistPage';
 
 // Protection Guards
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { AdminRoute } from '@/components/auth/AdminRoute';
+import { AdminGuard } from '@/components/admin/AdminGuard';
 
 // Admin Pages
 import { AdminLoginPage } from '@/pages/admin/AdminLoginPage';
@@ -40,8 +40,11 @@ import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
 import { AdminOrdersPage } from '@/pages/admin/AdminOrdersPage';
 import { AdminOrderDetailPage } from '@/pages/admin/AdminOrderDetailPage';
 import { AdminProductsPage } from '@/pages/admin/AdminProductsPage';
+import { AdminProductCreatePage } from '@/pages/admin/AdminProductCreatePage';
+import { AdminProductEditPage } from '@/pages/admin/AdminProductEditPage';
 import { AdminInventoryPage } from '@/pages/admin/AdminInventoryPage';
 import { AdminCustomersPage } from '@/pages/admin/AdminCustomersPage';
+import { AdminCustomerDetailPage } from '@/pages/admin/AdminCustomerDetailPage';
 import { AdminSettingsPage } from '@/pages/admin/AdminSettingsPage';
 
 export const router = createBrowserRouter([
@@ -96,13 +99,13 @@ export const router = createBrowserRouter([
     errorElement: <RouteErrorBoundary />,
   },
 
-  // Admin Portal Layout & Sub-Routes
+  // Admin Portal Layout & Sub-Routes (Guarded by AdminGuard)
   {
     path: '/admin',
     element: (
-      <AdminRoute>
+      <AdminGuard>
         <AdminLayout />
-      </AdminRoute>
+      </AdminGuard>
     ),
     errorElement: <RouteErrorBoundary />,
     children: [
@@ -110,8 +113,11 @@ export const router = createBrowserRouter([
       { path: 'orders', element: <AdminOrdersPage /> },
       { path: 'orders/:orderId', element: <AdminOrderDetailPage /> },
       { path: 'products', element: <AdminProductsPage /> },
+      { path: 'products/new', element: <AdminProductCreatePage /> },
+      { path: 'products/:productId/edit', element: <AdminProductEditPage /> },
       { path: 'inventory', element: <AdminInventoryPage /> },
       { path: 'customers', element: <AdminCustomersPage /> },
+      { path: 'customers/:customerId', element: <AdminCustomerDetailPage /> },
       { path: 'settings', element: <AdminSettingsPage /> },
       { path: '*', element: <Navigate to="/admin" replace /> },
     ],

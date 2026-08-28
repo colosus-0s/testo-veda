@@ -2,25 +2,27 @@ import React, { useState } from 'react';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { ProductCard } from '@/components/commerce/ProductCard';
-import { INITIAL_PRODUCTS } from '@/features/products/data/initialProducts';
+import { getActiveProducts } from '@/repositories/productRepository';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { ShieldCheck, Sparkles, Filter, CheckCircle2 } from 'lucide-react';
 
 export const ShopPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const products = getActiveProducts();
 
   const categories = [
     { id: 'all', label: 'All Formulations' },
     { id: 'vitality', label: 'Vitality & Stamina' },
     { id: 'vigor', label: 'Daily Vigor' },
     { id: 'adaptogen', label: 'Stress Adaptation' },
+    { id: 'recovery', label: 'Sleep & Recovery' },
   ];
 
-  const filteredProducts = INITIAL_PRODUCTS.filter((product) => {
-    const matchesCategory = selectedCategory === 'all' || product.category.toLowerCase().includes(selectedCategory);
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory = selectedCategory === 'all' || (product.category && product.category.toLowerCase().includes(selectedCategory));
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          product.shortDescription.toLowerCase().includes(searchQuery.toLowerCase());
+                          (product.shortDescription && product.shortDescription.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
 
