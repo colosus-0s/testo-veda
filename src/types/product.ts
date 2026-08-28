@@ -93,6 +93,7 @@ export interface Product {
   bestSeller: boolean;
   newArrival: boolean;
   tags: string[];
+  active?: boolean;
   seo: ProductSEO;
 
   regulatory: {

@@ -2,16 +2,18 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
+import { isDevPreviewActive } from '@/config/devPreview';
 import { getStoredOrders } from '@/services/orderService';
 import type { Order } from '@/types/order';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Package, MapPin, Heart, ShoppingBag, ArrowRight, ChevronRight, ShieldCheck } from 'lucide-react';
+import { Package, MapPin, Heart, ShoppingBag, ArrowRight, ChevronRight, ShieldCheck, ShieldAlert, LayoutDashboard } from 'lucide-react';
 
 export const AccountOverviewPage: React.FC = () => {
-  const { user, addresses, wishlistProductIds } = useAuth();
+  const { user, addresses, wishlistProductIds, isAdmin } = useAuth();
   const { cartSummary } = useCart();
   const orders: Order[] = getStoredOrders();
+  const devPreview = isDevPreviewActive();
 
   const summaryTiles = [
     {
@@ -63,6 +65,30 @@ export const AccountOverviewPage: React.FC = () => {
           Manage your dietary formulation orders, saved delivery addresses, and account security.
         </p>
       </div>
+
+      {/* ADMINISTRATION Section (Dev Preview & Admin Users) */}
+      {(devPreview || isAdmin) && (
+        <div className="bg-amber-50/90 p-6 rounded-3xl border-2 border-amber-400 space-y-4 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-[10px] font-black uppercase tracking-widest text-amber-950 bg-amber-200 px-3 py-1 rounded-full inline-block">
+                ADMINISTRATION {devPreview && !isAdmin ? '(DEV PREVIEW)' : ''}
+              </span>
+              <h3 className="font-serif text-xl font-bold text-amber-950 flex items-center gap-2 pt-1">
+                <ShieldAlert className="text-amber-700 shrink-0" size={20} /> Store Administration Panel
+              </h3>
+            </div>
+            <Link to="/admin">
+              <Button variant="gold" size="md" className="w-full sm:w-auto font-bold shadow-sm" leftIcon={<LayoutDashboard size={16} />} rightIcon={<ArrowRight size={14} />}>
+                Open Admin Dashboard
+              </Button>
+            </Link>
+          </div>
+          <p className="text-xs text-amber-900 leading-relaxed font-semibold">
+            Access store operations, order fulfillment, product catalog management, warehouse inventory stock controls, and customer records.
+          </p>
+        </div>
+      )}
 
       {/* Visual Summary Cards/Tiles */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

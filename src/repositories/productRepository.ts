@@ -33,7 +33,7 @@ export const saveProductsToStorage = (products: Product[]) => {
 
 export const getActiveProducts = (): Product[] => {
   const products = getProducts();
-  return products.filter((p) => p.featured || p.stock > 0 || (p.regulatory && p.regulatory.mrp > 0));
+  return products.filter((p) => p.active !== false && p.stock > 0);
 };
 
 export const getProductById = (id: string): Product | null => {
@@ -206,8 +206,8 @@ export const updateProduct = async (id: string, productData: Partial<Product>): 
 export const deactivateProduct = async (id: string): Promise<boolean> => {
   const existing = getProducts();
   const updatedList = existing.map((p) => {
-    if (p.id === id) {
-      return { ...p, stock: 0, featured: false };
+    if (p.id === id || p.slug === id) {
+      return { ...p, active: false, stock: 0, featured: false };
     }
     return p;
   });

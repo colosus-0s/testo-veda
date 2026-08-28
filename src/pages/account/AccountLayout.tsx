@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { isDevPreviewActive } from '@/config/devPreview';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
@@ -17,6 +18,8 @@ import {
   LogOut,
   ChevronRight,
   ShieldCheck,
+  LayoutDashboard,
+  ShieldAlert,
 } from 'lucide-react';
 
 interface NavItem {
@@ -32,9 +35,10 @@ interface NavSection {
 }
 
 export const AccountLayout: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const devPreview = isDevPreviewActive();
 
   const handleSignOut = async () => {
     await logout();
@@ -67,6 +71,19 @@ export const AccountLayout: React.FC = () => {
       ],
     },
   ];
+
+  if (isAdmin || devPreview) {
+    navSections.push({
+      title: 'ADMINISTRATION',
+      items: [
+        {
+          label: devPreview && !isAdmin ? 'Admin Panel (Dev Preview)' : 'Admin Panel',
+          href: '/admin',
+          icon: LayoutDashboard,
+        },
+      ],
+    });
+  }
 
   const isItemActive = (href: string, exact?: boolean) => {
     if (exact) return location.pathname === href;
@@ -125,6 +142,7 @@ export const AccountLayout: React.FC = () => {
                       {section.items.map((item) => {
                         const Icon = item.icon;
                         const active = isItemActive(item.href, item.exact);
+                        const isAdminItem = item.href.startsWith('/admin');
                         return (
                           <Link
                             key={item.href}
@@ -132,11 +150,13 @@ export const AccountLayout: React.FC = () => {
                             className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
                               active
                                 ? 'bg-[#6A1423] text-white shadow-sm'
+                                : isAdminItem
+                                ? 'bg-amber-500/10 text-amber-900 border border-amber-300 hover:bg-amber-500 hover:text-white'
                                 : 'text-[#171717] hover:bg-[#FCFBF8] hover:text-[#6A1423]'
                             }`}
                           >
                             <span className="flex items-center gap-2.5">
-                              <Icon size={16} className={active ? 'text-white' : 'text-slate-500'} />
+                              <Icon size={16} className={active ? 'text-white' : isAdminItem ? 'text-amber-800' : 'text-slate-500'} />
                               {item.label}
                             </span>
                             <ChevronRight size={14} className={active ? 'text-white' : 'text-slate-400'} />
@@ -156,6 +176,17 @@ export const AccountLayout: React.FC = () => {
                   </button>
                 </div>
               </div>
+
+              {devPreview && (
+                <div className="bg-amber-50 p-4 rounded-2xl border border-amber-300 text-xs text-amber-900 space-y-1.5">
+                  <span className="flex items-center gap-1.5 font-bold text-amber-950">
+                    <ShieldAlert size={16} className="text-amber-700 shrink-0" /> Dev Admin Access Active
+                  </span>
+                  <p className="text-[11px] leading-relaxed">
+                    Development preview mode allows inspecting store management UI prior to Supabase RLS integration.
+                  </p>
+                </div>
+              )}
 
               <div className="bg-[#FCFBF8] p-4 rounded-2xl border border-[#EBE7DF] text-xs text-slate-600 space-y-1">
                 <span className="flex items-center gap-1.5 font-bold text-[#173C2B]">

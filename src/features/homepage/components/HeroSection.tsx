@@ -73,24 +73,29 @@ export const HeroSection: React.FC = () => {
           {subheadline}
         </motion.p>
 
+        {/* CTA Container with ample max-width & responsive flex layout to eliminate text collision */}
         <motion.div
           initial={{ opacity: 1, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 max-w-2xl mx-auto px-2"
         >
-          <Link to={primaryCtaLink} className="w-full sm:w-auto">
+          <Link to={primaryCtaLink} className="w-full sm:w-auto shrink-0">
             <Button
               variant="gold"
               size="lg"
-              className="w-full sm:w-auto text-base shadow-xl shadow-[#C7A33A]/20"
-              rightIcon={<ArrowRight className="w-5 h-5" />}
+              className="w-full sm:w-auto text-sm sm:text-base font-bold px-6 py-3.5 shadow-xl shadow-[#C7A33A]/20 whitespace-normal sm:whitespace-nowrap leading-snug"
+              rightIcon={<ArrowRight className="w-5 h-5 shrink-0" />}
             >
               {primaryCtaText}
             </Button>
           </Link>
 
-          <a href={HERO_CONFIG.secondaryCtaLink} className="w-full sm:w-auto">
-            <Button variant="outline" size="lg" className="w-full sm:w-auto text-base border-white/30 hover:border-white/60 text-white">
+          <a href={HERO_CONFIG.secondaryCtaLink} className="w-full sm:w-auto shrink-0">
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto text-sm sm:text-base font-bold px-6 py-3.5 border-white/30 hover:border-white/60 text-white whitespace-nowrap"
+            >
               {HERO_CONFIG.secondaryCtaText}
             </Button>
           </a>
