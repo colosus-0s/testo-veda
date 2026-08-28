@@ -6,6 +6,7 @@ export interface ProductPriceProps {
   currency?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   showDiscountBadge?: boolean;
+  textColor?: string;
   className?: string;
 }
 
@@ -15,6 +16,7 @@ export const ProductPrice: React.FC<ProductPriceProps> = ({
   currency = '₹',
   size = 'md',
   showDiscountBadge = true,
+  textColor = 'text-[#171717]',
   className = '',
 }) => {
   const isDiscounted = compareAtPrice && compareAtPrice > price;
@@ -38,7 +40,7 @@ export const ProductPrice: React.FC<ProductPriceProps> = ({
 
   return (
     <div className={`inline-flex items-baseline gap-2 flex-wrap ${className}`}>
-      <span className={`font-serif-display text-white ${sizeClasses[size]}`}>
+      <span className={`font-serif-display ${textColor} ${sizeClasses[size]}`}>
         {currency}
         {price.toLocaleString('en-IN')}
       </span>
@@ -50,7 +52,7 @@ export const ProductPrice: React.FC<ProductPriceProps> = ({
             {compareAtPrice.toLocaleString('en-IN')}
           </span>
           {showDiscountBadge && (
-            <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-700/40 px-1.5 py-0.5 rounded">
+            <span className="text-[11px] font-semibold text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.5 rounded">
               SAVE {savings}%
             </span>
           )}

@@ -12,14 +12,14 @@ export const Badge: React.FC<BadgeProps> = ({
   className = '',
   ...props
 }) => {
-  const base = 'inline-flex items-center font-medium tracking-wide uppercase rounded select-none';
+  const base = 'inline-flex items-center font-bold tracking-wider uppercase rounded-md select-none shadow-sm';
 
   const variants = {
-    maroon: 'bg-[#8b1528] text-white',
-    gold: 'bg-[#d4af37]/15 text-[#d4af37] border border-[#d4af37]/30',
-    green: 'bg-[#2e6f40]/20 text-[#3d8b52] border border-[#2e6f40]/40',
-    outline: 'border border-neutral-700 text-neutral-300',
-    veg: 'bg-emerald-950/40 text-emerald-400 border border-emerald-600/40 gap-1.5',
+    maroon: 'bg-[#6A1423] text-white',
+    gold: 'bg-amber-100 text-amber-950 border border-amber-300',
+    green: 'bg-emerald-100 text-emerald-950 border border-emerald-300',
+    outline: 'bg-slate-100 text-slate-900 border border-slate-300',
+    veg: 'bg-emerald-50 text-[#173C2B] border border-emerald-300 gap-1.5',
   };
 
   const sizes = {
@@ -30,7 +30,7 @@ export const Badge: React.FC<BadgeProps> = ({
   return (
     <span className={`${base} ${variants[variant]} ${sizes[size]} ${className}`} {...props}>
       {variant === 'veg' && (
-        <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" aria-hidden="true" />
+        <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block shrink-0" aria-hidden="true" />
       )}
       {children}
     </span>

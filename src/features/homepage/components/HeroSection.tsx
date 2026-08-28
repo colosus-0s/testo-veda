@@ -10,7 +10,7 @@ export const HeroSection: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="relative min-h-[85vh] sm:min-h-[90vh] w-full flex items-center justify-center overflow-hidden bg-[#0f0f11] pt-12">
+    <section className="relative min-h-[75vh] sm:min-h-[85vh] w-full flex items-center justify-center overflow-hidden bg-[#0f0f11] pt-12 opacity-100">
       {/* Background Media Stage */}
       <div className="absolute inset-0 z-0">
         {!videoFailed && !shouldReduceMotion ? (
@@ -39,11 +39,10 @@ export const HeroSection: React.FC = () => {
       <div className="hero-glow top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none" />
 
       {/* Hero Content Box */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-16 pb-16">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-16 pb-16 opacity-100">
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 1, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
           className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#6A1423]/60 border border-[#6A1423] text-xs font-semibold text-[#F3E5AB] mb-6 backdrop-blur-md"
         >
           <ShieldCheck className="w-4 h-4 text-emerald-400" />
@@ -51,9 +50,8 @@ export const HeroSection: React.FC = () => {
         </motion.div>
 
         <motion.h1
-          initial={{ opacity: 0, y: 25 }}
+          initial={{ opacity: 1, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
           className="font-serif text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 drop-shadow-2xl"
         >
           AROGYA PATH <br className="hidden sm:inline" />
@@ -61,18 +59,16 @@ export const HeroSection: React.FC = () => {
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
           className="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto font-normal leading-relaxed mb-10 drop-shadow"
         >
           {HERO_CONFIG.subheadline}
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto"
         >
           <Link to={HERO_CONFIG.primaryCtaLink} className="w-full sm:w-auto">
@@ -97,7 +93,7 @@ export const HeroSection: React.FC = () => {
       {/* Scroll Indicator */}
       <a
         href="#formula"
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 text-slate-400 hover:text-white transition-colors animate-bounce p-2"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 text-slate-400 hover:text-white transition-colors p-2"
         aria-label="Scroll down to formula"
       >
         <ChevronDown className="w-6 h-6" />
