@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingBag, User, Menu, ShieldCheck } from 'lucide-react';
 import { SITE_CONFIG } from '@/config/site';
 import { Drawer } from '@/components/ui/Drawer';
@@ -17,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,6 +30,12 @@ export const Header: React.FC<HeaderProps> = ({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const isActive = (href: string) => {
+    if (href === '/') return location.pathname === '/';
+    if (href === '/testo') return location.pathname === '/testo' || location.pathname.startsWith('/products/');
+    return location.pathname.startsWith(href);
+  };
 
   return (
     <>
@@ -68,15 +75,22 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Desktop Navigation Links */}
           <nav aria-label="Main Navigation" className="hidden lg:flex items-center space-x-7">
-            {SITE_CONFIG.navigation.map((item) => (
-              <Link
-                key={item.label}
-                to={item.href}
-                className="text-sm font-semibold text-[#171717] hover:text-[#6A1423] hover:border-b-2 hover:border-[#6A1423] pb-1 transition-all"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {SITE_CONFIG.navigation.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.label}
+                  to={item.href}
+                  className={`text-sm transition-all pb-1 ${
+                    active
+                      ? 'font-bold text-[#6A1423] border-b-2 border-[#6A1423]'
+                      : 'font-semibold text-[#171717] hover:text-[#6A1423] hover:border-b-2 hover:border-[#6A1423]/50'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Header Action Icons */}
@@ -125,16 +139,21 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <nav className="flex flex-col space-y-4">
-            {SITE_CONFIG.navigation.map((item) => (
-              <Link
-                key={item.label}
-                to={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-lg font-serif font-bold text-[#171717] hover:text-[#6A1423] transition-colors py-1"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {SITE_CONFIG.navigation.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.label}
+                  to={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`text-lg font-serif transition-colors py-1 ${
+                    active ? 'font-black text-[#6A1423] underline' : 'font-bold text-[#171717] hover:text-[#6A1423]'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="pt-6 border-t border-slate-200 space-y-3 text-xs text-slate-600">

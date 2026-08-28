@@ -26,8 +26,8 @@ export const ShopPage: React.FC = () => {
 
   return (
     <div className="w-full bg-[#F7F4ED] text-[#171717] opacity-100 min-h-screen">
-      {/* Shop Hero Stage */}
-      <Section padding="md" className="bg-[#173C2B] text-white border-b border-[#2E6B4A]/50">
+      {/* Shop Hero Stage with explicit Deep Botanical Green background */}
+      <Section padding="md" background="deep-green" className="border-b border-[#2E6B4A]/50">
         <Container>
           <Breadcrumb items={[{ label: 'Shop All Formulations' }]} className="mb-6 text-[#E2E8F0]" />
 
@@ -38,7 +38,7 @@ export const ShopPage: React.FC = () => {
             <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
               Botanical Supplement Storefront
             </h1>
-            <p className="text-slate-200 text-base sm:text-lg leading-relaxed font-normal">
+            <p className="text-[#E2E8F0] text-base sm:text-lg leading-relaxed font-normal">
               Explore our core dietary formulations crafted with classical botanical extracts and transparent label disclosures.
             </p>
 
@@ -58,7 +58,7 @@ export const ShopPage: React.FC = () => {
       </Section>
 
       {/* Filter & Catalog Controls */}
-      <Section padding="lg" className="bg-[#FCFBF8] border-b border-[#EBE7DF]">
+      <Section padding="lg" background="white" className="border-b border-[#EBE7DF]">
         <Container>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-6 border-b border-[#EBE7DF]">
             {/* Category Filter Tabs */}

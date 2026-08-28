@@ -66,8 +66,8 @@ export const FAQPage: React.FC = () => {
 
   return (
     <div className="w-full bg-[#F7F4ED] text-[#171717] opacity-100 min-h-screen">
-      {/* Hero */}
-      <Section padding="md" className="bg-[#173C2B] text-white border-b border-[#2E6B4A]/50">
+      {/* Hero Stage with explicit Deep Botanical Green background */}
+      <Section padding="md" background="deep-green" className="border-b border-[#2E6B4A]/50">
         <Container>
           <Breadcrumb items={[{ label: 'Frequently Asked Questions' }]} className="mb-6 text-[#E2E8F0]" />
 
@@ -78,7 +78,7 @@ export const FAQPage: React.FC = () => {
             <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
               Frequently Asked Questions
             </h1>
-            <p className="text-slate-200 text-base sm:text-lg leading-relaxed font-normal">
+            <p className="text-[#E2E8F0] text-base sm:text-lg leading-relaxed font-normal">
               Find clear answers regarding product formulations, dosage guidelines, FSSAI regulatory licencing, and order fulfillment.
             </p>
           </div>
@@ -86,7 +86,7 @@ export const FAQPage: React.FC = () => {
       </Section>
 
       {/* Main FAQ Stage */}
-      <Section padding="xl" className="bg-[#FCFBF8] border-b border-[#EBE7DF]">
+      <Section padding="xl" background="white" className="border-b border-[#EBE7DF]">
         <Container size="narrow">
           {/* Controls Bar */}
           <div className="space-y-6 mb-12">

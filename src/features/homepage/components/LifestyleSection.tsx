@@ -6,14 +6,13 @@ import { ASSET_REGISTRY } from '@/config/assets';
 
 export const LifestyleSection: React.FC = () => {
   return (
-    <Section padding="xl" className="bg-[#FCFBF8] border-b border-[#EBE7DF] overflow-hidden text-[#171717]">
+    <Section padding="xl" background="white" className="border-b border-[#EBE7DF] overflow-hidden text-[#171717]">
       <Container>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 1, x: 0 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
             className="lg:col-span-6 space-y-6"
           >
             <span className="text-xs uppercase font-bold tracking-widest text-[#6A1423] block">
@@ -48,10 +47,9 @@ export const LifestyleSection: React.FC = () => {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 1, x: 0 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.2 }}
             className="lg:col-span-6 relative"
           >
             <div className="relative bg-[#F7F4ED] rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-square shadow-subtle-card group border border-[#EBE7DF]">

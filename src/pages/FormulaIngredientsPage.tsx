@@ -9,8 +9,8 @@ import { ShieldCheck, Leaf, Sparkles } from 'lucide-react';
 export const FormulaIngredientsPage: React.FC = () => {
   return (
     <div className="w-full bg-[#F7F4ED] text-[#171717] opacity-100 min-h-screen">
-      {/* Page Hero */}
-      <Section padding="md" className="bg-[#173C2B] text-white border-b border-[#2E6B4A]/50">
+      {/* Page Hero Stage with explicit Deep Botanical Green background */}
+      <Section padding="md" background="deep-green" className="border-b border-[#2E6B4A]/50">
         <Container>
           <Breadcrumb items={[{ label: 'Formula & Ingredients' }]} className="mb-6 text-[#E2E8F0]" />
 
@@ -21,7 +21,7 @@ export const FormulaIngredientsPage: React.FC = () => {
             <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
               Formula & Botanical Ingredients
             </h1>
-            <p className="text-slate-200 text-base sm:text-lg leading-relaxed font-normal">
+            <p className="text-[#E2E8F0] text-base sm:text-lg leading-relaxed font-normal">
               10 classical botanical extracts disclosed with full quantitative transparency and technical label declarations.
             </p>
 

@@ -6,8 +6,8 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 export const OurStoryPage: React.FC = () => {
   return (
     <div className="w-full bg-[#F7F4ED] text-[#171717] opacity-100 min-h-screen">
-      {/* Page Hero */}
-      <Section padding="md" className="bg-[#173C2B] text-white border-b border-[#2E6B4A]/50">
+      {/* Page Hero Stage with explicit Deep Botanical Green background */}
+      <Section padding="md" background="deep-green" className="border-b border-[#2E6B4A]/50">
         <Container>
           <Breadcrumb items={[{ label: 'Our Story' }]} className="mb-6 text-[#E2E8F0]" />
 
@@ -18,7 +18,7 @@ export const OurStoryPage: React.FC = () => {
             <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
               The Path To Mindful Wellness
             </h1>
-            <p className="text-slate-200 text-base sm:text-lg leading-relaxed font-normal">
+            <p className="text-[#E2E8F0] text-base sm:text-lg leading-relaxed font-normal">
               Combining classical Indian botanical heritage with modern daily routines and complete quantitative label disclosure.
             </p>
           </div>
@@ -26,7 +26,7 @@ export const OurStoryPage: React.FC = () => {
       </Section>
 
       {/* Editorial Story Chapters */}
-      <Section padding="xl" className="bg-[#FCFBF8] border-b border-[#EBE7DF]">
+      <Section padding="xl" background="white" className="border-b border-[#EBE7DF]">
         <Container size="narrow">
           <div className="space-y-16 text-left">
             {/* Chapter 1 */}

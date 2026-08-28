@@ -34,32 +34,29 @@ const HOMEPAGE_FAQ = [
 
 export const FAQPreviewSection: React.FC = () => {
   return (
-    <Section padding="xl" className="bg-[#F7F4ED] border-b border-[#EBE7DF] text-[#171717]">
+    <Section padding="xl" background="ivory" className="border-b border-[#EBE7DF] text-[#171717]">
       <Container size="narrow">
         <div className="text-center mb-10">
           <motion.span
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 1, y: 0 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
             className="text-xs uppercase font-bold tracking-widest text-[#6A1423] block mb-2"
           >
             Product Clarity & Information
           </motion.span>
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 1, y: 0 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
             className="font-serif text-3xl sm:text-4xl font-bold text-[#171717] mb-3"
           >
             Frequently Asked Questions
           </motion.h2>
           <motion.p
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 1, y: 0 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
             className="text-sm sm:text-base text-slate-700 font-normal max-w-xl mx-auto"
           >
             Factual information regarding formulation, directions, manufacturing compliance, and order delivery.
@@ -67,10 +64,9 @@ export const FAQPreviewSection: React.FC = () => {
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 0 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
           className="bg-[#FCFBF8] rounded-2xl p-6 sm:p-8 border border-[#EBE7DF] shadow-subtle-card"
         >
           <Accordion items={HOMEPAGE_FAQ} defaultOpenId="faq-1" dark={false} />

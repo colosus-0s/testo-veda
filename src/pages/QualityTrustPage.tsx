@@ -47,8 +47,8 @@ export const QualityTrustPage: React.FC = () => {
 
   return (
     <div className="w-full bg-[#F7F4ED] text-[#171717] opacity-100 min-h-screen">
-      {/* Page Hero */}
-      <Section padding="md" className="bg-[#173C2B] text-white border-b border-[#2E6B4A]/50">
+      {/* Page Hero Stage with explicit Deep Botanical Green background */}
+      <Section padding="md" background="deep-green" className="border-b border-[#2E6B4A]/50">
         <Container>
           <Breadcrumb items={[{ label: 'Quality & Trust' }]} className="mb-6 text-[#E2E8F0]" />
 
@@ -59,7 +59,7 @@ export const QualityTrustPage: React.FC = () => {
             <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
               Quality & Regulatory Compliance
             </h1>
-            <p className="text-slate-200 text-base sm:text-lg leading-relaxed font-normal">
+            <p className="text-[#E2E8F0] text-base sm:text-lg leading-relaxed font-normal">
               We operate with complete factual clarity regarding our regulatory licencing, manufacturing partners, and botanical standards.
             </p>
           </div>
@@ -67,7 +67,7 @@ export const QualityTrustPage: React.FC = () => {
       </Section>
 
       {/* Compliance Pillars Grid */}
-      <Section padding="xl" className="bg-[#FCFBF8] border-b border-[#EBE7DF]">
+      <Section padding="xl" background="white" className="border-b border-[#EBE7DF]">
         <Container>
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="text-xs uppercase font-bold tracking-widest text-[#6A1423] block mb-2">
@@ -105,7 +105,7 @@ export const QualityTrustPage: React.FC = () => {
       </Section>
 
       {/* Manufacturing & Commercial Disclosure Stage */}
-      <Section padding="xl" className="bg-[#F7F4ED] border-b border-[#EBE7DF]">
+      <Section padding="xl" background="ivory" className="border-b border-[#EBE7DF]">
         <Container size="narrow">
           <div className="bg-[#FCFBF8] rounded-3xl p-8 sm:p-12 border border-[#EBE7DF] shadow-subtle-card space-y-8 text-left">
             <div className="border-b border-[#EBE7DF] pb-6">
