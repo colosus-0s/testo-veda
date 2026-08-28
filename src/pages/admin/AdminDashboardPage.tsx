@@ -1,22 +1,24 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { getStoredOrders } from '@/services/orderService';
 import { INITIAL_PRODUCTS } from '@/features/products/data/initialProducts';
 import { Badge } from '@/components/ui/Badge';
-import { DollarSign, ShoppingBag, Package, Users } from 'lucide-react';
+import { DollarSign, ShoppingBag, Package, ChevronRight, Boxes } from 'lucide-react';
 
 export const AdminDashboardPage: React.FC = () => {
   const orders = getStoredOrders();
   const totalRevenue = orders.reduce((sum, ord) => sum + ord.total, 0);
+  const pendingOrders = orders.filter((o) => o.orderStatus === 'pending' || o.orderStatus === 'processing');
 
   const kpis = [
     { label: 'Total Revenue', value: `₹${totalRevenue.toLocaleString('en-IN')}`, icon: DollarSign, color: 'text-emerald-700' },
     { label: 'Total Orders', value: orders.length.toString(), icon: ShoppingBag, color: 'text-[#6A1423]' },
-    { label: 'Active Formulations', value: INITIAL_PRODUCTS.length.toString(), icon: Package, color: 'text-blue-700' },
-    { label: 'Registered Customers', value: '1', icon: Users, color: 'text-purple-700' },
+    { label: 'Pending Fulfillment', value: pendingOrders.length.toString(), icon: Boxes, color: 'text-amber-700' },
+    { label: 'Active Catalog', value: INITIAL_PRODUCTS.length.toString(), icon: Package, color: 'text-blue-700' },
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 text-left">
       <div>
         <h2 className="font-serif text-2xl font-bold text-[#171717]">Executive Storefront Overview</h2>
         <p className="text-xs text-slate-600">Real-time KPI metrics and order processing pipeline.</p>
@@ -40,7 +42,13 @@ export const AdminDashboardPage: React.FC = () => {
 
       {/* Recent Orders Table */}
       <div className="space-y-4">
-        <h3 className="font-serif text-lg font-bold text-[#171717]">Recent Customer Orders</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="font-serif text-lg font-bold text-[#171717]">Recent Customer Orders</h3>
+          <Link to="/admin/orders" className="text-xs font-bold text-[#6A1423] hover:underline flex items-center gap-1">
+            View All Orders ({orders.length}) <ChevronRight size={14} />
+          </Link>
+        </div>
+
         {orders.length === 0 ? (
           <div className="py-10 text-center text-slate-500 text-xs bg-[#F7F4ED] rounded-2xl border border-[#EBE7DF]">
             No customer orders registered yet. Orders created via checkout will appear here.
@@ -56,6 +64,7 @@ export const AdminDashboardPage: React.FC = () => {
                   <th className="p-3.5">Payment</th>
                   <th className="p-3.5">Status</th>
                   <th className="p-3.5">Date</th>
+                  <th className="p-3.5 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#EBE7DF]">
@@ -67,6 +76,11 @@ export const AdminDashboardPage: React.FC = () => {
                     <td className="p-3.5"><Badge variant="green">{ord.paymentStatus.toUpperCase()}</Badge></td>
                     <td className="p-3.5"><Badge variant="maroon">{ord.orderStatus.toUpperCase()}</Badge></td>
                     <td className="p-3.5 text-slate-500">{new Date(ord.createdAt).toLocaleDateString('en-IN')}</td>
+                    <td className="p-3.5 text-right">
+                      <Link to={`/admin/orders/${ord.id}`} className="font-bold text-[#6A1423] hover:underline">
+                        Details →
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>
