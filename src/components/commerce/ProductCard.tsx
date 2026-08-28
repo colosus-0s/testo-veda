@@ -6,6 +6,7 @@ import { ProductPrice } from './ProductPrice';
 import { ProductRating } from './ProductRating';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { useCart } from '@/context/CartContext';
 
 export interface ProductCardProps {
   product: Product;
@@ -18,6 +19,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onAddToCart,
   className = '',
 }) => {
+  const { addItem } = useCart();
+
+  const handleCartClick = () => {
+    if (onAddToCart) {
+      onAddToCart(product);
+    } else {
+      addItem(product, product.variants[0], 1);
+    }
+  };
+
   return (
     <div
       className={`group relative bg-[#FCFBF8] rounded-2xl overflow-hidden flex flex-col justify-between border border-[#EBE7DF] shadow-subtle-card hover:shadow-elevated-card hover:border-[#6A1423]/40 transition-all duration-300 ${className}`}
@@ -80,9 +91,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             size="sm"
             className="w-full shadow-sm font-bold"
             leftIcon={<ShoppingBag className="w-4 h-4" />}
-            onClick={() => onAddToCart && onAddToCart(product)}
+            onClick={handleCartClick}
           >
-            Explore TESTO
+            Add To Cart • ₹999
           </Button>
         </div>
       </div>

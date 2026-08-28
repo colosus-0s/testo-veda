@@ -45,6 +45,7 @@ export const ASSET_REGISTRY = {
   ],
 
   ingredients: {
+    allBotanicalsHero: '/images/ingredients/all_10_botanicals_hero.jpg',
     ashwagandha: '/images/ingredients/ashwagandha_root.jpg',
     shilajit: '/images/ingredients/shilajit_mineral.jpg',
     gokhuru: '/images/ingredients/gokhuru_fruit.jpg',

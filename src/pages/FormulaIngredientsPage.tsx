@@ -4,46 +4,73 @@ import { FormulaSection } from '@/features/homepage/components/FormulaSection';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { ShieldCheck, Leaf, Sparkles } from 'lucide-react';
+import { ASSET_REGISTRY } from '@/config/assets';
+import { SITE_CONFIG } from '@/config/site';
+import { ShieldCheck, Leaf, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export const FormulaIngredientsPage: React.FC = () => {
   return (
     <div className="w-full bg-[#F7F4ED] text-[#171717] opacity-100 min-h-screen">
-      {/* Page Hero Stage with explicit Deep Botanical Green background */}
-      <Section padding="md" background="deep-green" className="border-b border-[#2E6B4A]/50">
+      {/* 01 Premium Editorial Botanical Hero Stage (Warm Ivory Backdrop) */}
+      <Section padding="lg" background="ivory" className="border-b border-[#EBE7DF]">
         <Container>
-          <Breadcrumb items={[{ label: 'Formula & Ingredients' }]} className="mb-6 text-[#E2E8F0]" />
+          <Breadcrumb items={[{ label: 'Formula & Ingredients' }]} className="mb-8 text-slate-700" />
 
-          <div className="max-w-3xl">
-            <span className="text-xs uppercase font-bold tracking-widest text-[#F3E5AB] bg-white/10 px-3.5 py-1.5 rounded-full inline-block mb-3 border border-white/20">
-              Quantitative Label Transparency
-            </span>
-            <h1 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
-              Formula & Botanical Ingredients
-            </h1>
-            <p className="text-[#E2E8F0] text-base sm:text-lg leading-relaxed font-normal">
-              10 classical botanical extracts disclosed with full quantitative transparency and technical label declarations.
-            </p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            {/* Left Editorial Still-Life Image Stage */}
+            <div className="lg:col-span-6 relative">
+              <div className="relative bg-[#FCFBF8] rounded-3xl overflow-hidden aspect-[16/10] sm:aspect-[4/3] shadow-subtle-card border-2 border-[#EBE7DF] group">
+                <img
+                  src={ASSET_REGISTRY.ingredients.allBotanicalsHero}
+                  alt="Arogya Path 10 Classical Botanical Ingredients Still Life"
+                  className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-700"
+                />
+                <div className="absolute bottom-4 left-4 right-4 bg-[#FCFBF8]/95 backdrop-blur-sm p-3.5 rounded-xl border border-[#EBE7DF] shadow-md flex items-center justify-between text-xs font-bold text-[#171717]">
+                  <span className="flex items-center gap-1.5 text-[#173C2B]">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" /> 10 Botanical Synergy
+                  </span>
+                  <span className="text-[#6A1423] font-serif italic">Quantitative Formula</span>
+                </div>
+              </div>
+            </div>
 
-            <div className="flex items-center gap-4 flex-wrap pt-4 text-xs font-semibold text-[#E2E8F0]">
-              <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-md border border-white/15">
-                <ShieldCheck className="w-4 h-4 text-[#F3E5AB]" /> FSSAI Lic. #12118441000654
-              </span>
-              <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-md border border-white/15">
-                <Leaf className="w-4 h-4 text-emerald-400" /> 100% Veg HPMC Shells
-              </span>
-              <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-md border border-white/15">
-                <Sparkles className="w-4 h-4 text-[#F3E5AB]" /> ISO 9001:2015 & GMP Certified
-              </span>
+            {/* Right Typography & Positioning Stage */}
+            <div className="lg:col-span-6 space-y-6 text-left">
+              <div>
+                <span className="text-xs uppercase font-bold tracking-widest text-[#6A1423] bg-red-50 px-3.5 py-1.5 rounded-full inline-block mb-3 border border-red-100">
+                  Quantitative Botanical Intelligence
+                </span>
+                <h1 className="font-serif text-3xl sm:text-5xl font-bold text-[#171717] tracking-tight mb-4 leading-tight">
+                  Formula & Botanical Ingredients
+                </h1>
+                <p className="text-slate-700 text-base sm:text-lg leading-relaxed font-normal">
+                  Every capsule of TESTO Natural Power+ blends 10 classical plant extracts—disclosed with full quantitative label transparency and zero synthetic fillers.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-bold text-[#171717]">
+                <div className="bg-[#FCFBF8] p-3 rounded-xl border border-[#EBE7DF] flex flex-col gap-1">
+                  <ShieldCheck className="w-4 h-4 text-[#6A1423]" />
+                  <span>FSSAI Lic. #{SITE_CONFIG.fssaiLicense}</span>
+                </div>
+                <div className="bg-[#FCFBF8] p-3 rounded-xl border border-[#EBE7DF] flex flex-col gap-1">
+                  <Leaf className="w-4 h-4 text-emerald-600" />
+                  <span>100% Veg Shell (E 464)</span>
+                </div>
+                <div className="bg-[#FCFBF8] p-3 rounded-xl border border-[#EBE7DF] flex flex-col gap-1">
+                  <Sparkles className="w-4 h-4 text-[#6A1423]" />
+                  <span>ISO 9001 & GMP</span>
+                </div>
+              </div>
             </div>
           </div>
         </Container>
       </Section>
 
-      {/* 01 Technical Supplement Facts Table Stage */}
+      {/* 02 Technical Supplement Facts Table Stage (Warm White Backdrop) */}
       <FormulaSection />
 
-      {/* 02 Botanical Visual Storytelling Showcase */}
+      {/* 03 Botanical Visual Storytelling Showcase */}
       <IngredientStorySection />
     </div>
   );

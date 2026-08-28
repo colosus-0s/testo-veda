@@ -12,30 +12,30 @@ export const FormulaSection: React.FC = () => {
     <Section
       id="formula"
       padding="xl"
-      className="bg-[#173C2B] text-white border-y border-[#2E6B4A]/50 opacity-100"
-      style={{ backgroundColor: '#173C2B', color: '#ffffff' }}
+      background="white"
+      className="border-y border-[#EBE7DF] text-[#171717] opacity-100"
     >
       <Container size="narrow">
         <div className="text-center mb-12">
-          <span className="text-xs uppercase font-bold tracking-widest text-[#F3E5AB] bg-white/10 px-3.5 py-1.5 rounded-full inline-block mb-3 border border-white/20 shadow-sm">
+          <span className="text-xs uppercase font-bold tracking-widest text-[#6A1423] bg-red-50 px-3.5 py-1.5 rounded-full inline-block mb-3 border border-red-100 shadow-sm">
             Technical Label Disclosure
           </span>
-          <h2 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-3 tracking-tight drop-shadow-md">
+          <h2 className="font-serif text-3xl sm:text-5xl font-bold text-[#171717] mb-3 tracking-tight">
             What's In Each Capsule
           </h2>
-          <div className="flex items-center justify-center gap-3 text-sm text-[#E2E8F0] font-semibold flex-wrap">
-            <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-md border border-white/15">
-              <ShieldCheck className="w-4 h-4 text-[#F3E5AB]" />
+          <div className="flex items-center justify-center gap-3 text-sm text-slate-700 font-semibold flex-wrap">
+            <span className="flex items-center gap-1.5 bg-[#F7F4ED] px-3 py-1.5 rounded-md border border-[#EBE7DF] text-[#173C2B]">
+              <ShieldCheck className="w-4 h-4 text-[#173C2B]" />
               FSSAI License No. {product.regulatory.fssaiLicense}
             </span>
-            <span className="text-[#F3E5AB]">•</span>
-            <span className="bg-white/10 px-3 py-1 rounded-md border border-white/15">
+            <span className="text-[#6A1423]">•</span>
+            <span className="bg-[#F7F4ED] px-3 py-1.5 rounded-md border border-[#EBE7DF] text-slate-800">
               Serving Size: {facts.servingSize}
             </span>
           </div>
         </div>
 
-        {/* Visual Quantitative Ingredient Callout Cards (Dark Charcoal on Warm White) */}
+        {/* Visual Quantitative Ingredient Callout Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10 text-center">
           {[
             { name: 'Ashwagandha', qty: '100mg' },
@@ -47,7 +47,7 @@ export const FormulaSection: React.FC = () => {
           ].map((item, idx) => (
             <div
               key={idx}
-              className="bg-[#FCFBF8] text-[#171717] rounded-xl p-4 border border-slate-300 shadow-md"
+              className="bg-[#F7F4ED] text-[#171717] rounded-xl p-4 border border-[#EBE7DF] shadow-sm hover:border-[#6A1423]/40 transition-all"
             >
               <span className="text-xs text-slate-800 font-bold block mb-1">{item.name}</span>
               <span className="font-serif font-extrabold text-xl text-[#6A1423]">{item.qty}</span>
@@ -116,17 +116,17 @@ export const FormulaSection: React.FC = () => {
 
         {/* Directions & Usage Guide */}
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-          <div className="bg-white/10 border border-white/20 rounded-xl p-4 backdrop-blur-sm shadow-sm">
-            <span className="text-[11px] uppercase font-bold text-[#F3E5AB] block mb-1">Dosage</span>
-            <p className="text-xs text-white font-semibold">{product.directions.labelInstruction}</p>
+          <div className="bg-[#F7F4ED] border border-[#EBE7DF] rounded-xl p-4 shadow-sm">
+            <span className="text-[11px] uppercase font-bold text-[#6A1423] block mb-1">Dosage</span>
+            <p className="text-xs text-slate-900 font-bold">{product.directions.labelInstruction}</p>
           </div>
-          <div className="bg-white/10 border border-white/20 rounded-xl p-4 backdrop-blur-sm shadow-sm">
-            <span className="text-[11px] uppercase font-bold text-[#F3E5AB] block mb-1">How to Take</span>
-            <p className="text-xs text-white font-semibold">{product.directions.suggestedUse}</p>
+          <div className="bg-[#F7F4ED] border border-[#EBE7DF] rounded-xl p-4 shadow-sm">
+            <span className="text-[11px] uppercase font-bold text-[#6A1423] block mb-1">How to Take</span>
+            <p className="text-xs text-slate-900 font-bold">{product.directions.suggestedUse}</p>
           </div>
-          <div className="bg-white/10 border border-white/20 rounded-xl p-4 backdrop-blur-sm shadow-sm">
-            <span className="text-[11px] uppercase font-bold text-[#F3E5AB] block mb-1">Daily Usage</span>
-            <p className="text-xs text-white font-semibold">{product.directions.bestResultsDuration}</p>
+          <div className="bg-[#F7F4ED] border border-[#EBE7DF] rounded-xl p-4 shadow-sm">
+            <span className="text-[11px] uppercase font-bold text-[#6A1423] block mb-1">Daily Usage</span>
+            <p className="text-xs text-slate-900 font-bold">{product.directions.bestResultsDuration}</p>
           </div>
         </div>
       </Container>
