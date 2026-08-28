@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { isDevPreviewActive } from '@/config/devPreview';
 import { Badge } from '@/components/ui/Badge';
 import {
   User,
@@ -22,7 +21,6 @@ export const AccountPopover: React.FC = () => {
   const popoverRef = useRef<HTMLDivElement>(null);
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
-  const devPreview = isDevPreviewActive();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -90,14 +88,14 @@ export const AccountPopover: React.FC = () => {
 
               {/* Navigation Items */}
               <div className="p-2 space-y-0.5 text-xs">
-                {(isAdmin || devPreview) && (
+                {isAdmin && (
                   <Link
                     to="/admin"
                     onClick={() => setIsOpen(false)}
                     className="flex items-center justify-between p-2.5 rounded-xl font-bold text-[#6A1423] bg-[#6A1423]/10 hover:bg-[#6A1423] hover:text-white transition-all mb-1 border border-[#6A1423]/20"
                   >
                     <span className="flex items-center gap-2">
-                      <LayoutDashboard size={16} /> Admin Panel {devPreview && !isAdmin ? '(Dev Preview)' : ''}
+                      <LayoutDashboard size={16} /> Admin Panel
                     </span>
                     <ChevronRight size={14} />
                   </Link>
@@ -211,16 +209,6 @@ export const AccountPopover: React.FC = () => {
                 >
                   Create Account / Register
                 </Link>
-
-                {devPreview && (
-                  <Link
-                    to="/admin"
-                    onClick={() => setIsOpen(false)}
-                    className="w-full flex items-center justify-center gap-2 bg-amber-500 text-slate-950 py-2 rounded-xl text-xs font-extrabold border border-amber-600 shadow-xs hover:bg-amber-400 transition-colors mt-2"
-                  >
-                    <LayoutDashboard size={14} /> Open Admin Panel (Dev Preview)
-                  </Link>
-                )}
               </div>
 
               <div className="pt-3 border-t border-[#EBE7DF] flex items-center justify-between text-[11px]">

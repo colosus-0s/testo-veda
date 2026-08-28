@@ -1,15 +1,13 @@
 import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { isDevPreviewActive } from '@/config/devPreview';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
-import { LayoutDashboard, ShoppingBag, Package, PlusCircle, Users, Settings, LogOut, ArrowLeft, Boxes, AlertCircle } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, PlusCircle, Users, Settings, LogOut, ArrowLeft, Boxes } from 'lucide-react';
 
 export const AdminLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
-  const devPreview = isDevPreviewActive();
 
   const navItems = [
     { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
@@ -23,14 +21,6 @@ export const AdminLayout: React.FC = () => {
 
   return (
     <div className="w-full bg-[#F7F4ED] text-[#171717] min-h-screen">
-      {/* Dev Preview Mode Banner */}
-      {devPreview && (
-        <div className="bg-amber-500 text-slate-950 font-bold px-4 py-2 text-center text-xs flex items-center justify-center gap-2 border-b border-amber-600 shadow-sm">
-          <AlertCircle size={16} className="shrink-0" />
-          <span>⚡ DEVELOPMENT ADMIN PREVIEW ACTIVE — Isolated local testing mode before Supabase Auth connection</span>
-        </div>
-      )}
-
       <Section padding="sm" background="deep-green" className="border-b border-[#2E6B4A]/50">
         <Container>
           <div className="flex items-center justify-between">
@@ -41,7 +31,7 @@ export const AdminLayout: React.FC = () => {
               <span className="font-serif font-black text-xl text-white">Arogya Path Admin Portal</span>
             </div>
             <div className="flex items-center gap-4 text-xs text-[#E2E8F0] font-semibold">
-              <span>{user?.email || 'dev.admin@arogyapath.com'}</span>
+              <span>{user?.email || ''}</span>
               <button onClick={logout} className="p-1.5 hover:text-white text-slate-300 flex items-center gap-1" title="Sign Out">
                 <LogOut size={16} />
                 <span className="hidden sm:inline">Sign Out</span>

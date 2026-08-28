@@ -5,23 +5,18 @@ import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle, Zap } from 'lucide-react';
+import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
 
-  const { login, loginAsDemoCustomer, isLoading, error: authError } = useAuth();
+  const { login, isLoading, error: authError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = (location.state as { from?: { pathname?: string } })?.from?.pathname || '/account';
-
-  const handleDemoCustomerLogin = () => {
-    loginAsDemoCustomer();
-    navigate('/account', { replace: true });
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,32 +52,6 @@ export const LoginPage: React.FC = () => {
               </p>
             </div>
 
-            {/* Demo Access Button */}
-            <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-2 text-left">
-              <div className="flex items-center justify-between text-xs font-bold text-emerald-900">
-                <span className="flex items-center gap-1.5"><Zap size={16} className="text-emerald-600" /> Demo Account Access</span>
-                <span className="text-[10px] bg-emerald-200 px-2 py-0.5 rounded uppercase">Instant</span>
-              </div>
-              <p className="text-[11px] text-slate-600">
-                Sign in with our sample customer profile to review order history and account management.
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleDemoCustomerLogin}
-                className="w-full bg-[#173C2B] text-white border-[#173C2B] hover:bg-[#2E6B4A] font-bold text-xs shadow-sm mt-1"
-              >
-                ⚡ Sign In As Demo Customer
-              </Button>
-            </div>
-
-            <div className="relative flex py-2 items-center mb-6">
-              <div className="flex-grow border-t border-[#EBE7DF]"></div>
-              <span className="flex-shrink mx-4 text-slate-400 text-[10px] font-bold uppercase tracking-widest">Or Sign In With Password</span>
-              <div className="flex-grow border-t border-[#EBE7DF]"></div>
-            </div>
-
             {(formError || authError) && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-xs text-red-900 font-semibold text-left">
                 <AlertCircle className="w-4 h-4 text-[#6A1423] shrink-0 mt-0.5" />
@@ -102,7 +71,7 @@ export const LoginPage: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="aarav.sharma@example.com"
+                    placeholder="you@example.com"
                     className="w-full bg-[#F7F4ED] border border-[#EBE7DF] rounded-xl pl-10 pr-4 py-3 text-xs text-[#171717] placeholder-slate-400 focus:outline-none focus:border-[#6A1423]"
                   />
                 </div>
@@ -151,7 +120,7 @@ export const LoginPage: React.FC = () => {
               </p>
               <div className="flex items-center justify-center gap-1.5 text-[11px] text-[#173C2B] font-semibold">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Protected by 256-bit SSL Auth Security</span>
+                <span>Protected by Supabase Auth Security</span>
               </div>
             </div>
           </div>

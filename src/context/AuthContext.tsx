@@ -14,8 +14,6 @@ export interface AuthContextType {
   isLoading: boolean;
   error: string | null;
   login: (email: string, pass: string) => Promise<boolean>;
-  loginAsDemoAdmin: () => void;
-  loginAsDemoCustomer: () => void;
   register: (email: string, pass: string, fullName: string, phone?: string) => Promise<boolean>;
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<boolean>;
@@ -33,110 +31,87 @@ export interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_USER_KEY = 'arogyapath_user';
-
-const DEMO_CUSTOMER_USER: UserProfile = {
-  id: 'usr_demo_aarav_1',
-  email: 'aarav.sharma@example.com',
-  fullName: 'Aarav Sharma',
-  role: 'customer',
-  createdAt: '2026-01-15T10:00:00.000Z',
-};
-
-const DEMO_ADMIN_USER: UserProfile = {
-  id: 'usr_demo_admin_1',
-  email: 'admin@arogyapath.com',
-  fullName: 'Arogya Administrator',
-  role: 'admin',
-  createdAt: '2026-01-01T08:00:00.000Z',
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserProfile | null>(() => {
-    if (isSupabaseConfigured()) {
-      return null;
-    }
-    try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
-      if (saved) return JSON.parse(saved);
-      return DEMO_CUSTOMER_USER;
-    } catch {
-      return DEMO_CUSTOMER_USER;
-    }
-  });
-
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [addresses, setAddresses] = useState<UserAddress[]>([]);
   const [wishlistProductIds, setWishlistProductIds] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(() => isSupabaseConfigured());
+  const [isLoading, setIsLoading] = useState<boolean>(() => isSupabaseConfigured());
   const [error, setError] = useState<string | null>(null);
 
-  // Synchronize with Supabase Auth session & DB profile
+  // Load user profile from Supabase profiles table
+  const loadProfile = async (authUserId: string, authEmail: string): Promise<UserProfile | null> => {
+    try {
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', authUserId)
+        .single();
+
+      if (profileError || !profileData || profileData.registration_completed !== true) {
+        return null; // Profile uninitialized or registration uncompleted
+      }
+
+      const userProf: UserProfile = {
+        id: profileData.id,
+        email: profileData.email || authEmail,
+        fullName: profileData.full_name,
+        phone: profileData.phone || undefined,
+        role: profileData.role as 'customer' | 'admin' | 'superadmin',
+        registrationCompleted: profileData.registration_completed,
+        createdAt: profileData.created_at,
+      };
+
+      // Load associated addresses and wishlist
+      const userAddrs = await fetchUserAddresses(authUserId);
+      setAddresses(userAddrs);
+
+      const userWish = await fetchUserWishlist(authUserId);
+      setWishlistProductIds(userWish);
+
+      return userProf;
+    } catch (err) {
+      console.error('Error fetching profile from Supabase:', err);
+      return null;
+    }
+  };
+
+  // Synchronize Auth Session on Mount & Auth Change
   useEffect(() => {
     if (!isSupabaseConfigured()) {
-      return;
+      const timer = setTimeout(() => setIsLoading(false), 0);
+      return () => clearTimeout(timer);
     }
 
-    const loadProfile = async (authUserId: string, authEmail: string) => {
-      try {
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', authUserId)
-          .single();
-
-        if (profileError || !profileData) {
-          // Profile fallback
-          setUser({
-            id: authUserId,
-            email: authEmail,
-            fullName: 'Valued Customer',
-            role: 'customer',
-            createdAt: new Date().toISOString(),
-          });
-        } else {
-          setUser({
-            id: profileData.id,
-            email: profileData.email,
-            fullName: profileData.full_name,
-            phone: profileData.phone || undefined,
-            role: profileData.role as 'customer' | 'admin' | 'superadmin',
-            createdAt: profileData.created_at,
-          });
-        }
-
-        // Fetch addresses & wishlist for logged in user
-        const userAddrs = await fetchUserAddresses(authUserId);
-        setAddresses(userAddrs);
-
-        const userWish = await fetchUserWishlist(authUserId);
-        setWishlistProductIds(userWish);
-      } catch (err) {
-        console.error('Error loading Supabase profile:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    // Initialize session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
-        loadProfile(session.user.id, session.user.email || '');
+        const loadedUser = await loadProfile(session.user.id, session.user.email || '');
+        if (loadedUser) {
+          setUser(loadedUser);
+        } else {
+          // Reject invalid / uncompleted registration sessions
+          await supabase.auth.signOut();
+          setUser(null);
+        }
       } else {
         setUser(null);
-        setIsLoading(false);
       }
+      setIsLoading(false);
     });
 
-    // Listen to Auth State Changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
-        loadProfile(session.user.id, session.user.email || '');
+        const loadedUser = await loadProfile(session.user.id, session.user.email || '');
+        if (loadedUser) {
+          setUser(loadedUser);
+        } else {
+          setUser(null);
+        }
       } else {
         setUser(null);
         setAddresses([]);
         setWishlistProductIds([]);
-        setIsLoading(false);
       }
+      setIsLoading(false);
     });
 
     return () => {
@@ -144,74 +119,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      if (user) {
-        localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(user));
-      } else {
-        localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
-      }
-    }
-  }, [user]);
-
-  const loginAsDemoCustomer = () => {
-    if (!isSupabaseConfigured()) {
-      setUser(DEMO_CUSTOMER_USER);
-    }
-  };
-
-  const loginAsDemoAdmin = () => {
-    if (!isSupabaseConfigured()) {
-      setUser(DEMO_ADMIN_USER);
-    }
-  };
-
+  // Strict Login Function: Demands Supabase Auth + registration_completed = true
   const login = async (email: string, pass: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
-    try {
-      if (isSupabaseConfigured()) {
-        const { data, error: sbError } = await supabase.auth.signInWithPassword({ email, password: pass });
-        if (sbError) throw sbError;
-        if (data.user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', data.user.id)
-            .single();
 
-          setUser({
-            id: data.user.id,
-            email: data.user.email || email,
-            fullName: profile?.full_name || 'Customer',
-            phone: profile?.phone || undefined,
-            role: (profile?.role as 'customer' | 'admin' | 'superadmin') || 'customer',
-            createdAt: data.user.created_at,
-          });
-          setIsLoading(false);
-          return true;
-        }
+    const genericErrorMessage = "We couldn't sign you in. Please register for an Arogya Path account first or check your credentials.";
+
+    if (!isSupabaseConfigured()) {
+      setError(genericErrorMessage);
+      setIsLoading(false);
+      return false;
+    }
+
+    try {
+      const { data, error: sbError } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password: pass,
+      });
+
+      if (sbError || !data.user) {
+        setError(genericErrorMessage);
+        setIsLoading(false);
+        return false;
       }
 
-      // Dev mode fallback
-      const isDemoAdmin = email.toLowerCase().includes('admin');
-      const fallbackUser: UserProfile = {
-        id: `usr_${Date.now()}`,
-        email,
-        fullName: isDemoAdmin ? 'Arogya Administrator' : email.split('@')[0],
-        role: isDemoAdmin ? 'admin' : 'customer',
-        createdAt: new Date().toISOString(),
-      };
-      setUser(fallbackUser);
+      // Verify that registration_completed === true in profiles
+      const profile = await loadProfile(data.user.id, data.user.email || email);
+      if (!profile || profile.registrationCompleted !== true) {
+        // Reject session and sign out immediately
+        await supabase.auth.signOut();
+        setUser(null);
+        setError(genericErrorMessage);
+        setIsLoading(false);
+        return false;
+      }
+
+      setUser(profile);
       setIsLoading(false);
       return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+    } catch {
+      setError(genericErrorMessage);
       setIsLoading(false);
       return false;
     }
   };
 
+  // Storefront Registration Function: SignUp + complete_storefront_registration RPC
   const register = async (
     email: string,
     pass: string,
@@ -220,57 +174,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   ): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
+
+    if (!isSupabaseConfigured()) {
+      setError('Database services are currently unavailable. Please try again later.');
+      setIsLoading(false);
+      return false;
+    }
+
     try {
-      if (isSupabaseConfigured()) {
-        const { data, error: sbError } = await supabase.auth.signUp({
-          email,
-          password: pass,
-          options: {
-            data: {
-              full_name: fullName,
-              phone,
-              role: 'customer', // STRICTLY DEFAULT TO CUSTOMER
-            },
-          },
-        });
-        if (sbError) throw sbError;
-
-        if (data.user) {
-          // Ensure profile is inserted
-          await supabase.from('profiles').upsert({
-            id: data.user.id,
-            email,
+      const formattedEmail = email.trim().toLowerCase();
+      const { data, error: sbError } = await supabase.auth.signUp({
+        email: formattedEmail,
+        password: pass,
+        options: {
+          data: {
             full_name: fullName,
-            phone: phone || null,
-            role: 'customer', // STRICTLY ENFORCE CUSTOMER ROLE
-          });
-
-          setUser({
-            id: data.user.id,
-            email,
-            fullName,
             phone,
             role: 'customer',
-            createdAt: data.user.created_at,
-          });
-          setIsLoading(false);
-          return true;
-        }
+          },
+        },
+      });
+
+      if (sbError || !data.user) {
+        setError(sbError?.message || 'Registration failed. Please check your information.');
+        setIsLoading(false);
+        return false;
       }
 
-      const fallbackUser: UserProfile = {
-        id: `usr_${Date.now()}`,
-        email,
-        fullName,
-        phone,
-        role: 'customer',
-        createdAt: new Date().toISOString(),
-      };
-      setUser(fallbackUser);
+      // Complete Storefront Registration via SECURITY DEFINER RPC
+      const { error: rpcError } = await supabase.rpc('complete_storefront_registration', {
+        p_full_name: fullName,
+        p_phone: phone || null,
+      });
+
+      if (rpcError) {
+        console.warn('RPC complete_storefront_registration warning:', rpcError.message);
+      }
+
+      const profile = await loadProfile(data.user.id, formattedEmail);
+      if (profile) {
+        setUser(profile);
+      } else {
+        setUser({
+          id: data.user.id,
+          email: formattedEmail,
+          fullName,
+          phone,
+          role: 'customer',
+          registrationCompleted: true,
+          createdAt: new Date().toISOString(),
+        });
+      }
+
       setIsLoading(false);
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      setError(err instanceof Error ? err.message : 'Registration failed.');
       setIsLoading(false);
       return false;
     }
@@ -296,7 +255,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Password reset failed');
+      setError(err instanceof Error ? err.message : 'Password reset request failed.');
       setIsLoading(false);
       return false;
     }
@@ -313,7 +272,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update password');
+      setError(err instanceof Error ? err.message : 'Failed to update password.');
       setIsLoading(false);
       return false;
     }
@@ -322,7 +281,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateProfile = async (data: Partial<UserProfile>) => {
     if (!user) return;
     const safeData = { ...data };
-    delete (safeData as Partial<UserProfile> & { role?: string }).role;
+    delete (safeData as Partial<UserProfile> & { role?: string; registrationCompleted?: boolean }).role;
+    delete (safeData as Partial<UserProfile> & { role?: string; registrationCompleted?: boolean }).registrationCompleted;
 
     if (isSupabaseConfigured()) {
       try {
@@ -401,8 +361,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         error,
         login,
-        loginAsDemoAdmin,
-        loginAsDemoCustomer,
         register,
         logout,
         forgotPassword,

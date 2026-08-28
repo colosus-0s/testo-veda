@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   phone TEXT,
   avatar_url TEXT,
   role TEXT NOT NULL DEFAULT 'customer' CHECK (role IN ('customer', 'admin', 'superadmin')),
+  registration_completed BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

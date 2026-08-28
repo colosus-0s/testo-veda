@@ -1,15 +1,12 @@
 import React from 'react';
 import { Navigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { isDevPreviewActive } from '@/config/devPreview';
-import { isSupabaseConfigured } from '@/lib/supabase';
 import { ShieldAlert, ArrowLeft, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isAuthenticated, isAdmin, isLoading } = useAuth();
   const location = useLocation();
-  const devPreview = isDevPreviewActive();
 
   if (isLoading) {
     return (
@@ -20,11 +17,6 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
         </span>
       </div>
     );
-  }
-
-  // If development preview is active AND Supabase is not configured, allow local testing
-  if (devPreview && !isSupabaseConfigured()) {
-    return <>{children}</>;
   }
 
   if (!isAuthenticated) {

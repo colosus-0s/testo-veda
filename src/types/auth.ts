@@ -7,6 +7,7 @@ export interface UserProfile {
   phone?: string;
   avatarUrl?: string;
   role: UserRole;
+  registrationCompleted?: boolean;
   createdAt: string;
   updatedAt?: string;
 }

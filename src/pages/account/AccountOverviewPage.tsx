@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { isDevPreviewActive } from '@/config/devPreview';
 import { getStoredOrders } from '@/services/orderService';
 import type { Order } from '@/types/order';
 import { Button } from '@/components/ui/Button';
@@ -13,7 +12,6 @@ export const AccountOverviewPage: React.FC = () => {
   const { user, addresses, wishlistProductIds, isAdmin } = useAuth();
   const { cartSummary } = useCart();
   const orders: Order[] = getStoredOrders();
-  const devPreview = isDevPreviewActive();
 
   const summaryTiles = [
     {
@@ -66,13 +64,13 @@ export const AccountOverviewPage: React.FC = () => {
         </p>
       </div>
 
-      {/* ADMINISTRATION Section (Dev Preview & Admin Users) */}
-      {(devPreview || isAdmin) && (
+      {/* ADMINISTRATION Section (Admin Users Only) */}
+      {isAdmin && (
         <div className="bg-amber-50/90 p-6 rounded-3xl border-2 border-amber-400 space-y-4 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <span className="text-[10px] font-black uppercase tracking-widest text-amber-950 bg-amber-200 px-3 py-1 rounded-full inline-block">
-                ADMINISTRATION {devPreview && !isAdmin ? '(DEV PREVIEW)' : ''}
+                ADMINISTRATION
               </span>
               <h3 className="font-serif text-xl font-bold text-amber-950 flex items-center gap-2 pt-1">
                 <ShieldAlert className="text-amber-700 shrink-0" size={20} /> Store Administration Panel

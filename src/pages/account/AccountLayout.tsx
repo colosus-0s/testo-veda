@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { isDevPreviewActive } from '@/config/devPreview';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
@@ -19,7 +18,6 @@ import {
   ChevronRight,
   ShieldCheck,
   LayoutDashboard,
-  ShieldAlert,
 } from 'lucide-react';
 
 interface NavItem {
@@ -38,7 +36,6 @@ export const AccountLayout: React.FC = () => {
   const { user, logout, isAdmin } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const devPreview = isDevPreviewActive();
 
   const handleSignOut = async () => {
     await logout();
@@ -72,12 +69,12 @@ export const AccountLayout: React.FC = () => {
     },
   ];
 
-  if (isAdmin || devPreview) {
+  if (isAdmin) {
     navSections.push({
       title: 'ADMINISTRATION',
       items: [
         {
-          label: devPreview && !isAdmin ? 'Admin Panel (Dev Preview)' : 'Admin Panel',
+          label: 'Admin Panel',
           href: '/admin',
           icon: LayoutDashboard,
         },
@@ -176,17 +173,6 @@ export const AccountLayout: React.FC = () => {
                   </button>
                 </div>
               </div>
-
-              {devPreview && (
-                <div className="bg-amber-50 p-4 rounded-2xl border border-amber-300 text-xs text-amber-900 space-y-1.5">
-                  <span className="flex items-center gap-1.5 font-bold text-amber-950">
-                    <ShieldAlert size={16} className="text-amber-700 shrink-0" /> Dev Admin Access Active
-                  </span>
-                  <p className="text-[11px] leading-relaxed">
-                    Development preview mode allows inspecting store management UI prior to Supabase RLS integration.
-                  </p>
-                </div>
-              )}
 
               <div className="bg-[#FCFBF8] p-4 rounded-2xl border border-[#EBE7DF] text-xs text-slate-600 space-y-1">
                 <span className="flex items-center gap-1.5 font-bold text-[#173C2B]">

@@ -1,29 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { isSupabaseConfigured } from '@/lib/supabase';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
-import { ShieldAlert, Mail, Lock, ArrowRight, ShieldCheck, ArrowLeft, Zap } from 'lucide-react';
+import { ShieldAlert, Mail, Lock, ArrowRight, ShieldCheck, ArrowLeft } from 'lucide-react';
 
 export const AdminLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { login, loginAsDemoAdmin, logout, isLoading } = useAuth();
+  const { login, logout, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = (location.state as { from?: { pathname?: string } })?.from?.pathname || '/admin';
-  const supabaseConfigured = isSupabaseConfigured();
-
-  const handleDemoAdminLogin = () => {
-    if (!supabaseConfigured) {
-      loginAsDemoAdmin();
-      navigate('/admin', { replace: true });
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +27,7 @@ export const AdminLoginPage: React.FC = () => {
 
     const success = await login(email, password);
     if (success) {
+      // Check user role from state/storage
       const savedUser = JSON.parse(localStorage.getItem('arogyapath_user') || '{}');
       if (savedUser?.role === 'admin' || savedUser?.role === 'superadmin') {
         navigate(from, { replace: true });
@@ -44,7 +36,7 @@ export const AdminLoginPage: React.FC = () => {
         setErrorMessage('Access Denied: Your account does not have administrative privileges.');
       }
     } else {
-      setErrorMessage('Invalid credentials or authentication failure.');
+      setErrorMessage("We couldn't sign you in. Please verify your credentials or administrative authorization.");
     }
   };
 
@@ -73,34 +65,10 @@ export const AdminLoginPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Quick Demo Access Button (Dev Mode Only) */}
-          {!supabaseConfigured && (
-            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl space-y-2 text-left">
-              <div className="flex items-center justify-between text-xs font-bold text-amber-900">
-                <span className="flex items-center gap-1.5"><Zap size={16} className="text-[#6A1423]" /> Development & Review Access</span>
-                <span className="text-[10px] bg-amber-200 px-2 py-0.5 rounded uppercase">Instant</span>
-              </div>
-              <p className="text-[11px] text-slate-600">
-                Click below to test the Admin Panel with full administrative privileges in local preview mode.
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleDemoAdminLogin}
-                className="w-full bg-[#6A1423] text-white border-[#6A1423] hover:bg-[#3D0B15] font-bold text-xs shadow-sm mt-1"
-              >
-                ⚡ Enter Admin Panel (Demo Admin)
-              </Button>
-            </div>
-          )}
-
-          {supabaseConfigured && (
-            <div className="mb-6 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 font-semibold text-center">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 inline-block mr-1 -mt-0.5" />
-              Connected to Production Supabase Auth & Database
-            </div>
-          )}
+          <div className="mb-6 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 font-semibold text-center">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 inline-block mr-1 -mt-0.5" />
+            Protected by Supabase Auth & Role Authorization
+          </div>
 
           {errorMessage && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-xs text-red-900 font-semibold text-left">
