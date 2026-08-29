@@ -54,13 +54,15 @@ export const AccountOverviewPage: React.FC = () => {
     <div className="space-y-8 text-left">
       <div>
         <span className="text-xs uppercase font-bold tracking-widest text-[#6A1423] block mb-1">
-          Account Overview
+          {isAdmin ? 'Administrator Account Overview' : 'Account Overview'}
         </span>
         <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#171717]">
-          Hello, {user?.fullName || 'Customer'}
+          {isAdmin ? 'Hello, Administrator' : `Hello, ${user?.fullName || 'Customer'}`}
         </h2>
         <p className="text-xs text-slate-600 mt-1">
-          Manage your dietary formulation orders, saved delivery addresses, and account security.
+          {isAdmin
+            ? 'Manage your administrative profile, store operations dashboard, and security.'
+            : 'Manage your dietary formulation orders, saved delivery addresses, and account security.'}
         </p>
       </div>
 

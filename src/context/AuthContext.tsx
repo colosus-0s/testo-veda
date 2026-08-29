@@ -41,14 +41,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Load user profile from Supabase profiles table
   const loadProfile = async (authUserId: string, authEmail: string): Promise<UserProfile | null> => {
     try {
-      const { data: profileData, error: profileError } = await supabase
+      let profileData;
+      const { data: initialProfileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', authUserId)
-        .single();
+        .maybeSingle();
+
+      profileData = initialProfileData;
 
       if (profileError) {
         console.warn('[Supabase Profile Debug] Error fetching profile:', profileError.message);
+      }
+
+      // Self-healing for valid Auth users whose profile was missing or uninitialized
+      if (!profileData || profileData.registration_completed !== true) {
+        console.info('[Supabase Profile Debug] Profile missing or uncompleted for authenticated user. Initializing profile...');
+        const emailPrefix = authEmail ? authEmail.split('@')[0] : 'Valued Customer';
+        const formattedName = emailPrefix ? emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1) : 'Valued Customer';
+
+        const { error: rpcErr } = await supabase.rpc('complete_storefront_registration', {
+          p_full_name: formattedName,
+        });
+
+        if (!rpcErr) {
+          const { data: refetchedProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', authUserId)
+            .maybeSingle();
+          profileData = refetchedProfile;
+        }
       }
 
       if (!profileData || profileData.registration_completed !== true) {
