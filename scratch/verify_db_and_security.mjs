@@ -266,7 +266,11 @@ async function runRigorousSecuritySuite(auditInfo) {
     const orderExists = auditInfo.tableStatus.find(t => t.TABLE === 'public.orders')?.STATUS.startsWith('EXISTS');
     if (orderExists && clientA && clientB && userA) {
       const orderIdA = `00000000-0000-4000-a000-${String(ts).padStart(12, '0').substring(0, 12)}`;
-      await clientA.from('orders').insert({ id: orderIdA, order_number: `ORD-${ts}`, user_id: userA.id, customer_name: 'A', customer_email: emailA, subtotal: 100, shipping_fee: 0, total: 100, order_status: 'pending', payment_status: 'pending' }).catch(() => {});
+      try {
+        await clientA.from('orders').insert({ id: orderIdA, order_number: `ORD-${ts}`, user_id: userA.id, customer_name: 'A', customer_email: emailA, subtotal: 100, shipping_fee: 0, total: 100, order_status: 'pending', payment_status: 'pending' });
+      } catch {
+        // Fallback
+      }
       const { data: rOrdB } = await clientB.from('orders').select('*').eq('id', orderIdA);
       record('11. Customer Order Isolation', (!rOrdB || rOrdB.length === 0) ? 'PASS' : 'FAIL', `Customer B queried Customer A order: ${rOrdB?.length || 0} rows`);
     } else {
