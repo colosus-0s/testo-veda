@@ -19,6 +19,9 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Ensure registration_completed column exists if table previously existed without it
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS registration_completed BOOLEAN NOT NULL DEFAULT FALSE;
+
 -- 2. ADDRESSES TABLE
 CREATE TABLE IF NOT EXISTS public.addresses (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -68,6 +71,17 @@ CREATE TABLE IF NOT EXISTS public.products (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Ensure all columns exist if products table previously existed
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS low_stock_threshold INT NOT NULL DEFAULT 15;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS primary_image TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS images_json JSONB NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS badges_json JSONB NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS highlights_json JSONB NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS ingredients_json JSONB NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS supplement_facts_json JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS usage TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS warnings TEXT;
 
 -- 4. PRODUCT VARIANTS TABLE
 CREATE TABLE IF NOT EXISTS public.product_variants (
@@ -401,37 +415,58 @@ ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.admin_activity_logs ENABLE ROW LEVEL SECURITY;
 
 -- 1. Profiles RLS
+DROP POLICY IF EXISTS "Users read own profile" ON public.profiles;
 CREATE POLICY "Users read own profile" ON public.profiles FOR SELECT USING (auth.uid() = id OR public.is_admin());
+
+DROP POLICY IF EXISTS "Users update own profile fields" ON public.profiles;
 CREATE POLICY "Users update own profile fields" ON public.profiles FOR UPDATE USING (auth.uid() = id OR public.is_admin());
 
 -- 2. Products RLS
+DROP POLICY IF EXISTS "Public read active products" ON public.products;
 CREATE POLICY "Public read active products" ON public.products FOR SELECT USING (is_active = true OR public.is_admin());
+
+DROP POLICY IF EXISTS "Admin full access products" ON public.products;
 CREATE POLICY "Admin full access products" ON public.products FOR ALL USING (public.is_admin());
 
 -- 3. Addresses RLS
+DROP POLICY IF EXISTS "Users CRUD own addresses" ON public.addresses;
 CREATE POLICY "Users CRUD own addresses" ON public.addresses FOR ALL USING (auth.uid() = user_id OR public.is_admin());
 
 -- 4. Wishlist RLS
+DROP POLICY IF EXISTS "Users CRUD own wishlist" ON public.wishlist_items;
 CREATE POLICY "Users CRUD own wishlist" ON public.wishlist_items FOR ALL USING (auth.uid() = user_id OR public.is_admin());
 
 -- 5. Orders & Order Items RLS
+DROP POLICY IF EXISTS "Users read own orders" ON public.orders;
 CREATE POLICY "Users read own orders" ON public.orders FOR SELECT USING (auth.uid() = user_id OR public.is_admin());
+
+DROP POLICY IF EXISTS "Users insert own orders" ON public.orders;
 CREATE POLICY "Users insert own orders" ON public.orders FOR INSERT WITH CHECK (auth.uid() = user_id OR public.is_admin());
+
+DROP POLICY IF EXISTS "Admin update orders" ON public.orders;
 CREATE POLICY "Admin update orders" ON public.orders FOR UPDATE USING (public.is_admin());
 
+DROP POLICY IF EXISTS "Users read own order items" ON public.order_items;
 CREATE POLICY "Users read own order items" ON public.order_items FOR SELECT USING (
   EXISTS (SELECT 1 FROM public.orders WHERE orders.id = order_items.order_id AND (orders.user_id = auth.uid() OR public.is_admin()))
 );
+
+DROP POLICY IF EXISTS "Admin full access order items" ON public.order_items;
 CREATE POLICY "Admin full access order items" ON public.order_items FOR ALL USING (public.is_admin());
 
 -- 6. Inventory Movements RLS
+DROP POLICY IF EXISTS "Admin access inventory movements" ON public.inventory_movements;
 CREATE POLICY "Admin access inventory movements" ON public.inventory_movements FOR ALL USING (public.is_admin());
 
 -- 7. Settings RLS
+DROP POLICY IF EXISTS "Public read safe store settings" ON public.settings;
 CREATE POLICY "Public read safe store settings" ON public.settings FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Admin full access settings" ON public.settings;
 CREATE POLICY "Admin full access settings" ON public.settings FOR ALL USING (public.is_admin());
 
 -- 8. Admin Activity Logs RLS
+DROP POLICY IF EXISTS "Admin access activity logs" ON public.admin_activity_logs;
 CREATE POLICY "Admin access activity logs" ON public.admin_activity_logs FOR ALL USING (public.is_admin());
 
 -- ============================================================
