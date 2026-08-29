@@ -45,6 +45,11 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.prevent_registration_flag_tampering()
 RETURNS TRIGGER AS $$
 BEGIN
+  -- Allow service_role key (server/admin script) or direct SQL editor (auth.role() IS NULL)
+  IF (auth.role() = 'service_role') OR (auth.role() IS NULL) THEN
+    RETURN NEW;
+  END IF;
+
   -- If role OR registration_completed is changing, verify caller is superadmin
   IF (OLD.role IS DISTINCT FROM NEW.role) OR (OLD.registration_completed IS DISTINCT FROM NEW.registration_completed) THEN
     IF NOT EXISTS (

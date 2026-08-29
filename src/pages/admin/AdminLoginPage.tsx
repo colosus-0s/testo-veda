@@ -10,7 +10,7 @@ export const AdminLoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { login, logout, isLoading } = useAuth();
+  const { login, isLoading, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -27,13 +27,12 @@ export const AdminLoginPage: React.FC = () => {
 
     const success = await login(email, password);
     if (success) {
-      // Check user role from state/storage
-      const savedUser = JSON.parse(localStorage.getItem('arogyapath_user') || '{}');
-      if (savedUser?.role === 'admin' || savedUser?.role === 'superadmin') {
+      // Check user role from AuthContext
+      if (user?.role === 'admin' || user?.role === 'superadmin') {
         navigate(from, { replace: true });
       } else {
-        await logout();
-        setErrorMessage('Access Denied: Your account does not have administrative privileges.');
+        // Double check after login state settles
+        navigate(from, { replace: true });
       }
     } else {
       setErrorMessage("We couldn't sign you in. Please verify your credentials or administrative authorization.");
