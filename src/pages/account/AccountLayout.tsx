@@ -97,14 +97,14 @@ export const AccountLayout: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center font-serif text-2xl font-bold text-[#F3E5AB]">
-                {user?.fullName?.charAt(0) || 'U'}
+                {isAdmin ? <ShieldCheck size={32} className="text-[#F3E5AB]" /> : (user?.fullName?.charAt(0) || 'U')}
               </div>
               <div>
                 <span className="text-xs uppercase tracking-widest text-[#F3E5AB] font-bold block mb-1">
-                  Arogya Path Member
+                  {isAdmin ? 'Store Administrator' : 'Arogya Path Member'}
                 </span>
                 <h1 className="font-serif text-2xl sm:text-3xl font-bold text-white">
-                  Welcome back, {user?.fullName || 'Valued Customer'}
+                  {isAdmin ? 'Welcome back, Administrator' : `Welcome back, ${user?.fullName || 'Valued Customer'}`}
                 </h1>
                 <p className="text-xs text-[#E2E8F0] mt-1">{user?.email}</p>
               </div>

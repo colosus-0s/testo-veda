@@ -12,7 +12,7 @@ export const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
 
-  const { login, isLoading, error: authError } = useAuth();
+  const { login, isLoading, error: authError, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,7 +31,11 @@ export const LoginPage: React.FC = () => {
 
     const success = await login(email, password);
     if (success) {
-      navigate(from, { replace: true });
+      if (from === '/account' && (user?.role === 'admin' || user?.role === 'superadmin')) {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     }
   };
 
