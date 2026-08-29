@@ -148,7 +148,22 @@ async function verifyAdminState() {
       .update({ role: 'admin' })
       .eq('id', custAuth.user.id);
 
-    console.log(`✅ 4. Customer Role Escalation Blocked: ${errEsc ? 'PASS (Blocked)' : 'FAIL'}`);
+    const { data: recheckedProf } = await adminClient
+      .from('profiles')
+      .select('role')
+      .eq('id', custAuth.user.id)
+      .single();
+
+    console.log('   Diagnostic errEsc:', errEsc);
+    console.log('   Diagnostic rechecked customer role:', recheckedProf?.role);
+
+    const isEscalationBlocked = (!!errEsc && recheckedProf?.role === 'customer');
+    console.log(`✅ 4. Customer Role Escalation Blocked: ${isEscalationBlocked ? 'PASS (Blocked)' : 'FAIL (Security Violation: Customer modified role)'}`);
+    if (errEsc) {
+      console.log(`   - Error Message: "${errEsc.message}"`);
+    } else {
+      console.log('   - Error Message: None (Role was updated illegally!)');
+    }
 
     // Clean up test customer
     await adminClient.from('profiles').delete().eq('id', custAuth.user.id);
