@@ -28,14 +28,16 @@ loadEnvFile(path.resolve(rootDir, '.env.local'));
 
 const rawUrl = process.env.VITE_SUPABASE_URL || 'https://oqqrcluijcvvxrnkhsip.supabase.co';
 const supabaseUrl = rawUrl.replace(/\/rest\/v1\/?$/i, '').replace(/\/$/, '');
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseKey) {
+// Prioritize server-side secret key for administrative Storage uploads
+const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseSecretKey) {
   console.error('❌ ERROR: Missing Supabase key in environment!');
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseSecretKey);
 
 const BUCKET_NAME = 'storefront-assets';
 
@@ -174,27 +176,26 @@ async function runUploadPipeline() {
   // Ensure Bucket Exists
   const { data: bucketData, error: bucketError } = await supabase.storage.getBucket(BUCKET_NAME);
   if (bucketError) {
-    console.log(`Creating public bucket '${BUCKET_NAME}'...`);
+    console.log(`Attempting to create public bucket '${BUCKET_NAME}'...`);
     const { error: createError } = await supabase.storage.createBucket(BUCKET_NAME, {
       public: true,
       allowedMimeTypes: ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml', 'video/mp4', 'video/webm'],
       fileSizeLimit: 52428800, // 50MB
     });
     if (createError) {
-      console.warn(`Warning creating bucket '${BUCKET_NAME}':`, createError.message);
+      console.warn(`Note on bucket creation for '${BUCKET_NAME}':`, createError.message);
     }
   } else {
-    console.log(`Bucket '${BUCKET_NAME}' already exists and is configured.`);
+    console.log(`Bucket '${BUCKET_NAME}' found and ready.`);
   }
 
   let uploadedCount = 0;
   let failedCount = 0;
-  const publicUrls = {};
 
   for (const item of ASSET_MAPPINGS) {
     const fullLocalPath = path.resolve(rootDir, item.local);
     if (!fs.existsSync(fullLocalPath)) {
-      console.error(`❌ Local file not found: ${item.local}`);
+      console.error(`❌ Local file missing: ${item.local}`);
       failedCount++;
       continue;
     }
@@ -214,8 +215,7 @@ async function runUploadPipeline() {
       failedCount++;
     } else {
       const publicUrl = `${supabaseUrl}/storage/v1/object/public/${BUCKET_NAME}/${item.storagePath}`;
-      publicUrls[item.storagePath] = publicUrl;
-      console.log(`  ✅ Uploaded successfully: ${publicUrl}`);
+      console.log(`  ✅ Uploaded: ${publicUrl}`);
       uploadedCount++;
     }
   }
