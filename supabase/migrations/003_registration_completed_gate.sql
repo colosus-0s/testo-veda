@@ -45,6 +45,11 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.prevent_registration_flag_tampering()
 RETURNS TRIGGER AS $$
 BEGIN
+  -- Allow service_role key or postgres database admin
+  IF (auth.role() = 'service_role') OR (current_user = 'postgres') THEN
+    RETURN NEW;
+  END IF;
+
   -- If role OR registration_completed is changing, verify caller is superadmin
   IF (OLD.role IS DISTINCT FROM NEW.role) OR (OLD.registration_completed IS DISTINCT FROM NEW.registration_completed) THEN
     IF NOT EXISTS (

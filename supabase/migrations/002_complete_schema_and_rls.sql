@@ -209,6 +209,11 @@ $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.prevent_role_escalation()
 RETURNS TRIGGER AS $$
 BEGIN
+  -- Allow service_role key or postgres database admin
+  IF (auth.role() = 'service_role') OR (current_user = 'postgres') THEN
+    RETURN NEW;
+  END IF;
+
   -- If role is changing, verify caller is superadmin
   IF OLD.role IS DISTINCT FROM NEW.role THEN
     IF NOT EXISTS (
