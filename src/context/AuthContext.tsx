@@ -152,8 +152,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     setError(null);
 
-    const genericErrorMessage = "We couldn't sign you in. Please register for an Arogya Path account first or check your credentials.";
-
     if (!isSupabaseConfigured()) {
       setError('Database services are currently unavailable. Please verify your environment configuration.');
       setIsLoading(false);
@@ -168,11 +166,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (sbError || !data.user) {
         console.warn('[Supabase Auth Debug] signInWithPassword error:', sbError?.message || 'User object missing');
-        const isRateLimit = sbError?.message?.toLowerCase().includes('rate limit') || (sbError as { status?: number })?.status === 429;
+        const msg = sbError?.message?.toLowerCase() || '';
+        const isRateLimit = msg.includes('rate limit') || (sbError as { status?: number })?.status === 429;
+        
         if (isRateLimit) {
           setError('Too many sign in attempts have been requested. Please wait a little while and try again.');
+        } else if (msg.includes('email not confirmed')) {
+          setError('Please confirm your email address before signing in. Check your inbox for a verification link.');
+        } else if (msg.includes('invalid login credentials')) {
+          setError('Invalid email address or password. Please check your credentials and try again.');
         } else {
-          setError(genericErrorMessage);
+          setError(sbError?.message || 'Invalid login credentials. Please check your email and password.');
         }
         setIsLoading(false);
         return false;
@@ -184,7 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.warn('[Supabase Auth Debug] Rejecting login: Profile uncompleted or missing');
         await supabase.auth.signOut();
         setUser(null);
-        setError(genericErrorMessage);
+        setError('Your account profile registration could not be completed. Please re-register or contact support.');
         setIsLoading(false);
         return false;
       }
@@ -198,7 +202,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (errMsg.includes('rate limit')) {
         setError('Too many sign in attempts have been requested. Please wait a little while and try again.');
       } else {
-        setError(genericErrorMessage);
+        setError('An unexpected sign in error occurred. Please try again.');
       }
       setIsLoading(false);
       return false;
@@ -262,14 +266,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
 
-      // Call complete_storefront_registration RPC if needed
-      const { error: rpcError } = await supabase.rpc('complete_storefront_registration', {
-        p_full_name: fullName,
-        p_phone: phone || null,
-      });
+      // Call complete_storefront_registration RPC only if an active session exists
+      if (data.session) {
+        const { error: rpcError } = await supabase.rpc('complete_storefront_registration', {
+          p_full_name: fullName,
+          p_phone: phone || null,
+        });
 
-      if (rpcError) {
-        console.warn('[Supabase Auth Debug] RPC complete_storefront_registration warning:', rpcError.message);
+        if (rpcError) {
+          console.warn('[Supabase Auth Debug] RPC complete_storefront_registration warning:', rpcError.message);
+        }
       }
 
       // FORCED SIGN-OUT: Registration must NOT auto-login user into /account
