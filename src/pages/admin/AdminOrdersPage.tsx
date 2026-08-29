@@ -1,21 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getStoredOrders, updateOrderStatus } from '@/services/orderService';
+import { fetchAdminOrders, updateOrderStatus } from '@/services/orderService';
 import type { Order, OrderStatus } from '@/types/order';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Search, ChevronRight, Filter } from 'lucide-react';
 
 export const AdminOrdersPage: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>(getStoredOrders());
+  const [orders, setOrders] = useState<Order[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [fulfillmentFilter, setFulfillmentFilter] = useState<string>('all');
   const [paymentFilter, setPaymentFilter] = useState<string>('all');
 
+  const loadOrders = async () => {
+    const data = await fetchAdminOrders();
+    setOrders(data);
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchAdminOrders().then((data) => {
+      if (isMounted) {
+        setOrders(data);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
     const updated = await updateOrderStatus(orderId, newStatus);
     if (updated) {
-      setOrders(getStoredOrders());
+      loadOrders();
     }
   };
 

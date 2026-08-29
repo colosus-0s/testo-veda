@@ -162,9 +162,9 @@ export const CheckoutPage: React.FC = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              <Link to="/account">
+              <Link to={`/orders/track?orderNumber=${completedOrder.orderNumber}&token=${completedOrder.guestAccessToken || ''}`}>
                 <Button variant="primary" size="md">
-                  View Account Orders
+                  Track Your Order Status
                 </Button>
               </Link>
               <Link to="/shop">
@@ -173,6 +173,18 @@ export const CheckoutPage: React.FC = () => {
                 </Button>
               </Link>
             </div>
+
+            {!user && (
+              <div className="mt-6 p-5 bg-[#173C2B] text-white rounded-2xl text-xs text-center space-y-2">
+                <p className="font-serif font-bold text-sm">Save Your Order History for Future Purchases</p>
+                <p className="text-emerald-100 text-[11px]">
+                  Create an account to save your address, manage orders across devices, and earn rewards.
+                </p>
+                <Link to="/register" className="inline-block pt-1">
+                  <span className="font-bold underline text-[#E2C384]">Create Free Account &rarr;</span>
+                </Link>
+              </div>
+            )}
           </div>
         </Container>
       </div>

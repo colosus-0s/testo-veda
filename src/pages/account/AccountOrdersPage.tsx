@@ -1,28 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getStoredOrders, subscribeToOrders } from '@/services/orderService';
+import { fetchCustomerOrders, subscribeToOrders } from '@/services/orderService';
+import { useAuth } from '@/context/AuthContext';
 import type { Order } from '@/types/order';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Search, Package, ArrowRight, ChevronRight } from 'lucide-react';
 
 export const AccountOrdersPage: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>(getStoredOrders());
+  const { user } = useAuth();
+  const [orders, setOrders] = useState<Order[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
+    let isMounted = true;
+    if (user?.id) {
+      fetchCustomerOrders(user.id).then((data) => {
+        if (isMounted) {
+          setOrders(data);
+        }
+      });
+    }
+
     // Realtime Order Subscription
     const unsubscribe = subscribeToOrders((updatedOrder) => {
-      setOrders((prev) =>
-        prev.map((o) => (o.id === updatedOrder.id || o.orderNumber === updatedOrder.orderNumber ? { ...o, ...updatedOrder } : o))
-      );
+      if (isMounted) {
+        setOrders((prev) =>
+          prev.map((o) => (o.id === updatedOrder.id || o.orderNumber === updatedOrder.orderNumber ? { ...o, ...updatedOrder } : o))
+        );
+      }
     });
 
     return () => {
+      isMounted = false;
       unsubscribe();
     };
-  }, []);
+  }, [user?.id]);
 
   const filteredOrders = (orders || []).filter((o) => {
     const orderNum = o.orderNumber || '';

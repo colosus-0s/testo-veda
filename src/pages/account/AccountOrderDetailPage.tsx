@@ -1,13 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getOrderById } from '@/services/orderService';
+import { fetchAdminOrder } from '@/services/orderService';
+import type { Order } from '@/types/order';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { ArrowLeft, CheckCircle2, Package, MapPin, CreditCard, Clock } from 'lucide-react';
 
 export const AccountOrderDetailPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
-  const order = orderId ? getOrderById(orderId) : null;
+  const [order, setOrder] = useState<Order | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (orderId) {
+      fetchAdminOrder(orderId).then((data) => {
+        if (isMounted) {
+          setOrder(data);
+        }
+      });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [orderId]);
 
   if (!order) {
     return (

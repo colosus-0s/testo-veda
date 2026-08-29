@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getOrderById, updateOrderStatus } from '@/services/orderService';
+import { fetchAdminOrder, updateOrderStatus } from '@/services/orderService';
 import type { Order, OrderStatus } from '@/types/order';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -8,11 +8,25 @@ import { ArrowLeft, Package, CheckCircle2, MapPin, CreditCard, User, Truck, Cloc
 
 export const AdminOrderDetailPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
-  const [order, setOrder] = useState<Order | null>(orderId ? getOrderById(orderId) : null);
+  const [order, setOrder] = useState<Order | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const [courierName, setCourierName] = useState('BlueDart Express');
   const [trackingNumber, setTrackingNumber] = useState(orderId ? `AWB-${orderId.substring(0, 8).toUpperCase()}` : '');
+
+  useEffect(() => {
+    let isMounted = true;
+    if (orderId) {
+      fetchAdminOrder(orderId).then((data) => {
+        if (isMounted) {
+          setOrder(data);
+        }
+      });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [orderId]);
 
   if (!order) {
     return (
