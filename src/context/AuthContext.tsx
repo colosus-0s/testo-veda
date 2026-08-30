@@ -30,6 +30,24 @@ export interface AuthContextType {
   toggleWishlist: (productId: string) => void;
 }
 
+const GUEST_DEVICE_ID_KEY = 'arogyapath_guest_device_id_v1';
+
+export const getOrCreateGuestDeviceId = (): string => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      let id = window.localStorage.getItem(GUEST_DEVICE_ID_KEY);
+      if (!id) {
+        id = `anon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        window.localStorage.setItem(GUEST_DEVICE_ID_KEY, id);
+      }
+      return id;
+    }
+  } catch {
+    // Ignore storage error
+  }
+  return `anon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+};
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -118,27 +136,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (loadedUser) {
           setUser({ ...loadedUser, isAnonymous: isAnon });
-        } else if (isAnon) {
-          // Anonymous Guest Identity fallback
+        } else {
           setUser({
             id: session.user.id,
             email: session.user.email || '',
-            fullName: 'Valued Guest',
+            fullName: isAnon ? 'Valued Guest' : (session.user.user_metadata?.full_name || 'Valued Customer'),
             role: 'customer',
             registrationCompleted: true,
-            isAnonymous: true,
+            isAnonymous: isAnon,
             createdAt: session.user.created_at || new Date().toISOString(),
           });
-        } else {
-          // Reject invalid / uncompleted registration sessions for non-anon users
-          await supabase.auth.signOut();
-          setUser(null);
         }
       } else {
-        // Attempt Anonymous Sign-In transparently if supported
+        // Attempt Anonymous Sign-In transparently if supported by Supabase project
         try {
           const { data: anonData, error: anonErr } = await supabase.auth.signInAnonymously();
-          if (!anonErr && anonData.user) {
+          if (!anonErr && anonData?.user) {
             setUser({
               id: anonData.user.id,
               email: anonData.user.email || '',
@@ -149,10 +162,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               createdAt: anonData.user.created_at || new Date().toISOString(),
             });
           } else {
-            setUser(null);
+            console.warn('[Supabase Guest Auth Diagnostic] signInAnonymously status:', anonErr?.message || 'Anonymous auth unavailable.', 'Fallback to persistent guest device session.');
+            const guestDeviceId = getOrCreateGuestDeviceId();
+            setUser({
+              id: guestDeviceId,
+              email: '',
+              fullName: 'Valued Guest',
+              role: 'customer',
+              registrationCompleted: true,
+              isAnonymous: true,
+              createdAt: new Date().toISOString(),
+            });
           }
-        } catch {
-          setUser(null);
+        } catch (err) {
+          console.warn('[Supabase Guest Auth Diagnostic] Exception during signInAnonymously:', err);
+          const guestDeviceId = getOrCreateGuestDeviceId();
+          setUser({
+            id: guestDeviceId,
+            email: '',
+            fullName: 'Valued Guest',
+            role: 'customer',
+            registrationCompleted: true,
+            isAnonymous: true,
+            createdAt: new Date().toISOString(),
+          });
         }
       }
       setIsLoading(false);
@@ -164,9 +197,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (_event === 'SIGNED_OUT') {
-        setUser(null);
         setAddresses([]);
         setWishlistProductIds([]);
+        const guestDeviceId = getOrCreateGuestDeviceId();
+        setUser({
+          id: guestDeviceId,
+          email: '',
+          fullName: 'Valued Guest',
+          role: 'customer',
+          registrationCompleted: true,
+          isAnonymous: true,
+          createdAt: new Date().toISOString(),
+        });
         setIsLoading(false);
       } else {
         await handleSession(session);

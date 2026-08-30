@@ -78,13 +78,15 @@ CREATE OR REPLACE FUNCTION public.create_customer_order(
   p_customer_phone TEXT,
   p_shipping_address JSONB,
   p_items JSONB, -- Array of { product_id, quantity }
-  p_payment_provider TEXT DEFAULT 'mock'
+  p_payment_provider TEXT DEFAULT 'mock',
+  p_user_id UUID DEFAULT NULL
 )
 RETURNS JSONB AS $$
 DECLARE
   v_order_id UUID := uuid_generate_v4();
   v_order_number TEXT := 'AP-' || FLOOR(100000 + RANDOM() * 900000)::TEXT;
   v_guest_access_token UUID := uuid_generate_v4();
+  v_user_id UUID := COALESCE(auth.uid(), p_user_id);
   v_subtotal NUMERIC(10, 2) := 0;
   v_shipping_fee NUMERIC(10, 2) := 0;
   v_discount NUMERIC(10, 2) := 0;
@@ -134,13 +136,13 @@ BEGIN
   
   v_total := v_subtotal + v_shipping_fee - v_discount;
   
-  -- Create order record with guest_access_token and auth.uid()
+  -- Create order record with guest_access_token and user_id
   INSERT INTO public.orders (
     id, order_number, guest_access_token, user_id, customer_name, customer_email, customer_phone,
     shipping_address_json, subtotal, shipping_fee, discount, tax, total,
     currency, order_status, payment_status, payment_provider
   ) VALUES (
-    v_order_id, v_order_number, v_guest_access_token, auth.uid(), p_customer_name, p_customer_email, p_customer_phone,
+    v_order_id, v_order_number, v_guest_access_token, v_user_id, p_customer_name, p_customer_email, p_customer_phone,
     p_shipping_address, v_subtotal, v_shipping_fee, v_discount, v_tax, v_total,
     'INR', 'pending', 'pending', p_payment_provider
   );
@@ -177,7 +179,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
-GRANT EXECUTE ON FUNCTION public.create_customer_order(TEXT, TEXT, TEXT, JSONB, JSONB, TEXT) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.create_customer_order(TEXT, TEXT, TEXT, JSONB, JSONB, TEXT, UUID) TO anon, authenticated, service_role;
 
 -- 4. CREATE SECURE GUEST ORDER TRACKING RPC FUNCTION
 CREATE OR REPLACE FUNCTION public.get_guest_order_details(
