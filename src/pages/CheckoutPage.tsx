@@ -162,7 +162,7 @@ export const CheckoutPage: React.FC = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
-              <Link to={`/orders/track?orderNumber=${completedOrder.orderNumber}&token=${completedOrder.guestAccessToken || ''}`}>
+              <Link to={`/orders/track?orderNumber=${completedOrder.orderNumber}`}>
                 <Button variant="primary" size="md">
                   Track Your Order Status
                 </Button>

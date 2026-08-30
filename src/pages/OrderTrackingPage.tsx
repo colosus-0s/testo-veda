@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { fetchGuestOrder } from '@/services/orderService';
+import { fetchGuestOrder, fetchCustomerOrders } from '@/services/orderService';
+import { useAuth } from '@/context/AuthContext';
 import type { Order } from '@/types/order';
 import { Container } from '@/components/ui/Container';
 import { Section } from '@/components/ui/Section';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Package, Truck, CheckCircle2, Clock, MapPin, CreditCard, Search, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Package, Truck, CheckCircle2, Clock, MapPin, CreditCard, Search, ShieldCheck } from 'lucide-react';
 
 export const OrderTrackingPage: React.FC = () => {
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const urlOrderNumber = searchParams.get('orderNumber') || '';
   const urlToken = searchParams.get('token') || '';
@@ -16,6 +18,7 @@ export const OrderTrackingPage: React.FC = () => {
   const [orderNumberInput, setOrderNumberInput] = useState(urlOrderNumber);
   const [tokenInput, setTokenInput] = useState(urlToken);
 
+  const [userOrders, setUserOrders] = useState<Order[]>([]);
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -41,23 +44,41 @@ export const OrderTrackingPage: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
+
+    // Same-device automatic session lookup if user exists
+    if (user?.id) {
+      fetchCustomerOrders(user.id).then((ordersList) => {
+        if (!isMounted) return;
+        if (ordersList && ordersList.length > 0) {
+          setUserOrders(ordersList);
+          const matched = urlOrderNumber
+            ? ordersList.find((o) => o.orderNumber === urlOrderNumber.trim())
+            : ordersList[0];
+          setOrder(matched || ordersList[0]);
+          setErrorMsg(null);
+        }
+      });
+    }
+
+    // Cross-device explicit token lookup fallback
     if (urlOrderNumber && urlToken) {
       fetchGuestOrder(urlOrderNumber.trim(), urlToken.trim()).then((result) => {
         if (isMounted) {
           if (result) {
             setOrder(result);
             setErrorMsg(null);
-          } else {
+          } else if (!user?.id) {
             setOrder(null);
             setErrorMsg('No order found matching the provided Order Number and Access Code. Please check your credentials.');
           }
         }
       });
     }
+
     return () => {
       isMounted = false;
     };
-  }, [urlOrderNumber, urlToken]);
+  }, [user?.id, urlOrderNumber, urlToken]);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,54 +114,94 @@ export const OrderTrackingPage: React.FC = () => {
               </p>
             </div>
 
-            {/* Manual Lookup Form */}
-            <form onSubmit={handleFormSubmit} className="bg-[#FCFBF8] p-6 sm:p-8 rounded-3xl border border-[#EBE7DF] shadow-subtle-card space-y-4">
-              <h3 className="font-serif font-bold text-lg text-[#171717] flex items-center gap-2">
-                <Search size={18} className="text-[#6A1423]" /> Order Security Lookup
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div>
-                  <label className="font-bold text-[#171717] block mb-1 uppercase tracking-wider">
-                    Order Number
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={orderNumberInput}
-                    onChange={(e) => setOrderNumberInput(e.target.value)}
-                    placeholder="e.g. AP-849201"
-                    className="w-full p-3 bg-[#F7F4ED] border border-[#EBE7DF] rounded-xl text-[#171717] focus:outline-none focus:border-[#6A1423]"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-bold text-[#171717] block mb-1 uppercase tracking-wider">
-                    Security Access Token (UUID)
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={tokenInput}
-                    onChange={(e) => setTokenInput(e.target.value)}
-                    placeholder="e.g. 3b9e4a12-8f1d-4e92-a1b2-c3d4e5f6a7b8"
-                    className="w-full p-3 bg-[#F7F4ED] border border-[#EBE7DF] rounded-xl text-[#171717] font-mono focus:outline-none focus:border-[#6A1423]"
-                  />
+            {/* Active Orders List for Authenticated Guest / Member */}
+            {userOrders.length > 0 && (
+              <div className="bg-[#FCFBF8] p-6 rounded-3xl border border-[#EBE7DF] shadow-subtle-card space-y-4">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#6A1423] block">
+                  Orders Saved to This Device
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {userOrders.map((ord) => {
+                    const isSelected = order?.orderNumber === ord.orderNumber;
+                    return (
+                      <button
+                        key={ord.id || ord.orderNumber}
+                        onClick={() => {
+                          setOrder(ord);
+                          setErrorMsg(null);
+                        }}
+                        className={`p-4 rounded-2xl text-left border transition-all ${
+                          isSelected
+                            ? 'bg-[#6A1423] text-white border-[#6A1423] shadow-md'
+                            : 'bg-white text-[#171717] border-[#EBE7DF] hover:border-[#6A1423]'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between font-bold text-xs">
+                          <span>#{ord.orderNumber}</span>
+                          <Badge variant={isSelected ? 'outline' : 'green'} size="sm">
+                            {ord.orderStatus || 'pending'}
+                          </Badge>
+                        </div>
+                        <p className={`text-[11px] mt-2 font-medium ${isSelected ? 'text-rose-100' : 'text-slate-500'}`}>
+                          {ord.items?.length || 1} item(s) • ₹{ord.total?.toLocaleString('en-IN') || 0}
+                        </p>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
+            )}
+
+            {/* Manual Lookup Form (Secondary Recovery Option) */}
+            {userOrders.length === 0 && (
+              <form onSubmit={handleFormSubmit} className="bg-[#FCFBF8] p-6 sm:p-8 rounded-3xl border border-[#EBE7DF] shadow-subtle-card space-y-4">
+                <h3 className="font-serif font-bold text-lg text-[#171717] flex items-center gap-2">
+                  <Search size={18} className="text-[#6A1423]" /> Order Security Lookup
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <label className="font-bold text-[#171717] block mb-1 uppercase tracking-wider">
+                      Order Number
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={orderNumberInput}
+                      onChange={(e) => setOrderNumberInput(e.target.value)}
+                      placeholder="e.g. AP-849201"
+                      className="w-full p-3 bg-[#F7F4ED] border border-[#EBE7DF] rounded-xl text-[#171717] focus:outline-none focus:border-[#6A1423]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-[#171717] block mb-1 uppercase tracking-wider">
+                      Security Access Token (UUID)
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={tokenInput}
+                      onChange={(e) => setTokenInput(e.target.value)}
+                      placeholder="e.g. 3b9e4a12-8f1d-4e92-a1b2-c3d4e5f6a7b8"
+                      className="w-full p-3 bg-[#F7F4ED] border border-[#EBE7DF] rounded-xl text-[#171717] font-mono focus:outline-none focus:border-[#6A1423]"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2 flex justify-end">
+                  <Button variant="primary" size="md" isLoading={isLoading} type="submit" leftIcon={<Search size={16} />}>
+                    Lookup Order Progress
+                  </Button>
+                </div>
+              </form>
+            )}
 
               {errorMsg && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-xs text-red-900 font-semibold">
                   {errorMsg}
                 </div>
               )}
-
-              <div className="flex justify-end pt-2">
-                <Button variant="primary" size="md" type="submit" isLoading={isLoading} rightIcon={<ArrowRight size={16} />}>
-                  Track Order Details
-                </Button>
-              </div>
-            </form>
 
             {/* Order Tracking Output */}
             {order && (

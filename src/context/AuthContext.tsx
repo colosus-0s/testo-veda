@@ -13,6 +13,7 @@ export interface AuthContextType {
   isGuest: boolean;
   isAdmin: boolean;
   isLoading: boolean;
+  authReady: boolean;
   error: string | null;
   login: (email: string, pass: string) => Promise<boolean>;
   register: (email: string, pass: string, fullName: string, phone?: string) => Promise<boolean>;
@@ -37,6 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [addresses, setAddresses] = useState<UserAddress[]>([]);
   const [wishlistProductIds, setWishlistProductIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(() => isSupabaseConfigured());
+  const [authReady, setAuthReady] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   // Load user profile from Supabase profiles table
@@ -107,27 +109,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Synchronize Auth Session on Mount & Auth Change
   useEffect(() => {
     if (!isSupabaseConfigured()) {
-      const timer = setTimeout(() => setIsLoading(false), 0);
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+        setAuthReady(true);
+      }, 0);
       return () => clearTimeout(timer);
     }
 
     const handleSession = async (session: import('@supabase/supabase-js').Session | null) => {
       if (session?.user) {
         const isAnon = session.user.is_anonymous === true;
-        const loadedUser = await loadProfile(session.user.id, session.user.email || '');
-
-        if (loadedUser) {
-          setUser({ ...loadedUser, isAnonymous: isAnon });
-        } else {
+        if (isAnon) {
           setUser({
             id: session.user.id,
             email: session.user.email || '',
-            fullName: isAnon ? 'Valued Guest' : (session.user.user_metadata?.full_name || 'Valued Customer'),
+            fullName: 'Valued Guest',
             role: 'customer',
             registrationCompleted: true,
-            isAnonymous: isAnon,
+            isAnonymous: true,
             createdAt: session.user.created_at || new Date().toISOString(),
           });
+        } else {
+          const loadedUser = await loadProfile(session.user.id, session.user.email || '');
+          if (loadedUser) {
+            setUser({ ...loadedUser, isAnonymous: false });
+          } else {
+            setUser({
+              id: session.user.id,
+              email: session.user.email || '',
+              fullName: session.user.user_metadata?.full_name || 'Valued Customer',
+              role: 'customer',
+              registrationCompleted: true,
+              isAnonymous: false,
+              createdAt: session.user.created_at || new Date().toISOString(),
+            });
+          }
         }
       } else {
         // Attempt Anonymous Sign-In transparently via Supabase Auth
@@ -157,6 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
       setIsLoading(false);
+      setAuthReady(true);
     };
 
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -165,10 +182,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (_event === 'SIGNED_OUT') {
-        setUser(null);
         setAddresses([]);
         setWishlistProductIds([]);
+        // Re-establish anonymous session on explicit sign-out for guest storefront browsing
+        try {
+          const { data: anonData } = await supabase.auth.signInAnonymously();
+          if (anonData?.user) {
+            setUser({
+              id: anonData.user.id,
+              email: '',
+              fullName: 'Valued Guest',
+              role: 'customer',
+              registrationCompleted: true,
+              isAnonymous: true,
+              createdAt: anonData.user.created_at || new Date().toISOString(),
+            });
+          } else {
+            setUser(null);
+          }
+        } catch {
+          setUser(null);
+        }
         setIsLoading(false);
+        setAuthReady(true);
       } else {
         await handleSession(session);
       }
@@ -487,6 +523,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isGuest,
         isAdmin,
         isLoading,
+        authReady,
         error,
         login,
         register,
