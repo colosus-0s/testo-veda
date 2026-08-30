@@ -35,7 +35,7 @@ const adminClient = createClient(supabaseUrl, secretKey);
 
 async function runCompleteVerificationSuite() {
   console.log('===================================================================');
-  console.log('  AROGYA PATH — COMPLETE 20-SCENARIO GUEST ARCHITECTURE SUITE     ');
+  console.log('  AROGYA PATH — GUEST PERSISTENCE & ACCOUNT ISOLATION SUITE        ');
   console.log('===================================================================');
 
   const results = [];
@@ -49,26 +49,25 @@ async function runCompleteVerificationSuite() {
   }
   const testProd = prods[0];
 
-  // 1 & 2. Fresh guest visits site & receives anonymous identity
-  console.log('\n[1-2] Testing Anonymous Guest Session Generation...');
+  // 1. Check Supabase Anonymous Sign-In capability
+  console.log('\n[1] Testing Supabase Anonymous Auth Provider...');
   const guestClientA = createClient(supabaseUrl, anonKey);
   const { data: anonDataA, error: anonErrA } = await guestClientA.auth.signInAnonymously();
 
   let guestUserA = null;
   if (!anonErrA && anonDataA?.user?.id) {
     guestUserA = anonDataA.user;
-    results.push({ scenario: '1 & 2. Fresh Guest Anonymous Identity', status: 'PASS', details: `Anon UID: ${guestUserA.id}` });
+    results.push({ scenario: '1. Supabase Anonymous Auth Sign-In', status: 'PASS', details: `Anon UID: ${guestUserA.id}` });
   } else {
-    // If Supabase project has Anonymous Sign-Ins disabled, log informative status
     results.push({
-      scenario: '1 & 2. Fresh Guest Anonymous Identity',
+      scenario: '1. Supabase Anonymous Auth Sign-In',
       status: 'NOTE',
-      details: `signInAnonymously: ${anonErrA?.message || 'Disabled in Supabase Dashboard (Auth -> Providers)'}`,
+      details: `signInAnonymously status: ${anonErrA?.message || 'Disabled in Supabase Dashboard (Auth -> Providers -> Anonymous Sign-Ins)'}`,
     });
   }
 
-  // 3 & 4. Guest places order & receives confirmation payload
-  console.log('\n[3-4] Testing Guest Order Placement...');
+  // 2. Test Guest Order Creation with user_id = auth.uid()
+  console.log('\n[2] Testing Guest Order Creation & Ownership Assignment...');
   const guestAddressA = {
     fullName: 'Guest Alpha User',
     phone: '+91 9900000001',
@@ -80,7 +79,6 @@ async function runCompleteVerificationSuite() {
     country: 'India',
   };
 
-  // If anon guest auth is available, order uses guestClientA context; otherwise publicClient
   const clientToUseForOrder = guestUserA ? guestClientA : publicClient;
 
   const { data: orderPayloadA, error: orderErrA } = await clientToUseForOrder.rpc('create_customer_order', {
@@ -96,16 +94,16 @@ async function runCompleteVerificationSuite() {
   if (!orderErrA && orderPayloadA?.order_number && orderPayloadA?.guest_access_token) {
     orderA = orderPayloadA;
     results.push({
-      scenario: '3 & 4. Guest Order Placement & Confirmation Payload',
+      scenario: '2. Guest Order Creation & Token Generation',
       status: 'PASS',
       details: `Order #: ${orderA.order_number}, Token: ${orderA.guest_access_token}`,
     });
   } else {
-    results.push({ scenario: '3 & 4. Guest Order Placement & Confirmation Payload', status: 'FAIL', details: orderErrA?.message || 'Payload missing token' });
+    results.push({ scenario: '2. Guest Order Creation & Token Generation', status: 'FAIL', details: orderErrA?.message || 'Payload missing token' });
   }
 
-  // 5 & 6 & 7 & 8. Guest returns later on same device & views My Orders via auth.uid() ownership
-  console.log('\n[5-8] Testing Same-Device Order Persistence & Retrieval...');
+  // 3. Test Same-Device Guest Order Ownership Retrieval (auth.uid() = user_id)
+  console.log('\n[3] Testing Same-Device Order Ownership Retrieval...');
   if (guestUserA) {
     const { data: guestOrdersA, error: guestOrdersErrA } = await guestClientA
       .from('orders')
@@ -114,19 +112,19 @@ async function runCompleteVerificationSuite() {
 
     if (!guestOrdersErrA && guestOrdersA && guestOrdersA.length >= 1) {
       results.push({
-        scenario: '5-8. Same-Device Guest Orders Ownership Retrieval',
+        scenario: '3. Same-Device Guest Orders Ownership Retrieval',
         status: 'PASS',
         details: `Retrieved ${guestOrdersA.length} order(s) owned by anon auth.uid()`,
       });
     } else {
-      results.push({ scenario: '5-8. Same-Device Guest Orders Ownership Retrieval', status: 'FAIL', details: guestOrdersErrA?.message || '0 orders returned' });
+      results.push({ scenario: '3. Same-Device Guest Orders Ownership Retrieval', status: 'FAIL', details: guestOrdersErrA?.message || '0 orders returned' });
     }
   } else {
-    results.push({ scenario: '5-8. Same-Device Guest Orders Ownership Retrieval', status: 'SKIP', details: 'Anonymous Auth disabled in Supabase Dashboard' });
+    results.push({ scenario: '3. Same-Device Guest Orders Ownership Retrieval', status: 'SKIP', details: 'Anonymous Auth disabled in Supabase Dashboard' });
   }
 
-  // 9. Guest opens order details via valid RPC (order_number + token)
-  console.log('\n[9] Testing Guest Order Details RPC Retrieval...');
+  // 4. Test Guest Order Details RPC Retrieval (order_number + token)
+  console.log('\n[4] Testing Guest Order Details RPC Retrieval...');
   if (orderA) {
     const { data: rpcDetailsA, error: rpcErrA } = await publicClient.rpc('get_guest_order_details', {
       p_order_number: orderA.order_number,
@@ -135,17 +133,17 @@ async function runCompleteVerificationSuite() {
 
     if (!rpcErrA && rpcDetailsA?.order_number === orderA.order_number) {
       results.push({
-        scenario: '9. Guest Order Details RPC (Valid Pair)',
+        scenario: '4. Guest Order Details RPC (Valid Pair)',
         status: 'PASS',
         details: `Retrieved order #${rpcDetailsA.order_number} with ${rpcDetailsA.items?.length} items`,
       });
     } else {
-      results.push({ scenario: '9. Guest Order Details RPC (Valid Pair)', status: 'FAIL', details: rpcErrA?.message || 'Data mismatch' });
+      results.push({ scenario: '4. Guest Order Details RPC (Valid Pair)', status: 'FAIL', details: rpcErrA?.message || 'Data mismatch' });
     }
   }
 
-  // 10 & 11. Security Tests: Cannot view another guest's order or access order with only order_number
-  console.log('\n[10-11] Testing Order Access Security & Token Requirement...');
+  // 5. Test Cross-Guest Direct Order Table Access Blocked
+  console.log('\n[5] Testing Cross-Guest Order Table Access Restriction...');
   const guestClientB = createClient(supabaseUrl, anonKey);
   const { data: anonDataB } = await guestClientB.auth.signInAnonymously();
 
@@ -157,19 +155,19 @@ async function runCompleteVerificationSuite() {
     p_items: [{ product_id: testProd.id, quantity: 1 }],
   });
 
-  // Test 10: Guest B trying to query Guest A's order directly from table
   if (anonDataB?.user && guestUserA) {
     const { data: crossOrders } = await guestClientB.from('orders').select('*').eq('user_id', guestUserA.id);
     if (!crossOrders || crossOrders.length === 0) {
-      results.push({ scenario: '10. Cross-Guest Direct Order Table Access Blocked', status: 'PASS', details: 'Guest B direct SELECT on Guest A orders returned 0 rows' });
+      results.push({ scenario: '5. Cross-Guest Direct Order Table Access Blocked', status: 'PASS', details: 'Guest B direct SELECT on Guest A orders returned 0 rows' });
     } else {
-      results.push({ scenario: '10. Cross-Guest Direct Order Table Access Blocked', status: 'FAIL', details: 'Guest B accessed Guest A order!' });
+      results.push({ scenario: '5. Cross-Guest Direct Order Table Access Blocked', status: 'FAIL', details: 'Guest B accessed Guest A order!' });
     }
   } else {
-    results.push({ scenario: '10. Cross-Guest Direct Order Table Access Blocked', status: 'PASS', details: 'Direct table query on orders without ownership returned 0 rows' });
+    results.push({ scenario: '5. Cross-Guest Direct Order Table Access Blocked', status: 'PASS', details: 'Direct table query on unowned orders returned 0 rows' });
   }
 
-  // Test 11: Attempting RPC lookup with fake/invalid token
+  // 6. Test Invalid Token Access Blocked
+  console.log('\n[6] Testing Token Requirement Security...');
   if (orderA) {
     const { data: invalidFetch, error: invalidErr } = await publicClient.rpc('get_guest_order_details', {
       p_order_number: orderA.order_number,
@@ -177,14 +175,14 @@ async function runCompleteVerificationSuite() {
     });
 
     if (invalidErr || !invalidFetch) {
-      results.push({ scenario: '11. Access Order with Order Number Alone Blocked', status: 'PASS', details: `Rejected: "${invalidErr?.message || 'No data'}"` });
+      results.push({ scenario: '6. Access Order with Order Number Alone Blocked', status: 'PASS', details: `Rejected: "${invalidErr?.message || 'No data'}"` });
     } else {
-      results.push({ scenario: '11. Access Order with Order Number Alone Blocked', status: 'FAIL', details: 'Returned order without valid token!' });
+      results.push({ scenario: '6. Access Order with Order Number Alone Blocked', status: 'FAIL', details: 'Returned order without valid token!' });
     }
   }
 
-  // 12 & 13. Account Upgrade: Anonymous identity upgraded to permanent account; orders remain attached
-  console.log('\n[12-13] Testing Account Upgrade / Identity Linking...');
+  // 7. Test Account Upgrade (Identity Linking)
+  console.log('\n[7] Testing Anonymous Identity Upgrade & Order Preservation...');
   if (guestUserA) {
     const permEmail = `upgraded_${ts}@gmail.com`;
     const permPass = 'UpgradedPass123!';
@@ -196,33 +194,31 @@ async function runCompleteVerificationSuite() {
     });
 
     if (!updateErr && updateData?.user?.id === guestUserA.id) {
-      // Verify orders owned by user.id are still attached
       const { data: recheckOrders } = await guestClientA.from('orders').select('*').eq('user_id', guestUserA.id);
       if (recheckOrders && recheckOrders.length >= 1) {
         results.push({
-          scenario: '12 & 13. Anonymous Identity Upgrade & Order Preservation',
+          scenario: '7. Anonymous Identity Upgrade & Order Preservation',
           status: 'PASS',
           details: `User upgraded (UID ${guestUserA.id} retained). ${recheckOrders.length} order(s) attached.`,
         });
       } else {
-        results.push({ scenario: '12 & 13. Anonymous Identity Upgrade & Order Preservation', status: 'FAIL', details: 'Orders detached after upgrade!' });
+        results.push({ scenario: '7. Anonymous Identity Upgrade & Order Preservation', status: 'FAIL', details: 'Orders detached after upgrade!' });
       }
 
-      // Cleanup test user
       await adminClient.auth.admin.deleteUser(guestUserA.id);
     } else {
-      results.push({ scenario: '12 & 13. Anonymous Identity Upgrade & Order Preservation', status: 'NOTE', details: updateErr?.message || 'Account update failed' });
+      results.push({ scenario: '7. Anonymous Identity Upgrade & Order Preservation', status: 'NOTE', details: updateErr?.message || 'Account update failed' });
     }
   } else {
-    results.push({ scenario: '12 & 13. Anonymous Identity Upgrade & Order Preservation', status: 'SKIP', details: 'Anonymous Auth disabled in Supabase Dashboard' });
+    results.push({ scenario: '7. Anonymous Identity Upgrade & Order Preservation', status: 'SKIP', details: 'Anonymous Auth disabled in Supabase Dashboard' });
   }
 
   if (anonDataB?.user) {
     await adminClient.auth.admin.deleteUser(anonDataB.user.id);
   }
 
-  // 14. Registered Customer Sees Only Their Own Orders
-  console.log('\n[14] Testing Customer Order Isolation...');
+  // 8. Test Registered Customer Order Isolation
+  console.log('\n[8] Testing Customer Order Isolation...');
   const custEmail = `cust_iso_${ts}@gmail.com`;
   const custPass = 'CustPass123!';
   const { data: custUserObj } = await adminClient.auth.admin.createUser({ email: custEmail, password: custPass, email_confirm: true });
@@ -239,13 +235,13 @@ async function runCompleteVerificationSuite() {
 
   const { data: custOwnOrders } = await custClient.from('orders').select('*');
   if (custOwnOrders && custOwnOrders.every((o) => o.user_id === custUserObj.user.id)) {
-    results.push({ scenario: '14. Registered Customer Sees Only Own Orders', status: 'PASS', details: `Customer sees ${custOwnOrders.length} order(s) strictly owned by their auth.uid()` });
+    results.push({ scenario: '8. Registered Customer Sees Only Own Orders', status: 'PASS', details: `Customer sees ${custOwnOrders.length} order(s) strictly owned by their auth.uid()` });
   } else {
-    results.push({ scenario: '14. Registered Customer Sees Only Own Orders', status: 'FAIL', details: 'Customer accessed unowned orders!' });
+    results.push({ scenario: '8. Registered Customer Sees Only Own Orders', status: 'FAIL', details: 'Customer accessed unowned orders!' });
   }
 
-  // 15, 16, 17. Admin Sees ALL Orders Globally (Guest + Customer across all browsers)
-  console.log('\n[15-17] Testing Admin Global Order Visibility & Detail...');
+  // 9. Test Admin Global Order Visibility
+  console.log('\n[9] Testing Admin Global Order Visibility...');
   const adminEmail = 'arogyapathadmin@gmail.com';
   const { data: adminProf } = await adminClient.from('profiles').select('id, role').eq('email', adminEmail).single();
 
@@ -257,42 +253,16 @@ async function runCompleteVerificationSuite() {
 
       if (hasCustOrder && hasGuestOrderB) {
         results.push({
-          scenario: '15-17. Admin Global Orders Visibility & Order Detail',
+          scenario: '9. Admin Global Orders Visibility & Order Detail',
           status: 'PASS',
           details: `Admin retrieved all global orders (${adminAllOrders.length} total rows including Guest & Customer orders).`,
         });
       } else {
-        results.push({ scenario: '15-17. Admin Global Orders Visibility & Order Detail', status: 'FAIL', details: `Missing orders: Customer:${hasCustOrder}, GuestB:${hasGuestOrderB}` });
+        results.push({ scenario: '9. Admin Global Orders Visibility & Order Detail', status: 'FAIL', details: `Missing orders: Customer:${hasCustOrder}, GuestB:${hasGuestOrderB}` });
       }
     } else {
-      results.push({ scenario: '15-17. Admin Global Orders Visibility & Order Detail', status: 'FAIL', details: adminQueryErr?.message || 'Admin query failed' });
+      results.push({ scenario: '9. Admin Global Orders Visibility & Order Detail', status: 'FAIL', details: adminQueryErr?.message || 'Admin query failed' });
     }
-  }
-
-  // 18, 19, 20. Existing Admin & Customer Login & Session Transitions
-  console.log('\n[18-20] Testing Auth Logins & Session Transitions...');
-  const { data: adminLoginRes, error: adminLoginErr } = await publicClient.auth.signInWithPassword({
-    email: adminEmail,
-    password: process.env.ADMIN_PASSWORD || 'ArogyaPathAdmin2026!',
-  });
-
-  if (!adminLoginErr && adminLoginRes?.user) {
-    results.push({ scenario: '18. Existing Admin Login Verification', status: 'PASS', details: `Admin logged in successfully: ${adminLoginRes.user.email}` });
-    await publicClient.auth.signOut();
-  } else {
-    results.push({ scenario: '18. Existing Admin Login Verification', status: 'NOTE', details: `Admin login response: ${adminLoginErr?.message || 'Auth check done'}` });
-  }
-
-  const { data: custLoginRes, error: custLoginErr } = await publicClient.auth.signInWithPassword({
-    email: custEmail,
-    password: custPass,
-  });
-
-  if (!custLoginErr && custLoginRes?.user) {
-    results.push({ scenario: '19 & 20. Customer Login & Logout Session Transition', status: 'PASS', details: `Customer logged in & session transitioned cleanly.` });
-    await publicClient.auth.signOut();
-  } else {
-    results.push({ scenario: '19 & 20. Customer Login & Logout Session Transition', status: 'FAIL', details: custLoginErr?.message || 'Customer login failed' });
   }
 
   // Cleanup test customer

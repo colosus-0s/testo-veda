@@ -38,6 +38,8 @@ export const AccountOrdersPage: React.FC = () => {
     };
   }, [user?.id]);
 
+  const isGuest = user?.isAnonymous === true;
+
   const filteredOrders = (orders || []).filter((o) => {
     const orderNum = o.orderNumber || '';
     const items = o.items || [];
@@ -55,13 +57,33 @@ export const AccountOrdersPage: React.FC = () => {
 
   return (
     <div className="space-y-6 text-left">
+      {isGuest && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div>
+            <span className="font-serif font-bold text-amber-900 text-sm block">Guest Order History</span>
+            <p className="text-amber-800 mt-0.5">
+              These orders are saved on this browser device. Create a free account to access your full order history across all devices.
+            </p>
+          </div>
+          <Link to="/register" className="shrink-0">
+            <Button variant="primary" size="sm">
+              Create Free Account
+            </Button>
+          </Link>
+        </div>
+      )}
+
       <div>
         <span className="text-xs uppercase font-bold tracking-widest text-[#6A1423] block mb-1">
-          Order History
+          {isGuest ? 'Guest Order History' : 'Order History'}
         </span>
-        <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#171717]">My Orders</h2>
+        <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#171717]">
+          {isGuest ? 'My Guest Orders' : 'My Orders'}
+        </h2>
         <p className="text-xs text-slate-600 mt-1">
-          Track active shipments, inspect purchase invoices, and review past order history.
+          {isGuest
+            ? 'Review orders placed on this browser device.'
+            : 'Track active shipments, inspect purchase invoices, and review past order history.'}
         </p>
       </div>
 

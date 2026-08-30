@@ -175,12 +175,20 @@ export const AccountLayout: React.FC = () => {
                 ))}
 
                 <div className="pt-4 border-t border-[#EBE7DF]">
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 transition-colors"
-                  >
-                    <LogOut size={16} /> Sign Out Account
-                  </button>
+                  {isGuest ? (
+                    <Link to="/register">
+                      <Button variant="primary" size="sm" className="w-full font-bold">
+                        Create Free Account
+                      </Button>
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 transition-colors"
+                    >
+                      <LogOut size={16} /> Sign Out Account
+                    </button>
+                  )}
                 </div>
               </div>
 

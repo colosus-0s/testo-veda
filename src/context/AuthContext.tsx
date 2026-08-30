@@ -10,6 +10,7 @@ export interface AuthContextType {
   addresses: UserAddress[];
   wishlistProductIds: string[];
   isAuthenticated: boolean;
+  isGuest: boolean;
   isAdmin: boolean;
   isLoading: boolean;
   error: string | null;
@@ -471,14 +472,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const isGuest = !!user && user.isAnonymous === true;
+  const isAuthenticated = !!user && !isGuest;
+  const isAdmin = !!user && !isGuest && (user.role === 'admin' || user.role === 'superadmin');
+
   return (
     <AuthContext.Provider
       value={{
         user,
         addresses,
         wishlistProductIds,
-        isAuthenticated: !!user,
-        isAdmin: user?.role === 'admin' || user?.role === 'superadmin',
+        isAuthenticated,
+        isGuest,
+        isAdmin,
         isLoading,
         error,
         login,
