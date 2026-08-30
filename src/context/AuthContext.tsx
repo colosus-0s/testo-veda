@@ -30,24 +30,6 @@ export interface AuthContextType {
   toggleWishlist: (productId: string) => void;
 }
 
-const GUEST_DEVICE_ID_KEY = 'arogyapath_guest_device_id_v1';
-
-export const getOrCreateGuestDeviceId = (): string => {
-  try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      let id = window.localStorage.getItem(GUEST_DEVICE_ID_KEY);
-      if (!id) {
-        id = `anon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-        window.localStorage.setItem(GUEST_DEVICE_ID_KEY, id);
-      }
-      return id;
-    }
-  } catch {
-    // Ignore storage error
-  }
-  return `anon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-};
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -148,7 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
         }
       } else {
-        // Attempt Anonymous Sign-In transparently if supported by Supabase project
+        // Attempt Anonymous Sign-In transparently via Supabase Auth
         try {
           const { data: anonData, error: anonErr } = await supabase.auth.signInAnonymously();
           if (!anonErr && anonData?.user) {
@@ -162,30 +144,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               createdAt: anonData.user.created_at || new Date().toISOString(),
             });
           } else {
-            console.warn('[Supabase Guest Auth Diagnostic] signInAnonymously status:', anonErr?.message || 'Anonymous auth unavailable.', 'Fallback to persistent guest device session.');
-            const guestDeviceId = getOrCreateGuestDeviceId();
-            setUser({
-              id: guestDeviceId,
-              email: '',
-              fullName: 'Valued Guest',
-              role: 'customer',
-              registrationCompleted: true,
-              isAnonymous: true,
-              createdAt: new Date().toISOString(),
-            });
+            if (anonErr?.status === 422 || anonErr?.message?.toLowerCase().includes('disabled')) {
+              console.warn('[Supabase Auth Diagnostic] Anonymous Sign-Ins are disabled in Supabase Dashboard (Auth -> Providers -> Anonymous Sign-Ins).');
+            } else {
+              console.warn('[Supabase Auth Diagnostic] signInAnonymously failed:', anonErr?.message);
+            }
+            setUser(null);
           }
         } catch (err) {
-          console.warn('[Supabase Guest Auth Diagnostic] Exception during signInAnonymously:', err);
-          const guestDeviceId = getOrCreateGuestDeviceId();
-          setUser({
-            id: guestDeviceId,
-            email: '',
-            fullName: 'Valued Guest',
-            role: 'customer',
-            registrationCompleted: true,
-            isAnonymous: true,
-            createdAt: new Date().toISOString(),
-          });
+          console.warn('[Supabase Auth Diagnostic] Exception during signInAnonymously:', err);
+          setUser(null);
         }
       }
       setIsLoading(false);
@@ -197,18 +165,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (_event === 'SIGNED_OUT') {
+        setUser(null);
         setAddresses([]);
         setWishlistProductIds([]);
-        const guestDeviceId = getOrCreateGuestDeviceId();
-        setUser({
-          id: guestDeviceId,
-          email: '',
-          fullName: 'Valued Guest',
-          role: 'customer',
-          registrationCompleted: true,
-          isAnonymous: true,
-          createdAt: new Date().toISOString(),
-        });
         setIsLoading(false);
       } else {
         await handleSession(session);
