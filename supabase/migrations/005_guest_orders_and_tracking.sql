@@ -27,7 +27,51 @@ END $$;
 CREATE INDEX IF NOT EXISTS idx_orders_guest_access_token 
 ON public.orders(guest_access_token);
 
--- 2. UPDATE create_customer_order RPC TO GENERATE & RETURN GUEST_ACCESS_TOKEN
+-- 2. UPDATE handle_new_user TRIGGER TO SUPPORT ANONYMOUS & PERMANENT USER CONVERSION
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_is_anon BOOLEAN := COALESCE(NEW.is_anonymous, FALSE);
+  v_full_name TEXT;
+BEGIN
+  IF v_is_anon THEN
+    v_full_name := COALESCE(NEW.raw_user_meta_data->>'full_name', 'Valued Guest');
+  ELSE
+    v_full_name := COALESCE(NEW.raw_user_meta_data->>'full_name', 'Valued Customer');
+  END IF;
+
+  INSERT INTO public.profiles (
+    id, email, full_name, phone, role, registration_completed, created_at, updated_at
+  ) VALUES (
+    NEW.id,
+    NEW.email,
+    v_full_name,
+    NEW.raw_user_meta_data->>'phone',
+    'customer',
+    TRUE,
+    NOW(),
+    NOW()
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    email = COALESCE(EXCLUDED.email, public.profiles.email),
+    full_name = CASE 
+      WHEN EXCLUDED.full_name IS NOT NULL AND EXCLUDED.full_name <> 'Valued Guest' THEN EXCLUDED.full_name
+      ELSE public.profiles.full_name
+    END,
+    phone = COALESCE(EXCLUDED.phone, public.profiles.phone),
+    role = public.profiles.role, -- PRESERVE EXISTING ROLE (NEVER DOWNGRADE ADMINS/SUPERADMINS)
+    registration_completed = TRUE,
+    updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT OR UPDATE ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- 3. UPDATE create_customer_order RPC TO GENERATE & RETURN GUEST_ACCESS_TOKEN
 CREATE OR REPLACE FUNCTION public.create_customer_order(
   p_customer_name TEXT,
   p_customer_email TEXT,
@@ -90,7 +134,7 @@ BEGIN
   
   v_total := v_subtotal + v_shipping_fee - v_discount;
   
-  -- Create order record with guest_access_token and auth.uid() (NULL for guests)
+  -- Create order record with guest_access_token and auth.uid()
   INSERT INTO public.orders (
     id, order_number, guest_access_token, user_id, customer_name, customer_email, customer_phone,
     shipping_address_json, subtotal, shipping_fee, discount, tax, total,
@@ -135,7 +179,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 GRANT EXECUTE ON FUNCTION public.create_customer_order(TEXT, TEXT, TEXT, JSONB, JSONB, TEXT) TO anon, authenticated, service_role;
 
--- 3. CREATE SECURE GUEST ORDER TRACKING RPC FUNCTION
+-- 4. CREATE SECURE GUEST ORDER TRACKING RPC FUNCTION
 CREATE OR REPLACE FUNCTION public.get_guest_order_details(
   p_order_number TEXT,
   p_access_token UUID

@@ -69,6 +69,8 @@ export const AccountLayout: React.FC = () => {
     },
   ];
 
+  const isGuest = user?.isAnonymous === true;
+
   if (isAdmin) {
     navSections.push({
       title: 'ADMINISTRATION',
@@ -97,28 +99,36 @@ export const AccountLayout: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center font-serif text-2xl font-bold text-[#F3E5AB]">
-                {isAdmin ? <ShieldCheck size={32} className="text-[#F3E5AB]" /> : (user?.fullName?.charAt(0) || 'U')}
+                {isAdmin ? <ShieldCheck size={32} className="text-[#F3E5AB]" /> : isGuest ? 'G' : (user?.fullName?.charAt(0) || 'U')}
               </div>
               <div>
                 <span className="text-xs uppercase tracking-widest text-[#F3E5AB] font-bold block mb-1">
-                  {isAdmin ? 'Store Administrator' : 'Arogya Path Member'}
+                  {isAdmin ? 'Store Administrator' : isGuest ? 'Guest Account (No Password Required)' : 'Arogya Path Member'}
                 </span>
                 <h1 className="font-serif text-2xl sm:text-3xl font-bold text-white">
-                  {isAdmin ? 'Welcome back, Administrator' : `Welcome back, ${user?.fullName || 'Valued Customer'}`}
+                  {isAdmin ? 'Welcome back, Administrator' : isGuest ? 'Welcome back, Valued Guest' : `Welcome back, ${user?.fullName || 'Valued Customer'}`}
                 </h1>
-                <p className="text-xs text-[#E2E8F0] mt-1">{user?.email}</p>
+                <p className="text-xs text-[#E2E8F0] mt-1">{isGuest ? 'Session active on this browser device' : user?.email}</p>
               </div>
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSignOut}
-              className="border-white/30 text-white hover:bg-white/10 w-fit"
-              leftIcon={<LogOut size={16} />}
-            >
-              Sign Out
-            </Button>
+            {isGuest ? (
+              <Link to="/register">
+                <Button variant="secondary" size="sm">
+                  Create Free Account
+                </Button>
+              </Link>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSignOut}
+                className="border-white/30 text-white hover:bg-white/10 w-fit"
+                leftIcon={<LogOut size={16} />}
+              >
+                Sign Out
+              </Button>
+            )}
           </div>
         </Container>
       </Section>

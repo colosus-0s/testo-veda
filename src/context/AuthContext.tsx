@@ -110,36 +110,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return () => clearTimeout(timer);
     }
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    const handleSession = async (session: import('@supabase/supabase-js').Session | null) => {
       if (session?.user) {
+        const isAnon = session.user.is_anonymous === true;
         const loadedUser = await loadProfile(session.user.id, session.user.email || '');
+
         if (loadedUser) {
-          setUser(loadedUser);
+          setUser({ ...loadedUser, isAnonymous: isAnon });
+        } else if (isAnon) {
+          // Anonymous Guest Identity fallback
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            fullName: 'Valued Guest',
+            role: 'customer',
+            registrationCompleted: true,
+            isAnonymous: true,
+            createdAt: session.user.created_at || new Date().toISOString(),
+          });
         } else {
-          // Reject invalid / uncompleted registration sessions
+          // Reject invalid / uncompleted registration sessions for non-anon users
           await supabase.auth.signOut();
           setUser(null);
         }
       } else {
-        setUser(null);
+        // Attempt Anonymous Sign-In transparently if supported
+        try {
+          const { data: anonData, error: anonErr } = await supabase.auth.signInAnonymously();
+          if (!anonErr && anonData.user) {
+            setUser({
+              id: anonData.user.id,
+              email: anonData.user.email || '',
+              fullName: 'Valued Guest',
+              role: 'customer',
+              registrationCompleted: true,
+              isAnonymous: true,
+              createdAt: anonData.user.created_at || new Date().toISOString(),
+            });
+          } else {
+            setUser(null);
+          }
+        } catch {
+          setUser(null);
+        }
       }
       setIsLoading(false);
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      handleSession(session);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        const loadedUser = await loadProfile(session.user.id, session.user.email || '');
-        if (loadedUser) {
-          setUser(loadedUser);
-        } else {
-          setUser(null);
-        }
-      } else {
+      if (_event === 'SIGNED_OUT') {
         setUser(null);
         setAddresses([]);
         setWishlistProductIds([]);
+        setIsLoading(false);
+      } else {
+        await handleSession(session);
       }
-      setIsLoading(false);
     });
 
     return () => {
@@ -193,7 +223,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
 
-      setUser(profile);
+      setUser({ ...profile, isAnonymous: data.user.is_anonymous === true });
       setIsLoading(false);
       return true;
     } catch (err) {
@@ -209,25 +239,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Storefront Registration Function: Single signUp() request per submit & User-Friendly Rate Limit Handling
-  const register = async (
-    email: string,
-    pass: string,
-    fullName: string,
-    phone?: string
-  ): Promise<boolean> => {
+  // Register / Account Upgrade Function
+  const register = async (email: string, pass: string, fullName: string, phone?: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
     if (!isSupabaseConfigured()) {
-      setError('Database services are currently unavailable. Please configure environment variables.');
+      setError('Database services are currently unavailable. Please verify your environment configuration.');
       setIsLoading(false);
       return false;
     }
 
     try {
       const formattedEmail = email.trim().toLowerCase();
-      // Single EXACT signUp() request per user submit action
+
+      // If current user is an anonymous guest on the same device, upgrade their existing identity!
+      if (user?.isAnonymous) {
+        const { data: updateData, error: updateErr } = await supabase.auth.updateUser({
+          email: formattedEmail,
+          password: pass,
+          data: {
+            full_name: fullName,
+            phone,
+            role: 'customer',
+          },
+        });
+
+        if (!updateErr && updateData.user) {
+          const loadedUser = await loadProfile(updateData.user.id, formattedEmail);
+          if (loadedUser) {
+            setUser({ ...loadedUser, isAnonymous: false });
+          } else {
+            setUser({
+              id: updateData.user.id,
+              email: formattedEmail,
+              fullName,
+              phone,
+              role: 'customer',
+              registrationCompleted: true,
+              isAnonymous: false,
+              createdAt: updateData.user.created_at || new Date().toISOString(),
+            });
+          }
+          setIsLoading(false);
+          return true;
+        }
+      }
+
+      // Standard new user sign up (when not anonymous or if updateUser failed)
       const { data, error: sbError } = await supabase.auth.signUp({
         email: formattedEmail,
         password: pass,
@@ -278,7 +337,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
 
-      // FORCED SIGN-OUT: Registration must NOT auto-login user into /account
+      // FORCED SIGN-OUT for new standalone registrations
       await supabase.auth.signOut();
       setUser(null);
 
