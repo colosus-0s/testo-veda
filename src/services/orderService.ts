@@ -155,11 +155,13 @@ export const createOrder = async (params: CreateOrderParams): Promise<Order> => 
       if (!error && data) {
         const orderId = data.id;
         const orderNumber = data.order_number;
+        const guestAccessToken = data.guest_access_token;
         const total = data.total;
 
         const createdOrder: Order = {
           id: orderId,
           orderNumber,
+          guestAccessToken,
           userId,
           customerName,
           customerEmail,
@@ -248,6 +250,180 @@ export const createOrder = async (params: CreateOrderParams): Promise<Order> => 
   const existingOrders = getStoredOrders();
   saveOrdersToStorage([newOrder, ...existingOrders]);
   return newOrder;
+};
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export const mapDbRowToOrder = (row: any): Order => {
+  const items: OrderItem[] = Array.isArray(row.order_items)
+    ? row.order_items.map((item: any) => ({
+        id: item.id,
+        orderId: item.order_id,
+        productId: item.product_id,
+        productName: item.product_name_snapshot || item.product_name || 'Product',
+        productImage: item.product_image_snapshot || item.product_image || '',
+        variantId: item.variant_id || '',
+        packSize: item.pack_size_snapshot || item.pack_size || '',
+        unitPrice: Number(item.unit_price_snapshot || item.unit_price || 0),
+        quantity: Number(item.quantity || 1),
+        subtotal: Number(item.subtotal || 0),
+      }))
+    : Array.isArray(row.items)
+    ? row.items.map((item: any) => ({
+        id: item.id,
+        orderId: item.order_id || row.id,
+        productId: item.product_id,
+        productName: item.product_name || 'Product',
+        productImage: item.product_image || '',
+        variantId: item.variant_id || '',
+        packSize: item.pack_size || '',
+        unitPrice: Number(item.unit_price || 0),
+        quantity: Number(item.quantity || 1),
+        subtotal: Number(item.subtotal || 0),
+      }))
+    : [];
+
+  return {
+    id: row.id,
+    orderNumber: row.order_number,
+    guestAccessToken: row.guest_access_token,
+    userId: row.user_id || undefined,
+    customerName: row.customer_name || 'Valued Customer',
+    customerEmail: row.customer_email || '',
+    customerPhone: row.customer_phone || '',
+    shippingAddress: row.shipping_address_json || row.shipping_address || {},
+    subtotal: Number(row.subtotal || 0),
+    shippingFee: Number(row.shipping_fee || 0),
+    discount: Number(row.discount || 0),
+    total: Number(row.total || 0),
+    currency: row.currency || 'INR',
+    orderStatus: row.order_status || 'pending',
+    paymentStatus: row.payment_status || 'pending',
+    paymentProvider: row.payment_provider || 'Standard',
+    providerOrderId: row.provider_order_id,
+    providerPaymentId: row.provider_payment_id,
+    items,
+    createdAt: row.created_at || new Date().toISOString(),
+    updatedAt: row.updated_at || new Date().toISOString(),
+  };
+};
+
+/**
+ * Fetch ALL orders globally for Administrators from Supabase DB
+ */
+export const fetchAdminOrders = async (): Promise<Order[]> => {
+  if (!isSupabaseConfigured()) {
+    return getStoredOrders();
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*, order_items(*)')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.warn('[orderService] Error fetching admin orders from Supabase:', error.message);
+      return getStoredOrders();
+    }
+
+    if (data) {
+      return data.map(mapDbRowToOrder);
+    }
+  } catch (err) {
+    console.error('[orderService] Exception during admin orders fetch:', err);
+  }
+
+  return getStoredOrders();
+};
+
+/**
+ * Fetch a single order by ID or order_number for Administrators from Supabase DB
+ */
+export const fetchAdminOrder = async (orderId: string): Promise<Order | null> => {
+  if (!isSupabaseConfigured()) {
+    return getOrderById(orderId);
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*, order_items(*)')
+      .or(`id.eq.${orderId},order_number.eq.${orderId}`)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('[orderService] Error fetching admin order by ID:', error.message);
+      return getOrderById(orderId);
+    }
+
+    if (data) {
+      return mapDbRowToOrder(data);
+    }
+  } catch (err) {
+    console.error('[orderService] Exception during admin order fetch:', err);
+  }
+
+  return getOrderById(orderId);
+};
+
+/**
+ * Fetch orders belonging to a specific logged-in customer from Supabase DB
+ */
+export const fetchCustomerOrders = async (userId: string): Promise<Order[]> => {
+  if (!isSupabaseConfigured()) {
+    return getStoredOrders().filter((o) => o.userId === userId);
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*, order_items(*)')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.warn('[orderService] Error fetching customer orders:', error.message);
+      return getStoredOrders().filter((o) => o.userId === userId);
+    }
+
+    if (data) {
+      return data.map(mapDbRowToOrder);
+    }
+  } catch (err) {
+    console.error('[orderService] Exception during customer orders fetch:', err);
+  }
+
+  return getStoredOrders().filter((o) => o.userId === userId);
+};
+
+/**
+ * Securely fetch guest order details using the SECURITY DEFINER RPC get_guest_order_details
+ */
+export const fetchGuestOrder = async (orderNumber: string, accessToken: string): Promise<Order | null> => {
+  if (!isSupabaseConfigured()) {
+    const local = getStoredOrders().find((o) => o.orderNumber === orderNumber);
+    return local || null;
+  }
+
+  try {
+    const { data, error } = await supabase.rpc('get_guest_order_details', {
+      p_order_number: orderNumber,
+      p_access_token: accessToken,
+    });
+
+    if (error) {
+      console.warn('[orderService] Guest order lookup error:', error.message);
+      return null;
+    }
+
+    if (data) {
+      return mapDbRowToOrder(data);
+    }
+  } catch (err) {
+    console.error('[orderService] Exception during guest order RPC lookup:', err);
+  }
+
+  return null;
 };
 
 export const updateOrderStatus = async (

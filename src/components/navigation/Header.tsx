@@ -34,7 +34,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const { user, isAuthenticated, isGuest, isAdmin, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -271,6 +271,44 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <LogOut size={14} /> Sign Out
                 </button>
+              </div>
+            ) : isGuest ? (
+              <div className="space-y-1.5 pt-1">
+                <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 mb-2 text-left">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-amber-800 block">Guest Account Active</span>
+                  <p className="text-xs font-serif font-bold text-amber-950 mt-0.5">Welcome Back, Guest</p>
+                </div>
+                <Link
+                  to="/account/orders"
+                  onClick={handleMobileNavClick}
+                  className="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-[#171717] bg-[#F7F4ED]"
+                >
+                  <span className="flex items-center gap-2"><Package size={15} className="text-[#6A1423]" /> My Orders</span>
+                  <ChevronRight size={14} className="text-slate-400" />
+                </Link>
+                <Link
+                  to="/orders/track"
+                  onClick={handleMobileNavClick}
+                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#171717] hover:bg-[#F7F4ED]"
+                >
+                  <span className="flex items-center gap-2"><User size={15} /> Track an Order</span>
+                  <ChevronRight size={14} className="text-slate-400" />
+                </Link>
+                <Link
+                  to="/register"
+                  onClick={handleMobileNavClick}
+                  className="flex items-center justify-between bg-[#6A1423] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm mt-2"
+                >
+                  <span>Create Free Account</span>
+                  <ArrowRight size={14} />
+                </Link>
+                <Link
+                  to="/login"
+                  onClick={handleMobileNavClick}
+                  className="flex items-center justify-between bg-[#F7F4ED] border border-[#EBE7DF] text-[#171717] px-4 py-2 rounded-xl text-xs font-bold"
+                >
+                  <span>Sign In</span>
+                </Link>
               </div>
             ) : (
               <div className="space-y-2 pt-1">

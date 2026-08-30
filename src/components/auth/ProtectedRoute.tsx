@@ -3,10 +3,10 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 
 export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isLoading, authReady } = useAuth();
   const location = useLocation();
 
-  if (isLoading) {
+  if (isLoading || !authReady) {
     return (
       <div className="min-h-screen bg-[#F7F4ED] flex items-center justify-center text-[#171717]">
         <div className="text-center space-y-3">
@@ -17,7 +17,7 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
     );
   }
 
-  if (!isAuthenticated) {
+  if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

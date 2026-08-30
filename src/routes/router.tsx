@@ -47,6 +47,8 @@ import { AdminCustomersPage } from '@/pages/admin/AdminCustomersPage';
 import { AdminCustomerDetailPage } from '@/pages/admin/AdminCustomerDetailPage';
 import { AdminSettingsPage } from '@/pages/admin/AdminSettingsPage';
 
+import { OrderTrackingPage } from '@/pages/OrderTrackingPage';
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -67,6 +69,8 @@ export const router = createBrowserRouter([
       { path: 'cart', element: <CartPage /> },
       { path: 'checkout', element: <CheckoutPage /> },
       { path: 'order-confirmation/:orderId', element: <CheckoutPage /> },
+      { path: 'orders/track', element: <OrderTrackingPage /> },
+      { path: 'track-order', element: <OrderTrackingPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
       { path: 'forgot-password', element: <ForgotPasswordPage /> },

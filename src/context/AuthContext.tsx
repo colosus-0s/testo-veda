@@ -10,8 +10,10 @@ export interface AuthContextType {
   addresses: UserAddress[];
   wishlistProductIds: string[];
   isAuthenticated: boolean;
+  isGuest: boolean;
   isAdmin: boolean;
   isLoading: boolean;
+  authReady: boolean;
   error: string | null;
   login: (email: string, pass: string) => Promise<boolean>;
   register: (email: string, pass: string, fullName: string, phone?: string) => Promise<boolean>;
@@ -36,6 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [addresses, setAddresses] = useState<UserAddress[]>([]);
   const [wishlistProductIds, setWishlistProductIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(() => isSupabaseConfigured());
+  const [authReady, setAuthReady] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   // Load user profile from Supabase profiles table
@@ -106,40 +109,105 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Synchronize Auth Session on Mount & Auth Change
   useEffect(() => {
     if (!isSupabaseConfigured()) {
-      const timer = setTimeout(() => setIsLoading(false), 0);
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+        setAuthReady(true);
+      }, 0);
       return () => clearTimeout(timer);
     }
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    const handleSession = async (session: import('@supabase/supabase-js').Session | null) => {
       if (session?.user) {
-        const loadedUser = await loadProfile(session.user.id, session.user.email || '');
-        if (loadedUser) {
-          setUser(loadedUser);
+        const isAnon = session.user.is_anonymous === true;
+        if (isAnon) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            fullName: 'Valued Guest',
+            role: 'customer',
+            registrationCompleted: true,
+            isAnonymous: true,
+            createdAt: session.user.created_at || new Date().toISOString(),
+          });
         } else {
-          // Reject invalid / uncompleted registration sessions
-          await supabase.auth.signOut();
-          setUser(null);
+          const loadedUser = await loadProfile(session.user.id, session.user.email || '');
+          if (loadedUser) {
+            setUser({ ...loadedUser, isAnonymous: false });
+          } else {
+            setUser({
+              id: session.user.id,
+              email: session.user.email || '',
+              fullName: session.user.user_metadata?.full_name || 'Valued Customer',
+              role: 'customer',
+              registrationCompleted: true,
+              isAnonymous: false,
+              createdAt: session.user.created_at || new Date().toISOString(),
+            });
+          }
         }
       } else {
-        setUser(null);
+        // Attempt Anonymous Sign-In transparently via Supabase Auth
+        try {
+          const { data: anonData, error: anonErr } = await supabase.auth.signInAnonymously();
+          if (!anonErr && anonData?.user) {
+            setUser({
+              id: anonData.user.id,
+              email: anonData.user.email || '',
+              fullName: 'Valued Guest',
+              role: 'customer',
+              registrationCompleted: true,
+              isAnonymous: true,
+              createdAt: anonData.user.created_at || new Date().toISOString(),
+            });
+          } else {
+            if (anonErr?.status === 422 || anonErr?.message?.toLowerCase().includes('disabled')) {
+              console.warn('[Supabase Auth Diagnostic] Anonymous Sign-Ins are disabled in Supabase Dashboard (Auth -> Providers -> Anonymous Sign-Ins).');
+            } else {
+              console.warn('[Supabase Auth Diagnostic] signInAnonymously failed:', anonErr?.message);
+            }
+            setUser(null);
+          }
+        } catch (err) {
+          console.warn('[Supabase Auth Diagnostic] Exception during signInAnonymously:', err);
+          setUser(null);
+        }
       }
       setIsLoading(false);
+      setAuthReady(true);
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      handleSession(session);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        const loadedUser = await loadProfile(session.user.id, session.user.email || '');
-        if (loadedUser) {
-          setUser(loadedUser);
-        } else {
-          setUser(null);
-        }
-      } else {
-        setUser(null);
+      if (_event === 'SIGNED_OUT') {
         setAddresses([]);
         setWishlistProductIds([]);
+        // Re-establish anonymous session on explicit sign-out for guest storefront browsing
+        try {
+          const { data: anonData } = await supabase.auth.signInAnonymously();
+          if (anonData?.user) {
+            setUser({
+              id: anonData.user.id,
+              email: '',
+              fullName: 'Valued Guest',
+              role: 'customer',
+              registrationCompleted: true,
+              isAnonymous: true,
+              createdAt: anonData.user.created_at || new Date().toISOString(),
+            });
+          } else {
+            setUser(null);
+          }
+        } catch {
+          setUser(null);
+        }
+        setIsLoading(false);
+        setAuthReady(true);
+      } else {
+        await handleSession(session);
       }
-      setIsLoading(false);
     });
 
     return () => {
@@ -193,7 +261,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
 
-      setUser(profile);
+      setUser({ ...profile, isAnonymous: data.user.is_anonymous === true });
       setIsLoading(false);
       return true;
     } catch (err) {
@@ -209,25 +277,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Storefront Registration Function: Single signUp() request per submit & User-Friendly Rate Limit Handling
-  const register = async (
-    email: string,
-    pass: string,
-    fullName: string,
-    phone?: string
-  ): Promise<boolean> => {
+  // Register / Account Upgrade Function
+  const register = async (email: string, pass: string, fullName: string, phone?: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
     if (!isSupabaseConfigured()) {
-      setError('Database services are currently unavailable. Please configure environment variables.');
+      setError('Database services are currently unavailable. Please verify your environment configuration.');
       setIsLoading(false);
       return false;
     }
 
     try {
       const formattedEmail = email.trim().toLowerCase();
-      // Single EXACT signUp() request per user submit action
+
+      // If current user is an anonymous guest on the same device, upgrade their existing identity!
+      if (user?.isAnonymous) {
+        const { data: updateData, error: updateErr } = await supabase.auth.updateUser({
+          email: formattedEmail,
+          password: pass,
+          data: {
+            full_name: fullName,
+            phone,
+            role: 'customer',
+          },
+        });
+
+        if (!updateErr && updateData.user) {
+          const loadedUser = await loadProfile(updateData.user.id, formattedEmail);
+          if (loadedUser) {
+            setUser({ ...loadedUser, isAnonymous: false });
+          } else {
+            setUser({
+              id: updateData.user.id,
+              email: formattedEmail,
+              fullName,
+              phone,
+              role: 'customer',
+              registrationCompleted: true,
+              isAnonymous: false,
+              createdAt: updateData.user.created_at || new Date().toISOString(),
+            });
+          }
+          setIsLoading(false);
+          return true;
+        }
+      }
+
+      // Standard new user sign up (when not anonymous or if updateUser failed)
       const { data, error: sbError } = await supabase.auth.signUp({
         email: formattedEmail,
         password: pass,
@@ -278,7 +375,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
 
-      // FORCED SIGN-OUT: Registration must NOT auto-login user into /account
+      // FORCED SIGN-OUT for new standalone registrations
       await supabase.auth.signOut();
       setUser(null);
 
@@ -412,15 +509,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const isGuest = !!user && user.isAnonymous === true;
+  const isAuthenticated = !!user && !isGuest;
+  const isAdmin = !!user && !isGuest && (user.role === 'admin' || user.role === 'superadmin');
+
   return (
     <AuthContext.Provider
       value={{
         user,
         addresses,
         wishlistProductIds,
-        isAuthenticated: !!user,
-        isAdmin: user?.role === 'admin' || user?.role === 'superadmin',
+        isAuthenticated,
+        isGuest,
+        isAdmin,
         isLoading,
+        authReady,
         error,
         login,
         register,

@@ -1,17 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { getStoredOrders } from '@/services/orderService';
+import { fetchCustomerOrders } from '@/services/orderService';
 import type { Order } from '@/types/order';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Package, MapPin, Heart, ShoppingBag, ArrowRight, ChevronRight, ShieldCheck, ShieldAlert, LayoutDashboard } from 'lucide-react';
+import { Package, MapPin, Heart, ShoppingBag, ArrowRight, ChevronRight, ShieldCheck, ShieldAlert, LayoutDashboard, UserCheck } from 'lucide-react';
 
 export const AccountOverviewPage: React.FC = () => {
   const { user, addresses, wishlistProductIds, isAdmin } = useAuth();
   const { cartSummary } = useCart();
-  const orders: Order[] = getStoredOrders();
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (user?.id) {
+      fetchCustomerOrders(user.id).then((data) => {
+        if (isMounted) {
+          setOrders(data);
+        }
+      });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id]);
+
+  const isGuest = user?.isAnonymous === true;
 
   const summaryTiles = [
     {
@@ -52,12 +68,31 @@ export const AccountOverviewPage: React.FC = () => {
 
   return (
     <div className="space-y-8 text-left">
+      {isGuest && (
+        <div className="p-5 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <UserCheck className="w-6 h-6 text-amber-700 shrink-0 mt-0.5" />
+            <div>
+              <h4 className="font-serif font-bold text-amber-900 text-sm">Guest Session Active</h4>
+              <p className="text-xs text-amber-800 mt-0.5">
+                Your past guest orders are saved on this browser device. Create a free account anytime to preserve your purchase history permanently across all devices.
+              </p>
+            </div>
+          </div>
+          <Link to="/register" className="shrink-0">
+            <Button variant="primary" size="sm">
+              Create Free Account
+            </Button>
+          </Link>
+        </div>
+      )}
+
       <div>
         <span className="text-xs uppercase font-bold tracking-widest text-[#6A1423] block mb-1">
-          {isAdmin ? 'Administrator Account Overview' : 'Account Overview'}
+          {isAdmin ? 'Administrator Account Overview' : isGuest ? 'Guest Account Overview' : 'Account Overview'}
         </span>
         <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#171717]">
-          {isAdmin ? 'Hello, Administrator' : `Hello, ${user?.fullName || 'Customer'}`}
+          {isAdmin ? 'Hello, Administrator' : isGuest ? 'Hello, Valued Guest' : `Hello, ${user?.fullName || 'Customer'}`}
         </h2>
         <p className="text-xs text-slate-600 mt-1">
           {isAdmin

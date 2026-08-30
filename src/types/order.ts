@@ -44,6 +44,7 @@ export interface ShippingAddressSnapshot {
 export interface Order {
   id: string;
   orderNumber: string;
+  guestAccessToken?: string;
   userId?: string;
   customerName: string;
   customerEmail: string;

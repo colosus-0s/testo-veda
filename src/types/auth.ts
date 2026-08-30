@@ -8,6 +8,7 @@ export interface UserProfile {
   avatarUrl?: string;
   role: UserRole;
   registrationCompleted?: boolean;
+  isAnonymous?: boolean;
   createdAt: string;
   updatedAt?: string;
 }

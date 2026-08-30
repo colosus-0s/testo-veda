@@ -1,28 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getStoredOrders, subscribeToOrders } from '@/services/orderService';
+import { fetchCustomerOrders, subscribeToOrders } from '@/services/orderService';
+import { useAuth } from '@/context/AuthContext';
 import type { Order } from '@/types/order';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Search, Package, ArrowRight, ChevronRight } from 'lucide-react';
 
 export const AccountOrdersPage: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>(getStoredOrders());
+  const { user } = useAuth();
+  const [orders, setOrders] = useState<Order[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
+    let isMounted = true;
+    if (user?.id) {
+      fetchCustomerOrders(user.id).then((data) => {
+        if (isMounted) {
+          setOrders(data);
+        }
+      });
+    }
+
     // Realtime Order Subscription
     const unsubscribe = subscribeToOrders((updatedOrder) => {
-      setOrders((prev) =>
-        prev.map((o) => (o.id === updatedOrder.id || o.orderNumber === updatedOrder.orderNumber ? { ...o, ...updatedOrder } : o))
-      );
+      if (isMounted) {
+        setOrders((prev) =>
+          prev.map((o) => (o.id === updatedOrder.id || o.orderNumber === updatedOrder.orderNumber ? { ...o, ...updatedOrder } : o))
+        );
+      }
     });
 
     return () => {
+      isMounted = false;
       unsubscribe();
     };
-  }, []);
+  }, [user?.id]);
+
+  const isGuest = user?.isAnonymous === true;
 
   const filteredOrders = (orders || []).filter((o) => {
     const orderNum = o.orderNumber || '';
@@ -41,13 +57,33 @@ export const AccountOrdersPage: React.FC = () => {
 
   return (
     <div className="space-y-6 text-left">
+      {isGuest && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div>
+            <span className="font-serif font-bold text-amber-900 text-sm block">Guest Order History</span>
+            <p className="text-amber-800 mt-0.5">
+              These orders are saved on this browser device. Create a free account to access your full order history across all devices.
+            </p>
+          </div>
+          <Link to="/register" className="shrink-0">
+            <Button variant="primary" size="sm">
+              Create Free Account
+            </Button>
+          </Link>
+        </div>
+      )}
+
       <div>
         <span className="text-xs uppercase font-bold tracking-widest text-[#6A1423] block mb-1">
-          Order History
+          {isGuest ? 'Guest Order History' : 'Order History'}
         </span>
-        <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#171717]">My Orders</h2>
+        <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#171717]">
+          {isGuest ? 'My Guest Orders' : 'My Orders'}
+        </h2>
         <p className="text-xs text-slate-600 mt-1">
-          Track active shipments, inspect purchase invoices, and review past order history.
+          {isGuest
+            ? 'Review orders placed on this browser device.'
+            : 'Track active shipments, inspect purchase invoices, and review past order history.'}
         </p>
       </div>
 
