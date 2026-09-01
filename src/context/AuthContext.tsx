@@ -4,6 +4,7 @@ import type { UserProfile, UserAddress } from '@/types/auth';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchUserAddresses } from '@/services/addressService';
 import { fetchUserWishlist } from '@/services/wishlistService';
+import { claimGuestOrders } from '@/services/orderService';
 
 export interface AuthContextType {
   user: UserProfile | null;
@@ -131,6 +132,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             createdAt: session.user.created_at || new Date().toISOString(),
           });
         } else {
+          // Trigger claim_guest_orders RPC to link unowned orders matching user's verified phone
+          claimGuestOrders().catch((err) => console.warn('[AuthContext] claimGuestOrders warning:', err));
+
           const loadedUser = await loadProfile(session.user.id, session.user.email || '');
           if (loadedUser) {
             setUser({ ...loadedUser, isAnonymous: false });

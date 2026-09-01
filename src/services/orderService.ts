@@ -277,6 +277,24 @@ export const fetchGuestOrder = async (
   return null;
 };
 
+/**
+ * Claim previous unowned guest orders for the currently authenticated phone user
+ */
+export const claimGuestOrders = async (): Promise<number> => {
+  if (!isSupabaseConfigured()) return 0;
+  try {
+    const { data, error } = await supabase.rpc('claim_guest_orders');
+    if (error) {
+      console.warn('[orderService] claim_guest_orders warning:', error.message);
+      return 0;
+    }
+    return Number(data || 0);
+  } catch (err) {
+    console.error('[orderService] Exception during claim_guest_orders:', err);
+    return 0;
+  }
+};
+
 export const updateOrderStatus = async (
   orderId: string,
   orderStatus: OrderStatus,
