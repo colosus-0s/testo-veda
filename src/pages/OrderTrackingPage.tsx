@@ -6,7 +6,7 @@ import { Container } from '@/components/ui/Container';
 import { Section } from '@/components/ui/Section';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Package, Truck, CheckCircle2, Clock, MapPin, Search, ShieldCheck, Phone } from 'lucide-react';
+import { Package, Truck, CheckCircle2, Clock, MapPin, Search, ShieldCheck } from 'lucide-react';
 
 const getInitialOrderNumber = (urlParam: string): string => {
   if (urlParam.trim()) return urlParam.trim();
@@ -50,35 +50,34 @@ export const OrderTrackingPage: React.FC = () => {
   const urlToken = searchParams.get('token') || '';
 
   const [orderNumberInput, setOrderNumberInput] = useState<string>(() => getInitialOrderNumber(urlOrderNumber));
-  const [phoneInput, setPhoneInput] = useState<string>('');
-  const [tokenInput] = useState<string>(() => getInitialToken(urlToken));
+  const [tokenInput, setTokenInput] = useState<string>(() => getInitialToken(urlToken));
 
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const performLookup = async (num: string, phoneStr?: string, tokStr?: string) => {
+  const performLookup = async (num: string, tokStr?: string) => {
     const cleanNum = num.trim();
     if (!cleanNum) {
       setErrorMsg('Please enter your Order Number (e.g. AP-849201).');
       return;
     }
 
-    if (!phoneStr?.trim() && !tokStr?.trim()) {
-      setErrorMsg('For security, please enter either your registered Mobile Number or Security Token.');
+    if (!tokStr?.trim()) {
+      setErrorMsg('For security, your 128-bit Order Access Token is required to view order details.');
       return;
     }
 
     setIsLoading(true);
     setErrorMsg(null);
-    const result = await fetchGuestOrder(cleanNum, tokStr?.trim(), phoneStr?.trim());
+    const result = await fetchGuestOrder(cleanNum, tokStr.trim());
     setIsLoading(false);
 
     if (result) {
       setOrder(result);
     } else {
       setOrder(null);
-      setErrorMsg('No authorized order found matching the provided details. Please verify your order number and mobile number.');
+      setErrorMsg('No authorized order found matching the provided details. Please verify your order number and security access token.');
     }
   };
 
@@ -107,7 +106,7 @@ export const OrderTrackingPage: React.FC = () => {
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    performLookup(orderNumberInput, phoneInput, tokenInput);
+    performLookup(orderNumberInput, tokenInput);
   };
 
   const timelineStages = [
@@ -165,16 +164,16 @@ export const OrderTrackingPage: React.FC = () => {
 
                 <div>
                   <label className="font-bold text-[#171717] block mb-1 uppercase tracking-wider">
-                    Registered Mobile Number *
+                    Security Access Token (UUID) *
                   </label>
                   <div className="relative">
-                    <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <ShieldCheck className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
-                      type="tel"
+                      type="text"
                       required
-                      value={phoneInput}
-                      onChange={(e) => setPhoneInput(e.target.value)}
-                      placeholder="e.g. 9876543210"
+                      value={tokenInput}
+                      onChange={(e) => setTokenInput(e.target.value)}
+                      placeholder="e.g. 123e4567-e89b-12d3-a456-426614174000"
                       className="w-full p-3 pl-9 bg-[#F7F4ED] border border-[#EBE7DF] rounded-xl text-[#171717] focus:outline-none focus:border-[#6A1423]"
                     />
                   </div>

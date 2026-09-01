@@ -1,5 +1,5 @@
 -- ============================================================
--- AROGYA PATH — MIGRATION 006: SECURE GUEST CHECKOUT & GLOBAL ADMIN ORDERS
+-- AROGYA PATH — MIGRATION 006: NATIVE SUPABASE PHONE AUTH & SECURE ORDERS
 -- ============================================================
 
 -- 1. CANONICAL PHONE NORMALIZATION UTILITY FUNCTION
@@ -156,35 +156,32 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 GRANT EXECUTE ON FUNCTION public.create_customer_order(TEXT, TEXT, TEXT, JSONB, JSONB, TEXT) TO anon, authenticated, service_role;
 
 -- 4. SECURE AUTHORIZED GUEST ORDER DETAILS RPC FUNCTION
+-- REQUIRES SECRET guest_access_token UUID OR AUTHENTICATED USER/ADMIN
 CREATE OR REPLACE FUNCTION public.get_guest_order_details(
   p_order_number TEXT,
-  p_access_token UUID DEFAULT NULL,
-  p_phone TEXT DEFAULT NULL
+  p_access_token UUID DEFAULT NULL
 )
 RETURNS JSONB AS $$
 DECLARE
   v_order RECORD;
   v_items JSONB;
-  v_clean_phone TEXT := public.normalize_phone(p_phone);
 BEGIN
   IF p_order_number IS NULL OR TRIM(p_order_number) = '' THEN
     RAISE EXCEPTION 'Order number is required';
   END IF;
 
-  -- Require either matching UUID guest_access_token, exact matching mobile number, or authenticated admin/owner
+  -- Require either matching 128-bit secret guest_access_token OR authenticated admin/owner JWT
   SELECT * INTO v_order
   FROM public.orders
   WHERE UPPER(order_number) = UPPER(TRIM(p_order_number))
     AND (
       (p_access_token IS NOT NULL AND guest_access_token = p_access_token)
       OR
-      (v_clean_phone IS NOT NULL AND customer_phone = v_clean_phone)
-      OR
       (auth.uid() IS NOT NULL AND (user_id = auth.uid() OR public.is_admin()))
     );
 
   IF v_order.id IS NULL THEN
-    RETURN NULL; -- Unauthorized or invalid credentials (Prevents Order Enumeration)
+    RETURN NULL; -- Unauthorized access blocked (Prevents Order Enumeration)
   END IF;
 
   SELECT jsonb_agg(
@@ -228,9 +225,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
-GRANT EXECUTE ON FUNCTION public.get_guest_order_details(TEXT, UUID, TEXT) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.get_guest_order_details(TEXT, UUID) TO anon, authenticated, service_role;
 
--- 5. AUTOMATIC GUEST ORDER CLAIMING RPC FOR AUTHENTICATED PHONE USERS
+-- 5. SECURE AUTOMATIC GUEST ORDER CLAIMING RPC FOR AUTHENTICATED PHONE USERS
+-- ONLY CLAIMS UNOWNED ORDERS (user_id IS NULL) WITH MATCHING PHONE NUMBER
 CREATE OR REPLACE FUNCTION public.claim_guest_orders()
 RETURNS INT AS $$
 DECLARE
@@ -242,7 +240,7 @@ BEGIN
     RETURN 0;
   END IF;
 
-  -- Fetch user's registered phone number from auth.users or public.profiles
+  -- Fetch authenticated user's registered phone from auth.users or profiles
   SELECT public.normalize_phone(phone) INTO v_user_phone
   FROM public.profiles WHERE id = v_user_id;
 
@@ -252,10 +250,12 @@ BEGIN
   END IF;
 
   IF v_user_phone IS NOT NULL AND LENGTH(v_user_phone) >= 10 THEN
+    -- HARDENED MANDATE: ONLY update orders where user_id IS NULL
+    -- Never overwrite existing non-null user_id!
     UPDATE public.orders
     SET user_id = v_user_id,
         updated_at = NOW()
-    WHERE (user_id IS NULL OR user_id <> v_user_id)
+    WHERE user_id IS NULL
       AND customer_phone = v_user_phone;
       
     GET DIAGNOSTICS v_claimed_count = ROW_COUNT;
@@ -267,11 +267,11 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 GRANT EXECUTE ON FUNCTION public.claim_guest_orders() TO authenticated;
 
--- 6. STRICT HARDENED RLS POLICIES FOR ORDERS (NO DIRECT PUBLIC INSERT PERMITTED)
+-- 6. STRICT HARDENED RLS POLICIES FOR ORDERS
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
 
--- Revoke direct public insert access (Order creation MUST go through SECURITY DEFINER RPC create_customer_order)
+-- Revoke direct public insert access
 DROP POLICY IF EXISTS "Public insert orders via RPC" ON public.orders;
 
 -- Authenticated Customer Read Own Orders

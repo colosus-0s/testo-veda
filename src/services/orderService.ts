@@ -249,8 +249,7 @@ export const fetchCustomerOrders = async (userId: string): Promise<Order[]> => {
  */
 export const fetchGuestOrder = async (
   orderNumber: string,
-  accessToken?: string,
-  phone?: string
+  accessToken?: string
 ): Promise<Order | null> => {
   if (!isSupabaseConfigured() || !orderNumber.trim()) {
     return null;
@@ -261,7 +260,6 @@ export const fetchGuestOrder = async (
     const { data, error } = await supabase.rpc('get_guest_order_details', {
       p_order_number: cleanNum,
       p_access_token: accessToken || null,
-      p_phone: phone || null,
     });
 
     if (error) {
