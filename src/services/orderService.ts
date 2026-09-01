@@ -89,10 +89,31 @@ export const createOrder = async (params: CreateOrderParams): Promise<Order> => 
     throw new Error('Supabase database configuration is missing.');
   }
 
-  const itemsPayload = cartItems.map((item) => ({
-    product_id: item.productId,
-    quantity: item.quantity,
-  }));
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  const itemsPayload = await Promise.all(
+    cartItems.map(async (item) => {
+      let validProductId = item.productId;
+      if (!UUID_REGEX.test(validProductId)) {
+        try {
+          const { data: prodMatch } = await supabase
+            .from('products')
+            .select('id')
+            .or(`id.eq.${validProductId},slug.eq.${validProductId}`)
+            .maybeSingle();
+          if (prodMatch?.id) {
+            validProductId = prodMatch.id;
+          }
+        } catch {
+          // Ignore lookup failure
+        }
+      }
+      return {
+        product_id: validProductId,
+        quantity: item.quantity,
+      };
+    })
+  );
 
   const { data, error } = await supabase.rpc('create_customer_order', {
     p_customer_name: customerName,
