@@ -3,8 +3,6 @@ import type { CartItem } from '@/types/cart';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { logAdminActivity } from '@/services/auditService';
 
-export const getStoredOrders = (): Order[] => [];
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const mapDbRowToOrder = (row: any): Order => {
   const items: OrderItem[] = Array.isArray(row.order_items)
@@ -39,7 +37,7 @@ export const mapDbRowToOrder = (row: any): Order => {
     id: row.id,
     orderNumber: row.order_number,
     guestAccessToken: row.guest_access_token,
-    userId: row.customer_id || row.user_id || undefined,
+    userId: row.user_id || undefined,
     customerName: row.customer_name || 'Valued Customer',
     customerEmail: row.customer_email || '',
     customerPhone: row.customer_phone || '',
@@ -98,11 +96,11 @@ export const createOrder = async (params: CreateOrderParams): Promise<Order> => 
 
   const { data, error } = await supabase.rpc('create_customer_order', {
     p_customer_name: customerName,
+    p_customer_email: customerEmail,
     p_customer_phone: customerPhone,
     p_shipping_address: shippingAddress,
     p_items: itemsPayload,
     p_payment_provider: paymentProvider,
-    p_customer_email: customerEmail,
   });
 
   if (error || !data) {
@@ -112,13 +110,13 @@ export const createOrder = async (params: CreateOrderParams): Promise<Order> => 
 
   const orderId = data.id;
   const orderNumber = data.order_number;
+  const guestAccessToken = data.guest_access_token;
   const total = data.total;
 
   const createdOrder: Order = {
     id: orderId,
     orderNumber,
-    guestAccessToken: data.guest_access_token,
-    userId: data.customer_id,
+    guestAccessToken,
     customerName,
     customerEmail,
     customerPhone,
@@ -147,7 +145,7 @@ export const createOrder = async (params: CreateOrderParams): Promise<Order> => 
     updatedAt: new Date().toISOString(),
   };
 
-  // Cache recent order in sessionStorage for immediate post-checkout tracking
+  // Cache recent order in sessionStorage for immediate post-checkout tracking on current browser
   try {
     if (typeof window !== 'undefined' && window.sessionStorage) {
       window.sessionStorage.setItem('arogyapath_recent_order', JSON.stringify(createdOrder));
@@ -160,7 +158,7 @@ export const createOrder = async (params: CreateOrderParams): Promise<Order> => 
 };
 
 /**
- * Fetch ALL orders globally for Administrators from Supabase DB
+ * Fetch ALL orders globally for Administrators directly from Supabase DB
  */
 export const fetchAdminOrders = async (): Promise<Order[]> => {
   if (!isSupabaseConfigured()) {
@@ -217,22 +215,18 @@ export const fetchAdminOrder = async (orderId: string): Promise<Order | null> =>
 };
 
 /**
- * Fetch orders belonging to a specific customer by ID or phone number
+ * Fetch orders belonging to a specific logged-in customer from Supabase DB
  */
-export const fetchCustomerOrders = async (userOrPhoneIdentifier: string): Promise<Order[]> => {
-  if (!isSupabaseConfigured() || !userOrPhoneIdentifier) {
+export const fetchCustomerOrders = async (userId: string): Promise<Order[]> => {
+  if (!isSupabaseConfigured() || !userId) {
     return [];
   }
 
   try {
-    // Normalize phone identifier (extract last 10 digits if phone format)
-    const digitsOnly = userOrPhoneIdentifier.replace(/\D/g, '');
-    const searchPhone = digitsOnly.length >= 10 ? digitsOnly.slice(-10) : userOrPhoneIdentifier;
-
     const { data, error } = await supabase
       .from('orders')
       .select('*, order_items(*)')
-      .or(`customer_id.eq.${userOrPhoneIdentifier},user_id.eq.${userOrPhoneIdentifier},customer_phone.ilike.%${searchPhone}%`)
+      .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -251,46 +245,38 @@ export const fetchCustomerOrders = async (userOrPhoneIdentifier: string): Promis
 };
 
 /**
- * Fetch order details directly by order number for immediate post-checkout tracking
+ * Securely fetch guest order details via authorized SECURITY DEFINER RPC
  */
-export const fetchOrderByNumber = async (orderNumber: string): Promise<Order | null> => {
+export const fetchGuestOrder = async (
+  orderNumber: string,
+  accessToken?: string,
+  phone?: string
+): Promise<Order | null> => {
   if (!isSupabaseConfigured() || !orderNumber.trim()) {
     return null;
   }
 
   try {
     const cleanNum = orderNumber.trim();
-    // Try RPC get_order_by_number first
-    const { data: rpcData, error: rpcErr } = await supabase.rpc('get_order_by_number', {
+    const { data, error } = await supabase.rpc('get_guest_order_details', {
       p_order_number: cleanNum,
+      p_access_token: accessToken || null,
+      p_phone: phone || null,
     });
 
-    if (!rpcErr && rpcData) {
-      return mapDbRowToOrder(rpcData);
+    if (error) {
+      console.warn('[orderService] Authorized guest order lookup warning:', error.message);
+      return null;
     }
 
-    // Direct table lookup fallback
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*, order_items(*)')
-      .eq('order_number', cleanNum)
-      .maybeSingle();
-
-    if (!error && data) {
+    if (data) {
       return mapDbRowToOrder(data);
     }
   } catch (err) {
-    console.error('[orderService] Exception during order number lookup:', err);
+    console.error('[orderService] Exception during guest order lookup:', err);
   }
 
   return null;
-};
-
-/**
- * Legacy guest order lookup compatibility helper
- */
-export const fetchGuestOrder = async (orderNumber: string): Promise<Order | null> => {
-  return fetchOrderByNumber(orderNumber);
 };
 
 export const updateOrderStatus = async (

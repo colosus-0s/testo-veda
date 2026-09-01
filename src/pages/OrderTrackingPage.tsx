@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { fetchOrderByNumber } from '@/services/orderService';
+import { fetchGuestOrder } from '@/services/orderService';
 import type { Order } from '@/types/order';
 import { Container } from '@/components/ui/Container';
 import { Section } from '@/components/ui/Section';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Package, Truck, CheckCircle2, Clock, MapPin, Search } from 'lucide-react';
+import { Package, Truck, CheckCircle2, Clock, MapPin, Search, ShieldCheck, Phone } from 'lucide-react';
 
 const getInitialOrderNumber = (urlParam: string): string => {
   if (urlParam.trim()) return urlParam.trim();
@@ -26,48 +26,76 @@ const getInitialOrderNumber = (urlParam: string): string => {
   return '';
 };
 
+const getInitialToken = (urlParam: string): string => {
+  if (urlParam.trim()) return urlParam.trim();
+  try {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      const saved = window.sessionStorage.getItem('arogyapath_recent_order');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.guestAccessToken) {
+          return parsed.guestAccessToken;
+        }
+      }
+    }
+  } catch {
+    // Ignore parse error
+  }
+  return '';
+};
+
 export const OrderTrackingPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const urlOrderNumber = searchParams.get('orderNumber') || '';
+  const urlToken = searchParams.get('token') || '';
 
   const [orderNumberInput, setOrderNumberInput] = useState<string>(() => getInitialOrderNumber(urlOrderNumber));
+  const [phoneInput, setPhoneInput] = useState<string>('');
+  const [tokenInput] = useState<string>(() => getInitialToken(urlToken));
+
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const performLookup = async (num: string) => {
+  const performLookup = async (num: string, phoneStr?: string, tokStr?: string) => {
     const cleanNum = num.trim();
     if (!cleanNum) {
       setErrorMsg('Please enter your Order Number (e.g. AP-849201).');
       return;
     }
 
+    if (!phoneStr?.trim() && !tokStr?.trim()) {
+      setErrorMsg('For security, please enter either your registered Mobile Number or Security Token.');
+      return;
+    }
+
     setIsLoading(true);
     setErrorMsg(null);
-    const result = await fetchOrderByNumber(cleanNum);
+    const result = await fetchGuestOrder(cleanNum, tokStr?.trim(), phoneStr?.trim());
     setIsLoading(false);
 
     if (result) {
       setOrder(result);
     } else {
       setOrder(null);
-      setErrorMsg(`No active order found matching order number "${cleanNum}". Please verify your order number.`);
+      setErrorMsg('No authorized order found matching the provided details. Please verify your order number and mobile number.');
     }
   };
 
   useEffect(() => {
     let isMounted = true;
     const targetNum = urlOrderNumber.trim() || getInitialOrderNumber(urlOrderNumber);
+    const targetTok = urlToken.trim() || getInitialToken(urlToken);
 
-    if (targetNum) {
-      fetchOrderByNumber(targetNum).then((res) => {
+    if (targetNum && targetTok) {
+      fetchGuestOrder(targetNum, targetTok).then((res) => {
         if (!isMounted) return;
         setIsLoading(false);
         if (res) {
           setOrder(res);
           setErrorMsg(null);
         } else {
-          setErrorMsg(`Order ${targetNum} could not be found. Please check your order number.`);
+          setErrorMsg(`Order ${targetNum} requires authentication. Please enter your registered mobile number below.`);
         }
       });
     }
@@ -75,11 +103,11 @@ export const OrderTrackingPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [urlOrderNumber]);
+  }, [urlOrderNumber, urlToken]);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    performLookup(orderNumberInput);
+    performLookup(orderNumberInput, phoneInput, tokenInput);
   };
 
   const timelineStages = [
@@ -98,7 +126,7 @@ export const OrderTrackingPage: React.FC = () => {
       <Section padding="lg" background="ivory">
         <Container size="default">
           <div className="text-left space-y-8">
-            {/* Page Title */}
+            {/* Page Header */}
             <div>
               <span className="text-[11px] font-bold tracking-widest uppercase text-[#6A1423] block mb-1">
                 Arogya Path Express Logistics
@@ -107,29 +135,55 @@ export const OrderTrackingPage: React.FC = () => {
                 Track Your Shipment
               </h1>
               <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                Enter your Order Number to view real-time fulfillment progress.
+                Enter your Order Number and registered Mobile Number to view authorized real-time fulfillment progress.
               </p>
             </div>
 
-            {/* Order Number Search Bar */}
+            {/* Secure Authorized Order Lookup Form */}
             <form onSubmit={handleFormSubmit} className="bg-[#FCFBF8] p-6 sm:p-8 rounded-3xl border border-[#EBE7DF] shadow-subtle-card space-y-4">
               <h3 className="font-serif font-bold text-lg text-[#171717] flex items-center gap-2">
-                <Search size={18} className="text-[#6A1423]" /> Order Number Lookup
+                <ShieldCheck size={18} className="text-[#6A1423]" /> Authorized Order Lookup
               </h3>
 
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    required
-                    value={orderNumberInput}
-                    onChange={(e) => setOrderNumberInput(e.target.value)}
-                    placeholder="Enter Order Number (e.g. AP-948858)"
-                    className="w-full p-3 bg-[#F7F4ED] border border-[#EBE7DF] rounded-xl text-xs text-[#171717] focus:outline-none focus:border-[#6A1423]"
-                  />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <label className="font-bold text-[#171717] block mb-1 uppercase tracking-wider">
+                    Order Number *
+                  </label>
+                  <div className="relative">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      required
+                      value={orderNumberInput}
+                      onChange={(e) => setOrderNumberInput(e.target.value)}
+                      placeholder="e.g. AP-948858"
+                      className="w-full p-3 pl-9 bg-[#F7F4ED] border border-[#EBE7DF] rounded-xl text-[#171717] focus:outline-none focus:border-[#6A1423]"
+                    />
+                  </div>
                 </div>
+
+                <div>
+                  <label className="font-bold text-[#171717] block mb-1 uppercase tracking-wider">
+                    Registered Mobile Number *
+                  </label>
+                  <div className="relative">
+                    <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="tel"
+                      required
+                      value={phoneInput}
+                      onChange={(e) => setPhoneInput(e.target.value)}
+                      placeholder="e.g. 9876543210"
+                      className="w-full p-3 pl-9 bg-[#F7F4ED] border border-[#EBE7DF] rounded-xl text-[#171717] focus:outline-none focus:border-[#6A1423]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-2">
                 <Button variant="primary" size="md" isLoading={isLoading} type="submit" leftIcon={<Search size={16} />}>
-                  Track Order Progress
+                  View Authorized Status
                 </Button>
               </div>
 
@@ -166,7 +220,7 @@ export const OrderTrackingPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Visual Fulfillment Timeline */}
+                  {/* Fulfillment Timeline */}
                   <div>
                     <h3 className="font-serif font-bold text-base text-[#171717] mb-6 flex items-center gap-2">
                       <Truck className="w-5 h-5 text-[#6A1423]" /> Shipment Progress Timeline
@@ -206,9 +260,8 @@ export const OrderTrackingPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Delivery Address & Purchased Items Breakdown */}
+                  {/* Delivery Destination & Purchased Items Breakdown */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-[#EBE7DF] pt-6 text-xs">
-                    {/* Delivery Address */}
                     <div className="space-y-2 bg-[#F7F4ED] p-5 rounded-2xl border border-[#EBE7DF]">
                       <h4 className="font-bold text-[#171717] uppercase tracking-wider flex items-center gap-2">
                         <MapPin className="w-4 h-4 text-[#6A1423]" /> Shipping Destination
@@ -222,7 +275,6 @@ export const OrderTrackingPage: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Order Items */}
                     <div className="space-y-2 bg-[#F7F4ED] p-5 rounded-2xl border border-[#EBE7DF]">
                       <h4 className="font-bold text-[#171717] uppercase tracking-wider flex items-center gap-2">
                         <Package className="w-4 h-4 text-[#6A1423]" /> Purchased Items ({order.items.length})
