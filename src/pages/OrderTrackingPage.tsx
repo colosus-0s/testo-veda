@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { fetchGuestOrder } from '@/services/orderService';
 import type { Order } from '@/types/order';
 import { Container } from '@/components/ui/Container';
 import { Section } from '@/components/ui/Section';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Package, Truck, CheckCircle2, Clock, MapPin, Search, ShieldCheck } from 'lucide-react';
+import { Package, Truck, CheckCircle2, Clock, MapPin, ShieldCheck, ArrowRight } from 'lucide-react';
 
 const getInitialOrderNumber = (urlParam: string): string => {
   if (urlParam.trim()) return urlParam.trim();
@@ -49,37 +49,8 @@ export const OrderTrackingPage: React.FC = () => {
   const urlOrderNumber = searchParams.get('orderNumber') || '';
   const urlToken = searchParams.get('token') || '';
 
-  const [orderNumberInput, setOrderNumberInput] = useState<string>(() => getInitialOrderNumber(urlOrderNumber));
-  const [tokenInput, setTokenInput] = useState<string>(() => getInitialToken(urlToken));
-
   const [order, setOrder] = useState<Order | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  const performLookup = async (num: string, tokStr?: string) => {
-    const cleanNum = num.trim();
-    if (!cleanNum) {
-      setErrorMsg('Please enter your Order Number (e.g. AP-849201).');
-      return;
-    }
-
-    if (!tokStr?.trim()) {
-      setErrorMsg('For security, your 128-bit Order Access Token is required to view order details.');
-      return;
-    }
-
-    setIsLoading(true);
-    setErrorMsg(null);
-    const result = await fetchGuestOrder(cleanNum, tokStr.trim());
-    setIsLoading(false);
-
-    if (result) {
-      setOrder(result);
-    } else {
-      setOrder(null);
-      setErrorMsg('No authorized order found matching the provided details. Please verify your order number and security access token.');
-    }
-  };
 
   useEffect(() => {
     let isMounted = true;
@@ -89,12 +60,11 @@ export const OrderTrackingPage: React.FC = () => {
     if (targetNum && targetTok) {
       fetchGuestOrder(targetNum, targetTok).then((res) => {
         if (!isMounted) return;
-        setIsLoading(false);
         if (res) {
           setOrder(res);
           setErrorMsg(null);
         } else {
-          setErrorMsg(`Order ${targetNum} requires authentication. Please enter your registered mobile number below.`);
+          setErrorMsg(`Order details could not be retrieved. Please sign in with your mobile number to view your orders.`);
         }
       });
     }
@@ -103,11 +73,6 @@ export const OrderTrackingPage: React.FC = () => {
       isMounted = false;
     };
   }, [urlOrderNumber, urlToken]);
-
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    performLookup(orderNumberInput, tokenInput);
-  };
 
   const timelineStages = [
     { status: 'pending', label: 'Order Confirmed', description: 'Your order details have been securely recorded.' },
@@ -124,7 +89,7 @@ export const OrderTrackingPage: React.FC = () => {
     <div className="w-full bg-[#F7F4ED] text-[#171717] min-h-screen">
       <Section padding="lg" background="ivory">
         <Container size="default">
-          <div className="text-left space-y-8">
+          <div className="text-left space-y-8 max-w-4xl mx-auto">
             {/* Page Header */}
             <div>
               <span className="text-[11px] font-bold tracking-widest uppercase text-[#6A1423] block mb-1">
@@ -134,67 +99,12 @@ export const OrderTrackingPage: React.FC = () => {
                 Track Your Shipment
               </h1>
               <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                Enter your Order Number and registered Mobile Number to view authorized real-time fulfillment progress.
+                Review live fulfillment progress for your orders.
               </p>
             </div>
 
-            {/* Secure Authorized Order Lookup Form */}
-            <form onSubmit={handleFormSubmit} className="bg-[#FCFBF8] p-6 sm:p-8 rounded-3xl border border-[#EBE7DF] shadow-subtle-card space-y-4">
-              <h3 className="font-serif font-bold text-lg text-[#171717] flex items-center gap-2">
-                <ShieldCheck size={18} className="text-[#6A1423]" /> Authorized Order Lookup
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div>
-                  <label className="font-bold text-[#171717] block mb-1 uppercase tracking-wider">
-                    Order Number *
-                  </label>
-                  <div className="relative">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      required
-                      value={orderNumberInput}
-                      onChange={(e) => setOrderNumberInput(e.target.value)}
-                      placeholder="e.g. AP-948858"
-                      className="w-full p-3 pl-9 bg-[#F7F4ED] border border-[#EBE7DF] rounded-xl text-[#171717] focus:outline-none focus:border-[#6A1423]"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="font-bold text-[#171717] block mb-1 uppercase tracking-wider">
-                    Security Access Token (UUID) *
-                  </label>
-                  <div className="relative">
-                    <ShieldCheck className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      required
-                      value={tokenInput}
-                      onChange={(e) => setTokenInput(e.target.value)}
-                      placeholder="e.g. 123e4567-e89b-12d3-a456-426614174000"
-                      className="w-full p-3 pl-9 bg-[#F7F4ED] border border-[#EBE7DF] rounded-xl text-[#171717] focus:outline-none focus:border-[#6A1423]"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end pt-2">
-                <Button variant="primary" size="md" isLoading={isLoading} type="submit" leftIcon={<Search size={16} />}>
-                  View Authorized Status
-                </Button>
-              </div>
-
-              {errorMsg && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-xs text-red-900 font-semibold">
-                  {errorMsg}
-                </div>
-              )}
-            </form>
-
             {/* Order Tracking Output Card */}
-            {order && (
+            {order ? (
               <div className="space-y-6">
                 <div className="bg-[#FCFBF8] p-6 sm:p-8 rounded-3xl border border-[#EBE7DF] shadow-subtle-card space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#EBE7DF] pb-4">
@@ -296,6 +206,31 @@ export const OrderTrackingPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            ) : (
+              /* Mobile Phone Access Prompt when visiting tracking page directly */
+              <div className="bg-[#FCFBF8] p-8 sm:p-12 rounded-3xl border border-[#EBE7DF] shadow-subtle-card text-center space-y-4 max-w-md mx-auto">
+                <ShieldCheck className="w-12 h-12 text-[#6A1423] mx-auto" />
+                <h3 className="font-serif text-2xl font-bold text-[#171717]">
+                  Access Your Orders & Track Deliveries
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  To view your orders and track active shipments, sign in securely using your registered mobile number.
+                </p>
+
+                {errorMsg && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-900 font-semibold">
+                    {errorMsg}
+                  </div>
+                )}
+
+                <div className="pt-2">
+                  <Link to="/login">
+                    <Button variant="primary" size="lg" className="w-full font-bold shadow-md" rightIcon={<ArrowRight size={16} />}>
+                      Access Orders via Mobile Phone
+                    </Button>
+                  </Link>
                 </div>
               </div>
             )}

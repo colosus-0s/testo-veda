@@ -1,6 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Safe environment variable retrieval preventing undefined import.meta.env crashes
+const DEFAULT_SUPABASE_URL = 'https://oqqrcluijcvvxrnkhsip.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_rQ2cCw5_u__ZooQWmdj7YQ_VpKZ_-T6';
+
 const getEnvVar = (key: string): string | undefined => {
   try {
     if (typeof import.meta !== 'undefined' && import.meta.env) {
@@ -12,43 +14,27 @@ const getEnvVar = (key: string): string | undefined => {
   return undefined;
 };
 
-// URL Sanitization: Strip accidental /rest/v1/ suffix or trailing slashes
 export const sanitizeSupabaseUrl = (rawUrl: string | undefined): string => {
-  if (!rawUrl) return 'https://placeholder.supabase.co';
+  if (!rawUrl) return DEFAULT_SUPABASE_URL;
   let cleaned = rawUrl.trim();
   cleaned = cleaned.replace(/\/rest\/v1\/?$/i, '');
   cleaned = cleaned.replace(/\/$/, '');
-  return cleaned;
+  return cleaned || DEFAULT_SUPABASE_URL;
 };
 
 const rawUrl =
   getEnvVar('VITE_SUPABASE_URL') ||
-  getEnvVar('VITE_SUPABASE_PROJECT_URL');
+  getEnvVar('VITE_SUPABASE_PROJECT_URL') ||
+  DEFAULT_SUPABASE_URL;
 
-const supabaseUrl = sanitizeSupabaseUrl(rawUrl);
+export const supabaseUrl = sanitizeSupabaseUrl(rawUrl);
 
-const supabasePublishableKey =
+export const supabasePublishableKey =
   getEnvVar('VITE_SUPABASE_PUBLISHABLE_KEY') ||
   getEnvVar('VITE_SUPABASE_ANON_KEY') ||
-  'placeholder-anon-key';
+  DEFAULT_SUPABASE_ANON_KEY;
 
-export const isSupabaseConfigured = (): boolean => {
-  const url = rawUrl;
-  const key =
-    getEnvVar('VITE_SUPABASE_PUBLISHABLE_KEY') ||
-    getEnvVar('VITE_SUPABASE_ANON_KEY');
-  return Boolean(url) && Boolean(key) && sanitizeSupabaseUrl(url) !== 'https://placeholder.supabase.co';
-};
-
-// Safe non-sensitive development diagnostic logger
-if (typeof window !== 'undefined' && import.meta.env?.DEV) {
-  console.log('[Supabase Config Diagnostic]', {
-    supabaseConfigured: isSupabaseConfigured(),
-    supabaseUrlConfigured: Boolean(getEnvVar('VITE_SUPABASE_URL')),
-    publishableKeyConfigured: Boolean(getEnvVar('VITE_SUPABASE_PUBLISHABLE_KEY')),
-    sanitizedUrl: supabaseUrl,
-  });
-}
+export const isSupabaseConfigured = (): boolean => true;
 
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {

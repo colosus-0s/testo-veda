@@ -136,7 +136,7 @@ export const CheckoutPage: React.FC = () => {
 
               {/* Immediate Post-Checkout Navigation */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
-                <Link to={`/orders/track?orderNumber=${completedOrder.orderNumber}`}>
+                <Link to={`/orders/track?orderNumber=${completedOrder.orderNumber}&token=${completedOrder.guestAccessToken || ''}`}>
                   <Button variant="primary" size="md">
                     Track My Order
                   </Button>
