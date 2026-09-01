@@ -16,6 +16,7 @@ export interface AuthContextType {
   authReady: boolean;
   error: string | null;
   login: (email: string, pass: string) => Promise<boolean>;
+  loginWithPhone: (phone: string, pass: string) => Promise<boolean>;
   register: (email: string, pass: string, fullName: string, phone?: string) => Promise<boolean>;
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<boolean>;
@@ -277,6 +278,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Customer Phone Login Function (Mobile Number + Password)
+  const loginWithPhone = async (phone: string, pass: string): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+
+    if (!isSupabaseConfigured()) {
+      setError('Database services are currently unavailable.');
+      setIsLoading(false);
+      return false;
+    }
+
+    try {
+      const { data, error: rpcError } = await supabase.rpc('customer_phone_login', {
+        p_phone: phone.trim(),
+        p_password: pass,
+      });
+
+      if (rpcError || !data?.customer) {
+        setError(rpcError?.message || 'Invalid mobile number or password.');
+        setIsLoading(false);
+        return false;
+      }
+
+      const cust = data.customer;
+      const custUser: UserProfile = {
+        id: cust.id,
+        email: '',
+        fullName: cust.full_name,
+        phone: cust.phone,
+        role: 'customer',
+        registrationCompleted: true,
+        isAnonymous: false,
+        createdAt: new Date().toISOString(),
+      };
+
+      setUser(custUser);
+
+      try {
+        if (typeof window !== 'undefined' && window.sessionStorage) {
+          window.sessionStorage.setItem('arogyapath_customer_session', JSON.stringify({ custUser, orders: data.orders }));
+        }
+      } catch {
+        // Ignore
+      }
+
+      setIsLoading(false);
+      return true;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to authenticate mobile account.';
+      setError(msg);
+      setIsLoading(false);
+      return false;
+    }
+  };
+
   // Register / Account Upgrade Function
   const register = async (email: string, pass: string, fullName: string, phone?: string): Promise<boolean> => {
     setIsLoading(true);
@@ -526,6 +582,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         authReady,
         error,
         login,
+        loginWithPhone,
         register,
         logout,
         forgotPassword,

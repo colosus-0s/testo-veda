@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchAdminOrders, updateOrderStatus } from '@/services/orderService';
+import { fetchAdminOrders, updateOrderStatus, subscribeToOrders } from '@/services/orderService';
 import type { Order, OrderStatus } from '@/types/order';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -24,8 +24,13 @@ export const AdminOrdersPage: React.FC = () => {
         setOrders(data);
       }
     });
+    const unsubscribe = subscribeToOrders(() => {
+      loadOrders();
+    });
+
     return () => {
       isMounted = false;
+      unsubscribe();
     };
   }, []);
 
