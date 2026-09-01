@@ -2,7 +2,7 @@
 -- AROGYA PATH — MIGRATION 006: SECURE GUEST CHECKOUT & GLOBAL ADMIN ORDERS
 -- ============================================================
 
--- 1. PHONE NORMALIZATION UTILITY FUNCTION
+-- 1. CANONICAL PHONE NORMALIZATION UTILITY FUNCTION
 CREATE OR REPLACE FUNCTION public.normalize_phone(p_phone TEXT)
 RETURNS TEXT AS $$
 DECLARE
@@ -20,7 +20,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
--- 2. ENSURE GUEST ACCESS TOKEN COLUMN & INDEXES ON public.orders
+-- 2. ENSURE GUEST ACCESS TOKEN COLUMN & INDEXES ON public.orders (NON-DESTRUCTIVE)
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -41,7 +41,7 @@ CREATE INDEX IF NOT EXISTS idx_orders_guest_access_token ON public.orders(guest_
 CREATE INDEX IF NOT EXISTS idx_orders_customer_phone ON public.orders(customer_phone);
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON public.orders(user_id);
 
--- 3. ATOMIC CHECKOUT ORDER CREATION RPC FUNCTION
+-- 3. ATOMIC CHECKOUT ORDER CREATION RPC FUNCTION (SECURITY DEFINER)
 CREATE OR REPLACE FUNCTION public.create_customer_order(
   p_customer_name TEXT,
   p_customer_email TEXT,
@@ -76,7 +76,7 @@ BEGIN
     RAISE EXCEPTION 'A valid 10-digit mobile number is required.';
   END IF;
 
-  -- Validate items & calculate subtotal
+  -- Validate items & calculate subtotal server-side
   FOR v_item IN SELECT * FROM jsonb_array_elements(p_items) LOOP
     v_prod_id := (v_item->>'product_id')::UUID;
     v_qty := (v_item->>'quantity')::INT;
@@ -110,7 +110,7 @@ BEGIN
 
   v_total := v_subtotal + v_shipping_fee - v_discount;
 
-  -- Create order record
+  -- Create order record securely
   INSERT INTO public.orders (
     id, order_number, guest_access_token, user_id, customer_name, customer_email, customer_phone,
     shipping_address_json, subtotal, shipping_fee, discount, tax, total,
@@ -121,7 +121,7 @@ BEGIN
     'INR', 'pending', 'pending', COALESCE(p_payment_provider, 'Cash on Delivery')
   );
 
-  -- Insert order items & update stock
+  -- Insert order items & update stock atomically
   FOR v_item IN SELECT * FROM jsonb_array_elements(p_items) LOOP
     v_prod_id := (v_item->>'product_id')::UUID;
     v_qty := (v_item->>'quantity')::INT;
@@ -171,20 +171,20 @@ BEGIN
     RAISE EXCEPTION 'Order number is required';
   END IF;
 
-  -- Require either matching UUID guest_access_token, matching phone, or authenticated user/admin
+  -- Require either matching UUID guest_access_token, exact matching mobile number, or authenticated admin/owner
   SELECT * INTO v_order
   FROM public.orders
   WHERE UPPER(order_number) = UPPER(TRIM(p_order_number))
     AND (
       (p_access_token IS NOT NULL AND guest_access_token = p_access_token)
       OR
-      (v_clean_phone IS NOT NULL AND customer_phone LIKE '%' || v_clean_phone)
+      (v_clean_phone IS NOT NULL AND customer_phone = v_clean_phone)
       OR
       (auth.uid() IS NOT NULL AND (user_id = auth.uid() OR public.is_admin()))
     );
 
   IF v_order.id IS NULL THEN
-    RETURN NULL;
+    RETURN NULL; -- Unauthorized or invalid credentials (Prevents Order Enumeration)
   END IF;
 
   SELECT jsonb_agg(
@@ -230,21 +230,61 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 GRANT EXECUTE ON FUNCTION public.get_guest_order_details(TEXT, UUID, TEXT) TO anon, authenticated, service_role;
 
--- 5. RLS POLICIES FOR SECURE ORDERS & GLOBAL ADMIN ACCESS
+-- 5. AUTOMATIC GUEST ORDER CLAIMING RPC FOR AUTHENTICATED PHONE USERS
+CREATE OR REPLACE FUNCTION public.claim_guest_orders()
+RETURNS INT AS $$
+DECLARE
+  v_user_id UUID := auth.uid();
+  v_user_phone TEXT;
+  v_claimed_count INT := 0;
+BEGIN
+  IF v_user_id IS NULL THEN
+    RETURN 0;
+  END IF;
+
+  -- Fetch user's registered phone number from auth.users or public.profiles
+  SELECT public.normalize_phone(phone) INTO v_user_phone
+  FROM public.profiles WHERE id = v_user_id;
+
+  IF v_user_phone IS NULL THEN
+    SELECT public.normalize_phone(phone) INTO v_user_phone
+    FROM auth.users WHERE id = v_user_id;
+  END IF;
+
+  IF v_user_phone IS NOT NULL AND LENGTH(v_user_phone) >= 10 THEN
+    UPDATE public.orders
+    SET user_id = v_user_id,
+        updated_at = NOW()
+    WHERE (user_id IS NULL OR user_id <> v_user_id)
+      AND customer_phone = v_user_phone;
+      
+    GET DIAGNOSTICS v_claimed_count = ROW_COUNT;
+  END IF;
+
+  RETURN v_claimed_count;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+GRANT EXECUTE ON FUNCTION public.claim_guest_orders() TO authenticated;
+
+-- 6. STRICT HARDENED RLS POLICIES FOR ORDERS (NO DIRECT PUBLIC INSERT PERMITTED)
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
 
+-- Revoke direct public insert access (Order creation MUST go through SECURITY DEFINER RPC create_customer_order)
 DROP POLICY IF EXISTS "Public insert orders via RPC" ON public.orders;
-CREATE POLICY "Public insert orders via RPC" ON public.orders FOR INSERT WITH CHECK (true);
 
+-- Authenticated Customer Read Own Orders
 DROP POLICY IF EXISTS "Users read own orders" ON public.orders;
 CREATE POLICY "Users read own orders" ON public.orders FOR SELECT USING (
   (auth.uid() IS NOT NULL AND auth.uid() = user_id) OR public.is_admin()
 );
 
+-- Admin Update Orders Policy
 DROP POLICY IF EXISTS "Admin update orders" ON public.orders;
 CREATE POLICY "Admin update orders" ON public.orders FOR UPDATE USING (public.is_admin());
 
+-- Order Items Read Policy
 DROP POLICY IF EXISTS "Users read own order items" ON public.order_items;
 CREATE POLICY "Users read own order items" ON public.order_items FOR SELECT USING (
   EXISTS (
@@ -254,5 +294,6 @@ CREATE POLICY "Users read own order items" ON public.order_items FOR SELECT USIN
   )
 );
 
+-- Admin Full Access Order Items Policy
 DROP POLICY IF EXISTS "Admin access order items" ON public.order_items;
 CREATE POLICY "Admin access order items" ON public.order_items FOR ALL USING (public.is_admin());
