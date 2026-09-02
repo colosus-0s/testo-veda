@@ -77,6 +77,17 @@ export const CheckoutPage: React.FC = () => {
       });
 
       setCompletedOrder(created);
+
+      if (typeof window !== 'undefined') {
+        const recentOrderPayload = JSON.stringify({
+          orderNumber: created.orderNumber,
+          guestAccessToken: created.guestAccessToken,
+          timestamp: Date.now(),
+        });
+        try { window.localStorage.setItem('arogyapath_recent_order', recentOrderPayload); } catch { /* Ignore */ }
+        try { window.sessionStorage.setItem('arogyapath_recent_order', recentOrderPayload); } catch { /* Ignore */ }
+      }
+
       clearCart();
       setIsProcessing(false);
     } catch (err: unknown) {
