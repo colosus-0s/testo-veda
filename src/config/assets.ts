@@ -15,7 +15,7 @@ export const ASSET_REGISTRY = {
     fssaiBadge: '/static/fssai-badge.svg',
     gmpSeal: '/static/gmp-seal.svg',
     isoSeal: '/static/iso-seal.svg',
-    lifestyleHero: '/assets/brand/arogya_lifestyle_hero.jpg',
+    lifestyleHero: '/assets/brand/arogya_lifestyle_hero.png',
   },
   
   hero: {

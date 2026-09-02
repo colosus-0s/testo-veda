@@ -23,7 +23,7 @@ export const FormulaIngredientsPage: React.FC = () => {
                 <img
                   src={ASSET_REGISTRY.ingredients.allBotanicalsHero}
                   alt="Arogya Path 10 Classical Botanical Ingredients Still Life"
-                  className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-700"
+                  className="w-full h-full object-contain p-2 object-center group-hover:scale-102 transition-transform duration-700"
                 />
                 <div className="absolute bottom-4 left-4 right-4 bg-[#FCFBF8]/95 backdrop-blur-sm p-3.5 rounded-xl border border-[#EBE7DF] shadow-md flex items-center justify-between text-xs font-bold text-[#171717]">
                   <span className="flex items-center gap-1.5 text-[#173C2B]">
