@@ -64,7 +64,7 @@ export const OrderTrackingPage: React.FC = () => {
           setOrder(res);
           setErrorMsg(null);
         } else {
-          setErrorMsg(`Order details could not be retrieved. Please sign in with your mobile number to view your orders.`);
+          setErrorMsg('Order details could not be retrieved. Your private order link is required.');
         }
       });
     }
@@ -96,10 +96,10 @@ export const OrderTrackingPage: React.FC = () => {
                 Arogya Path Express Logistics
               </span>
               <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#171717]">
-                Track Your Shipment
+                Order Details & Tracking
               </h1>
               <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                Review live fulfillment progress for your orders.
+                Review live fulfillment progress for your purchase.
               </p>
             </div>
 
@@ -209,26 +209,20 @@ export const OrderTrackingPage: React.FC = () => {
                 </div>
               </div>
             ) : (
-              /* Mobile Phone Access Prompt when visiting tracking page directly */
+              /* Simple Card when visiting without active order link */
               <div className="bg-[#FCFBF8] p-8 sm:p-12 rounded-3xl border border-[#EBE7DF] shadow-subtle-card text-center space-y-4 max-w-md mx-auto">
                 <ShieldCheck className="w-12 h-12 text-[#6A1423] mx-auto" />
                 <h3 className="font-serif text-2xl font-bold text-[#171717]">
-                  Access Your Orders & Track Deliveries
+                  Private Order Link Required
                 </h3>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  To view your orders and track active shipments, sign in securely using your registered mobile number.
+                  {errorMsg || 'Your private order link is required to view order details.'}
                 </p>
 
-                {errorMsg && (
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-900 font-semibold">
-                    {errorMsg}
-                  </div>
-                )}
-
                 <div className="pt-2">
-                  <Link to="/login">
+                  <Link to="/testo">
                     <Button variant="primary" size="lg" className="w-full font-bold shadow-md" rightIcon={<ArrowRight size={16} />}>
-                      Access Orders via Mobile Phone
+                      Continue Shopping
                     </Button>
                   </Link>
                 </div>
