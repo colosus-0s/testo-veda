@@ -1,6 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import type { CartItem, CartSummary } from '@/types/cart';
 import type { Product, ProductVariant } from '@/types/product';
 
@@ -26,7 +25,6 @@ const LOCAL_STORAGE_CART_KEY = 'arogyapath_cart_v1';
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [directCheckoutItem, setDirectCheckoutItem] = useState<CartItem | null>(null);
-  const navigate = useNavigate();
 
   // Initial cart state MUST be empty if nothing is stored in localStorage
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
@@ -91,7 +89,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsCartOpen(true);
   };
 
-  // Buy Now direct purchase: does NOT mutate persistent cart or header badge
+  // Buy Now direct purchase: sets direct checkout payload without mutating persistent cart or header badge
   const buyNow = (product: Product, variant?: ProductVariant, quantity = 1) => {
     const targetVariant = variant || product.variants[0];
     const itemId = `direct_${product.id}_${targetVariant.id}`;
@@ -107,7 +105,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     setDirectCheckoutItem(directItem);
-    navigate('/checkout');
   };
 
   const clearDirectCheckout = () => {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ShieldCheck, ShoppingBag, Truck, RefreshCw, CheckCircle2, ShieldAlert, FileText } from 'lucide-react';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
@@ -16,6 +16,7 @@ import { useCart } from '@/context/CartContext';
 
 export const ProductDetailPage: React.FC = () => {
   const { addToCart, buyNow } = useCart();
+  const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
   const product = getProductBySlug(slug || '') || getProducts()[0];
   
@@ -186,7 +187,10 @@ export const ProductDetailPage: React.FC = () => {
                   size="lg"
                   className="w-full shadow-md font-bold text-base bg-[#6A1423] hover:bg-[#520f1b]"
                   leftIcon={<Truck className="w-5 h-5" />}
-                  onClick={() => buyNow(product, selectedVariant, quantity)}
+                  onClick={() => {
+                    buyNow(product, selectedVariant, quantity);
+                    navigate('/checkout');
+                  }}
                 >
                   Buy Now • ₹{(selectedVariant.price * quantity).toLocaleString('en-IN')}
                 </Button>
