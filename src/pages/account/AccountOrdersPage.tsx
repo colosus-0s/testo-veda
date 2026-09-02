@@ -15,8 +15,9 @@ export const AccountOrdersPage: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
-    if (user?.id) {
-      fetchCustomerOrders(user.id).then((data) => {
+    const identifier = user?.id || user?.phone || '';
+    if (identifier) {
+      fetchCustomerOrders(identifier).then((data) => {
         if (isMounted) {
           setOrders(data);
         }
@@ -36,7 +37,7 @@ export const AccountOrdersPage: React.FC = () => {
       isMounted = false;
       unsubscribe();
     };
-  }, [user?.id]);
+  }, [user?.id, user?.phone]);
 
   const isGuest = user?.isAnonymous === true;
 

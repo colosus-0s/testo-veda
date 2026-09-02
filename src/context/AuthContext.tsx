@@ -4,6 +4,7 @@ import type { UserProfile, UserAddress } from '@/types/auth';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchUserAddresses } from '@/services/addressService';
 import { fetchUserWishlist } from '@/services/wishlistService';
+import { claimGuestOrders } from '@/services/orderService';
 
 export interface AuthContextType {
   user: UserProfile | null;
@@ -16,6 +17,9 @@ export interface AuthContextType {
   authReady: boolean;
   error: string | null;
   login: (email: string, pass: string) => Promise<boolean>;
+  loginWithPhone: (phone: string, pass: string) => Promise<boolean>;
+  signInWithPhoneOtp: (phone: string) => Promise<boolean>;
+  verifyPhoneOtp: (phone: string, token: string) => Promise<boolean>;
   register: (email: string, pass: string, fullName: string, phone?: string) => Promise<boolean>;
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<boolean>;
@@ -130,6 +134,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             createdAt: session.user.created_at || new Date().toISOString(),
           });
         } else {
+          // Trigger claim_guest_orders RPC to link unowned orders matching user's verified phone
+          claimGuestOrders().catch((err) => console.warn('[AuthContext] claimGuestOrders warning:', err));
+
           const loadedUser = await loadProfile(session.user.id, session.user.email || '');
           if (loadedUser) {
             setUser({ ...loadedUser, isAnonymous: false });
@@ -160,15 +167,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               createdAt: anonData.user.created_at || new Date().toISOString(),
             });
           } else {
-            if (anonErr?.status === 422 || anonErr?.message?.toLowerCase().includes('disabled')) {
-              console.warn('[Supabase Auth Diagnostic] Anonymous Sign-Ins are disabled in Supabase Dashboard (Auth -> Providers -> Anonymous Sign-Ins).');
-            } else {
-              console.warn('[Supabase Auth Diagnostic] signInAnonymously failed:', anonErr?.message);
-            }
             setUser(null);
           }
-        } catch (err) {
-          console.warn('[Supabase Auth Diagnostic] Exception during signInAnonymously:', err);
+        } catch {
           setUser(null);
         }
       }
@@ -184,7 +185,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (_event === 'SIGNED_OUT') {
         setAddresses([]);
         setWishlistProductIds([]);
-        // Re-establish anonymous session on explicit sign-out for guest storefront browsing
         try {
           const { data: anonData } = await supabase.auth.signInAnonymously();
           if (anonData?.user) {
@@ -215,16 +215,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  // Strict Login Function: Demands Supabase Auth + registration_completed = true
   const login = async (email: string, pass: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
-
-    if (!isSupabaseConfigured()) {
-      setError('Database services are currently unavailable. Please verify your environment configuration.');
-      setIsLoading(false);
-      return false;
-    }
 
     try {
       const { data, error: sbError } = await supabase.auth.signInWithPassword({
@@ -233,30 +226,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (sbError || !data.user) {
-        console.warn('[Supabase Auth Debug] signInWithPassword error:', sbError?.message || 'User object missing');
         const msg = sbError?.message?.toLowerCase() || '';
-        const isRateLimit = msg.includes('rate limit') || (sbError as { status?: number })?.status === 429;
-        
-        if (isRateLimit) {
-          setError('Too many sign in attempts have been requested. Please wait a little while and try again.');
-        } else if (msg.includes('email not confirmed')) {
-          setError('Please confirm your email address before signing in. Check your inbox for a verification link.');
-        } else if (msg.includes('invalid login credentials')) {
+        if (msg.includes('invalid login credentials')) {
           setError('Invalid email address or password. Please check your credentials and try again.');
         } else {
-          setError(sbError?.message || 'Invalid login credentials. Please check your email and password.');
+          setError(sbError?.message || 'Invalid login credentials.');
         }
         setIsLoading(false);
         return false;
       }
 
-      // Verify that registration_completed === true in profiles
       const profile = await loadProfile(data.user.id, data.user.email || email);
       if (!profile || profile.registrationCompleted !== true) {
-        console.warn('[Supabase Auth Debug] Rejecting login: Profile uncompleted or missing');
         await supabase.auth.signOut();
         setUser(null);
-        setError('Your account profile registration could not be completed. Please re-register or contact support.');
+        setError('Your account profile registration could not be completed.');
         setIsLoading(false);
         return false;
       }
@@ -264,67 +248,132 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser({ ...profile, isAnonymous: data.user.is_anonymous === true });
       setIsLoading(false);
       return true;
-    } catch (err) {
-      console.error('[Supabase Auth Debug] Exception during login:', err);
-      const errMsg = err instanceof Error ? err.message.toLowerCase() : '';
-      if (errMsg.includes('rate limit')) {
-        setError('Too many sign in attempts have been requested. Please wait a little while and try again.');
-      } else {
-        setError('An unexpected sign in error occurred. Please try again.');
-      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Login failed.';
+      setError(msg);
       setIsLoading(false);
       return false;
     }
   };
 
-  // Register / Account Upgrade Function
+  const loginWithPhone = async (phone: string, pass: string): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { data, error: rpcError } = await supabase.rpc('customer_phone_login', {
+        p_phone: phone.trim(),
+        p_password: pass,
+      });
+
+      if (rpcError || !data?.customer) {
+        setError(rpcError?.message || 'Invalid mobile number or password.');
+        setIsLoading(false);
+        return false;
+      }
+
+      const cust = data.customer;
+      const custUser: UserProfile = {
+        id: cust.id,
+        email: '',
+        fullName: cust.full_name,
+        phone: cust.phone,
+        role: 'customer',
+        registrationCompleted: true,
+        isAnonymous: false,
+        createdAt: new Date().toISOString(),
+      };
+
+      setUser(custUser);
+      setIsLoading(false);
+      return true;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to authenticate mobile account.';
+      setError(msg);
+      setIsLoading(false);
+      return false;
+    }
+  };
+
+  // Native Supabase Phone Auth (OTP) Send Request
+  const signInWithPhoneOtp = async (phone: string): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+    const cleanPhone = phone.replace(/\D/g, '');
+    const formattedPhone = cleanPhone.length === 10 ? `+91${cleanPhone}` : `+${cleanPhone}`;
+    try {
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        phone: formattedPhone,
+      });
+
+      if (otpError) {
+        console.warn('[Supabase Phone Auth] OTP request error:', otpError.message);
+        setError(otpError.message || 'Failed to send OTP to mobile number.');
+        setIsLoading(false);
+        return false;
+      }
+
+      setIsLoading(false);
+      return true;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to send OTP.';
+      setError(msg);
+      setIsLoading(false);
+      return false;
+    }
+  };
+
+  // Native Supabase Phone Auth (OTP) Verification
+  const verifyPhoneOtp = async (phone: string, token: string): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+    const cleanPhone = phone.replace(/\D/g, '');
+    const formattedPhone = cleanPhone.length === 10 ? `+91${cleanPhone}` : `+${cleanPhone}`;
+    try {
+      const { data, error: verifyErr } = await supabase.auth.verifyOtp({
+        phone: formattedPhone,
+        token: token.trim(),
+        type: 'sms',
+      });
+
+      if (verifyErr || !data?.user) {
+        setError(verifyErr?.message || 'Invalid or expired OTP code.');
+        setIsLoading(false);
+        return false;
+      }
+
+      // Automatically claim unowned guest orders
+      await claimGuestOrders();
+
+      const userProf: UserProfile = {
+        id: data.user.id,
+        email: data.user.email || '',
+        fullName: data.user.user_metadata?.full_name || 'Valued Customer',
+        phone: formattedPhone,
+        role: 'customer',
+        registrationCompleted: true,
+        isAnonymous: false,
+        createdAt: data.user.created_at || new Date().toISOString(),
+      };
+
+      setUser(userProf);
+      setIsLoading(false);
+      return true;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to verify OTP.';
+      setError(msg);
+      setIsLoading(false);
+      return false;
+    }
+  };
+
   const register = async (email: string, pass: string, fullName: string, phone?: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
-    if (!isSupabaseConfigured()) {
-      setError('Database services are currently unavailable. Please verify your environment configuration.');
-      setIsLoading(false);
-      return false;
-    }
-
     try {
       const formattedEmail = email.trim().toLowerCase();
 
-      // If current user is an anonymous guest on the same device, upgrade their existing identity!
-      if (user?.isAnonymous) {
-        const { data: updateData, error: updateErr } = await supabase.auth.updateUser({
-          email: formattedEmail,
-          password: pass,
-          data: {
-            full_name: fullName,
-            phone,
-            role: 'customer',
-          },
-        });
-
-        if (!updateErr && updateData.user) {
-          const loadedUser = await loadProfile(updateData.user.id, formattedEmail);
-          if (loadedUser) {
-            setUser({ ...loadedUser, isAnonymous: false });
-          } else {
-            setUser({
-              id: updateData.user.id,
-              email: formattedEmail,
-              fullName,
-              phone,
-              role: 'customer',
-              registrationCompleted: true,
-              isAnonymous: false,
-              createdAt: updateData.user.created_at || new Date().toISOString(),
-            });
-          }
-          setIsLoading(false);
-          return true;
-        }
-      }
-
-      // Standard new user sign up (when not anonymous or if updateUser failed)
       const { data, error: sbError } = await supabase.auth.signUp({
         email: formattedEmail,
         password: pass,
@@ -337,67 +386,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       });
 
-      if (sbError) {
-        console.error('[Supabase Auth Debug] signUp error:', sbError.message);
-        const isRateLimit = sbError.message.toLowerCase().includes('rate limit') || (sbError as { status?: number })?.status === 429;
-        if (isRateLimit) {
-          setError('Too many verification emails have been requested. Please wait a little while and try again.');
-        } else {
-          setError(sbError.message || 'Registration failed. Please check your information.');
-        }
+      if (sbError || !data?.user) {
+        setError(sbError?.message || 'Registration failed.');
         setIsLoading(false);
         return false;
       }
 
-      // DUPLICATE SIGNUP DETECTION: Supabase returns identities: [] when user already exists
-      if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-        console.warn('[Supabase Auth Debug] Duplicate registration attempt detected for email:', formattedEmail);
-        setError('An account with this email already exists. Please sign in instead.');
-        setIsLoading(false);
-        return false;
-      }
-
-      if (!data?.user) {
-        setError('Registration failed. Please check your information.');
-        setIsLoading(false);
-        return false;
-      }
-
-      // Call complete_storefront_registration RPC only if an active session exists
-      if (data.session) {
-        const { error: rpcError } = await supabase.rpc('complete_storefront_registration', {
-          p_full_name: fullName,
-          p_phone: phone || null,
-        });
-
-        if (rpcError) {
-          console.warn('[Supabase Auth Debug] RPC complete_storefront_registration warning:', rpcError.message);
-        }
-      }
-
-      // FORCED SIGN-OUT for new standalone registrations
       await supabase.auth.signOut();
       setUser(null);
-
       setIsLoading(false);
       return true;
-    } catch (err) {
-      console.error('[Supabase Auth Debug] Exception during registration:', err);
-      const errMsg = err instanceof Error ? err.message.toLowerCase() : '';
-      if (errMsg.includes('rate limit')) {
-        setError('Too many verification emails have been requested. Please wait a little while and try again.');
-      } else {
-        setError(err instanceof Error ? err.message : 'Registration failed.');
-      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Registration failed.';
+      setError(msg);
       setIsLoading(false);
       return false;
     }
   };
 
   const logout = async () => {
-    if (isSupabaseConfigured()) {
-      await supabase.auth.signOut();
-    }
+    await supabase.auth.signOut();
     setUser(null);
     setAddresses([]);
     setWishlistProductIds([]);
@@ -407,14 +415,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     setError(null);
     try {
-      if (isSupabaseConfigured()) {
-        const { error: sbError } = await supabase.auth.resetPasswordForEmail(email);
-        if (sbError) throw sbError;
-      }
+      const { error: sbError } = await supabase.auth.resetPasswordForEmail(email);
+      if (sbError) throw sbError;
       setIsLoading(false);
       return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Password reset request failed.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Password reset request failed.';
+      setError(msg);
       setIsLoading(false);
       return false;
     }
@@ -424,14 +431,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     setError(null);
     try {
-      if (isSupabaseConfigured()) {
-        const { error: sbError } = await supabase.auth.updateUser({ password: newPass });
-        if (sbError) throw sbError;
-      }
+      const { error: sbError } = await supabase.auth.updateUser({ password: newPass });
+      if (sbError) throw sbError;
       setIsLoading(false);
       return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update password.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to update password.';
+      setError(msg);
       setIsLoading(false);
       return false;
     }
@@ -443,19 +449,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     delete (safeData as Partial<UserProfile> & { role?: string; registrationCompleted?: boolean }).role;
     delete (safeData as Partial<UserProfile> & { role?: string; registrationCompleted?: boolean }).registrationCompleted;
 
-    if (isSupabaseConfigured()) {
-      try {
-        await supabase
-          .from('profiles')
-          .update({
-            full_name: safeData.fullName || user.fullName,
-            phone: safeData.phone || user.phone,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', user.id);
-      } catch (err) {
-        console.error('Error updating profile in Supabase:', err);
-      }
+    try {
+      await supabase
+        .from('profiles')
+        .update({
+          full_name: safeData.fullName || user.fullName,
+          phone: safeData.phone || user.phone,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+    } catch (err) {
+      console.error('Error updating profile in Supabase:', err);
     }
     setUser((prev) => (prev ? { ...prev, ...safeData } : null));
   };
@@ -526,6 +530,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         authReady,
         error,
         login,
+        loginWithPhone,
+        signInWithPhoneOtp,
+        verifyPhoneOtp,
         register,
         logout,
         forgotPassword,

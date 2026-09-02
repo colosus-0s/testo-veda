@@ -3,7 +3,7 @@ import { ASSET_REGISTRY } from '@/config/assets';
 
 export const INITIAL_PRODUCTS: Product[] = [
   {
-    id: 'prod-testo-natural-power-plus',
+    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
     slug: 'testo-natural-power-plus',
     sku: 'AP-TESTO-30V',
     name: 'TESTO Natural Power+ Capsules',
