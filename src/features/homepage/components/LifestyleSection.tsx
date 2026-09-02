@@ -54,7 +54,7 @@ export const LifestyleSection: React.FC = () => {
           >
             <div className="relative bg-[#F7F4ED] rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-square shadow-subtle-card group border border-[#EBE7DF]">
               <img
-                src={ASSET_REGISTRY.products.testoNatural.front}
+                src={ASSET_REGISTRY.brand.lifestyleHero}
                 alt="Arogya Path Lifestyle Vitality"
                 className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
               />

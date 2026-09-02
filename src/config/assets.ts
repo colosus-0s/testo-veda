@@ -1,6 +1,6 @@
 /**
  * Central Asset Registry for Arogya Path
- * Maps verified product photography, botanical ingredient assets, and infographics.
+ * Maps verified product photography, botanical ingredient assets, brand lifestyle visuals, and infographics.
  */
 
 const rawSupabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://oqqrcluijcvvxrnkhsip.supabase.co';
@@ -15,6 +15,7 @@ export const ASSET_REGISTRY = {
     fssaiBadge: '/static/fssai-badge.svg',
     gmpSeal: '/static/gmp-seal.svg',
     isoSeal: '/static/iso-seal.svg',
+    lifestyleHero: '/assets/brand/arogya_lifestyle_hero.jpg',
   },
   
   hero: {
