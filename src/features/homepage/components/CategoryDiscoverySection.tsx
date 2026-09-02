@@ -12,7 +12,7 @@ export const CategoryDiscoverySection: React.FC = () => {
       id: 'cat-mens-wellness',
       title: "Men's Wellness & Vitality",
       description: 'Foundational daily botanical support for endurance, stamina, and resilience.',
-      image: ASSET_REGISTRY.lifestyle[0],
+      image: ASSET_REGISTRY.ingredients.ashwagandha,
       icon: Activity,
       link: '/collections/mens-wellness',
       tag: 'Featured Category',

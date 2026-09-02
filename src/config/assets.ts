@@ -1,6 +1,6 @@
 /**
  * Central Asset Registry for Arogya Path
- * Maps production media assets from docs/ and public/assets with fallbacks.
+ * Maps verified product photography, botanical ingredient assets, and infographics.
  */
 
 const rawSupabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://oqqrcluijcvvxrnkhsip.supabase.co';
@@ -19,48 +19,42 @@ export const ASSET_REGISTRY = {
   
   hero: {
     video: `${storageBase}/hero/hero_commercial_video.mp4`,
-    poster: '/assets/product-media/testo image (2).png',
-    fallbackImage: '/assets/product-media/testo image (2).png',
+    poster: '/assets/products/testo_front.png',
+    fallbackImage: '/assets/products/testo_front.png',
   },
 
   products: {
     testoNatural: {
-      front: '/assets/product-media/testo image (2).png',
-      label: '/assets/product-media/testo booster label.png',
-      render3d: '/assets/product-media/testo image (3).png',
-      ingredientsInfographic: '/assets/product-media/testo ingredients (1).png',
-      directionsInfographic: '/assets/product-media/testo ingredients (2).png',
-      benefitsInfographic: '/assets/product-media/testo ingredients (3).png',
+      front: '/assets/products/testo_front.png',
+      label: '/assets/products/testo_label.png',
+      render3d: '/assets/products/testo_3d.png',
+      side: '/assets/products/testo_side.png',
+      ingredientsInfographic: '/assets/products/ingredients_infographic.png',
+      directionsInfographic: '/assets/products/directions_infographic.png',
+      benefitsInfographic: '/assets/products/benefits_infographic.png',
       gallery: [
-        '/assets/product-media/testo image (2).png',
-        '/assets/product-media/testo image (3).png',
-        '/assets/product-media/testo image (4).png',
-        '/assets/product-media/testo booster label.png',
-        '/assets/product-media/testo ingredients (1).png',
-        '/assets/product-media/testo ingredients (2).png',
-        '/assets/product-media/testo ingredients (3).png',
+        '/assets/products/testo_front.png',
+        '/assets/products/testo_3d.png',
+        '/assets/products/testo_side.png',
+        '/assets/products/testo_label.png',
+        '/assets/products/ingredients_infographic.png',
+        '/assets/products/directions_infographic.png',
+        '/assets/products/benefits_infographic.png',
       ],
     },
   },
 
-  lifestyle: [
-    '/assets/actual-products/file_000000000470820bbde9e46c5efa5dbd.png',
-    '/assets/actual-products/file_000000001400821185a0014a130ef8ef.png',
-    '/assets/actual-products/file_00000000286c820bbed3cb2fb6202976.png',
-    '/assets/actual-products/file_000000003fd8820ba380c5b87ab78271.png',
-  ],
-
   ingredients: {
-    allBotanicalsHero: '/assets/product-media/testo ingredients (1).png',
-    ashwagandha: '/assets/actual-products/file_00000000418081fa9e56a73d26af827c.png',
-    shilajit: '/assets/actual-products/file_00000000537881fa9a81507b1e1d23c2.png',
-    gokhuru: '/assets/actual-products/file_0000000066b481fa8ca03cd243a27adc.png',
-    safedMusli: '/assets/actual-products/file_000000006adc81fa9de47ea3f5b22de9.png',
-    saffron: '/assets/actual-products/file_000000006f6081fabb5058dac80e4e9a.png',
-    seaBuckthorn: '/assets/actual-products/file_0000000074c882118348e9c24fe82d25.png',
-    fenugreek: '/assets/actual-products/file_00000000994881fa98fd0eaf2e29e679.png',
-    kaunch: '/assets/actual-products/file_000000009da481faa3f2211e4d5d4b9e.png',
-    talmakhana: '/assets/actual-products/file_000000009ea081fa9e6c0434f317e49e.png',
-    ginger: '/assets/actual-products/file_00000000d90881fabf04f01472e8b388.png',
+    allBotanicalsHero: '/assets/products/ingredients_infographic.png',
+    ashwagandha: '/assets/ingredients/ashwagandha.png',
+    shilajit: '/assets/ingredients/shilajit.png',
+    gokhuru: '/assets/ingredients/gokhuru.png',
+    safedMusli: '/assets/ingredients/safed_musli.png',
+    saffron: '/assets/ingredients/saffron.png',
+    seaBuckthorn: '/assets/ingredients/sea_buckthorn.png',
+    fenugreek: '/assets/ingredients/fenugreek.png',
+    kaunch: '/assets/ingredients/kaunch.png',
+    talmakhana: '/assets/ingredients/talmakhana.png',
+    ginger: '/assets/ingredients/ginger.png',
   },
 } as const;
