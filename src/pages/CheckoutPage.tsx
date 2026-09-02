@@ -13,8 +13,25 @@ import { Badge } from '@/components/ui/Badge';
 import { ShieldCheck, CheckCircle2, ShoppingBag, Truck, AlertCircle, Phone, User, MapPin } from 'lucide-react';
 
 export const CheckoutPage: React.FC = () => {
-  const { cartItems, cartSummary, clearCart } = useCart();
+  const { cartItems: persistentCartItems, clearCart, directCheckoutItem, clearDirectCheckout } = useCart();
   const { user, addresses } = useAuth();
+
+  const cartItems = directCheckoutItem ? [directCheckoutItem] : persistentCartItems;
+
+  const subtotal = cartItems.reduce((sum, item) => sum + item.variant.price * item.quantity, 0);
+  const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const freeShippingThreshold = 499;
+  const shippingFee = subtotal >= freeShippingThreshold || itemCount === 0 ? 0 : 99;
+  const total = subtotal + shippingFee;
+
+  const cartSummary = {
+    subtotal,
+    discount: 0,
+    shippingFee,
+    freeShippingThreshold,
+    total,
+    itemCount,
+  };
 
   // Shipping & Customer Information Form State
   const defaultAddr = addresses.find((a: UserAddress) => a.isDefault) || addresses[0];
@@ -88,7 +105,11 @@ export const CheckoutPage: React.FC = () => {
         try { window.sessionStorage.setItem('arogyapath_recent_order', recentOrderPayload); } catch { /* Ignore */ }
       }
 
-      clearCart();
+      if (directCheckoutItem) {
+        clearDirectCheckout();
+      } else {
+        clearCart();
+      }
       setIsProcessing(false);
     } catch (err: unknown) {
       console.error('[CheckoutPage] Order creation error:', err);

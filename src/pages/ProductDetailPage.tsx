@@ -15,7 +15,7 @@ import { ProductCard } from '@/components/commerce/ProductCard';
 import { useCart } from '@/context/CartContext';
 
 export const ProductDetailPage: React.FC = () => {
-  const { addToCart } = useCart();
+  const { addToCart, buyNow } = useCart();
   const { slug } = useParams<{ slug: string }>();
   const product = getProductBySlug(slug || '') || getProducts()[0];
   
@@ -168,14 +168,25 @@ export const ProductDetailPage: React.FC = () => {
               </div>
 
               {/* Quantity & CTA */}
-              <div className="flex items-center gap-4 pt-4 border-t border-[#EBE7DF]">
-                <QuantitySelector quantity={quantity} onQuantityChange={setQuantity} size="lg" />
+              <div className="space-y-3 pt-4 border-t border-[#EBE7DF]">
+                <div className="flex items-center gap-4">
+                  <QuantitySelector quantity={quantity} onQuantityChange={setQuantity} size="lg" />
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="flex-1 font-bold text-sm border-[#6A1423] text-[#6A1423] hover:bg-[#6A1423] hover:text-white transition-all"
+                    leftIcon={<ShoppingBag className="w-4 h-4" />}
+                    onClick={() => addToCart(product, selectedVariant, quantity)}
+                  >
+                    Add to Cart
+                  </Button>
+                </div>
                 <Button
                   variant="primary"
                   size="lg"
-                  className="flex-1 shadow-md font-bold text-base"
-                  leftIcon={<ShoppingBag className="w-5 h-5" />}
-                  onClick={() => addToCart(product, selectedVariant, quantity)}
+                  className="w-full shadow-md font-bold text-base bg-[#6A1423] hover:bg-[#520f1b]"
+                  leftIcon={<Truck className="w-5 h-5" />}
+                  onClick={() => buyNow(product, selectedVariant, quantity)}
                 >
                   Buy Now • ₹{(selectedVariant.price * quantity).toLocaleString('en-IN')}
                 </Button>
