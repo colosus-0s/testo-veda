@@ -5,7 +5,7 @@
 
 const rawSupabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://oqqrcluijcvvxrnkhsip.supabase.co';
 const supabaseBaseUrl = rawSupabaseUrl.replace(/\/rest\/v1\/?$/i, '').replace(/\/$/, '');
-const storageBase = `${supabaseBaseUrl}/storage/v1/object/public/storefront-assets`;
+const storageBase = `${supabaseBaseUrl}/storage/v1/object/public/arogya-path-storefront-v2`;
 
 export const ASSET_REGISTRY = {
   brand: {
