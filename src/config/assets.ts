@@ -1,6 +1,6 @@
 /**
  * Central Asset Registry for Arogya Path
- * Maps production media assets to Supabase Storage CDN URLs with local fallbacks.
+ * Maps production media assets from docs/ and public/assets with fallbacks.
  */
 
 const rawSupabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://oqqrcluijcvvxrnkhsip.supabase.co';
@@ -9,8 +9,8 @@ const storageBase = `${supabaseBaseUrl}/storage/v1/object/public/storefront-asse
 
 export const ASSET_REGISTRY = {
   brand: {
-    logo: `${storageBase}/brand/favicon.svg`,
-    logoFull: `${storageBase}/brand/favicon.svg`,
+    logo: '/static/favicon.svg',
+    logoFull: '/static/favicon.svg',
     vegSymbol: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%232e6f40" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3" stroke="%232e6f40" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="%232e6f40"/></svg>',
     fssaiBadge: '/static/fssai-badge.svg',
     gmpSeal: '/static/gmp-seal.svg',
@@ -19,46 +19,48 @@ export const ASSET_REGISTRY = {
   
   hero: {
     video: `${storageBase}/hero/hero_commercial_video.mp4`,
-    poster: `${storageBase}/products/prod_testo_front.png`,
-    fallbackImage: `${storageBase}/products/prod_testo_front.png`,
+    poster: '/assets/product-media/testo image (2).png',
+    fallbackImage: '/assets/product-media/testo image (2).png',
   },
 
   products: {
     testoNatural: {
-      front: `${storageBase}/products/prod_testo_front.png`,
-      label: `${storageBase}/products/prod_testo_label.png`,
-      render3d: `${storageBase}/products/prod_testo_front.png`,
-      ingredientsInfographic: `${storageBase}/products/prod_testo_ingredients_infographic.png`,
-      directionsInfographic: `${storageBase}/products/prod_testo_directions_infographic.png`,
-      benefitsInfographic: `${storageBase}/products/prod_testo_benefits_infographic.png`,
+      front: '/assets/product-media/testo image (2).png',
+      label: '/assets/product-media/testo booster label.png',
+      render3d: '/assets/product-media/testo image (3).png',
+      ingredientsInfographic: '/assets/product-media/testo ingredients (1).png',
+      directionsInfographic: '/assets/product-media/testo ingredients (2).png',
+      benefitsInfographic: '/assets/product-media/testo ingredients (3).png',
       gallery: [
-        `${storageBase}/products/prod_testo_front.png`,
-        `${storageBase}/products/prod_testo_label.png`,
-        `${storageBase}/products/prod_testo_ingredients_infographic.png`,
-        `${storageBase}/products/prod_testo_directions_infographic.png`,
-        `${storageBase}/products/prod_testo_benefits_infographic.png`,
+        '/assets/product-media/testo image (2).png',
+        '/assets/product-media/testo image (3).png',
+        '/assets/product-media/testo image (4).png',
+        '/assets/product-media/testo booster label.png',
+        '/assets/product-media/testo ingredients (1).png',
+        '/assets/product-media/testo ingredients (2).png',
+        '/assets/product-media/testo ingredients (3).png',
       ],
     },
   },
 
   lifestyle: [
-    `${storageBase}/lifestyle/lifestyle_1.png`,
-    `${storageBase}/lifestyle/lifestyle_2.png`,
-    `${storageBase}/lifestyle/lifestyle_3.png`,
-    `${storageBase}/lifestyle/lifestyle_4.png`,
+    '/assets/actual-products/file_000000000470820bbde9e46c5efa5dbd.png',
+    '/assets/actual-products/file_000000001400821185a0014a130ef8ef.png',
+    '/assets/actual-products/file_00000000286c820bbed3cb2fb6202976.png',
+    '/assets/actual-products/file_000000003fd8820ba380c5b87ab78271.png',
   ],
 
   ingredients: {
-    allBotanicalsHero: `${storageBase}/ingredients/all_10_botanicals_hero.jpg`,
-    ashwagandha: `${storageBase}/ingredients/ashwagandha_root.jpg`,
-    shilajit: `${storageBase}/ingredients/shilajit_mineral.jpg`,
-    gokhuru: `${storageBase}/ingredients/gokhuru_fruit.jpg`,
-    safedMusli: `${storageBase}/ingredients/safed_musli.jpg`,
-    saffron: `${storageBase}/ingredients/saffron_flower.jpg`,
-    seaBuckthorn: `${storageBase}/ingredients/sea_buckthorn.jpg`,
-    fenugreek: `${storageBase}/ingredients/fenugreek_seeds.jpg`,
-    kaunch: `${storageBase}/ingredients/kaunch_beej.jpg`,
-    talmakhana: `${storageBase}/ingredients/talmakhana_seeds.jpg`,
-    ginger: `${storageBase}/ingredients/ginger_rhizome.jpg`,
+    allBotanicalsHero: '/assets/product-media/testo ingredients (1).png',
+    ashwagandha: '/assets/actual-products/file_00000000418081fa9e56a73d26af827c.png',
+    shilajit: '/assets/actual-products/file_00000000537881fa9a81507b1e1d23c2.png',
+    gokhuru: '/assets/actual-products/file_0000000066b481fa8ca03cd243a27adc.png',
+    safedMusli: '/assets/actual-products/file_000000006adc81fa9de47ea3f5b22de9.png',
+    saffron: '/assets/actual-products/file_000000006f6081fabb5058dac80e4e9a.png',
+    seaBuckthorn: '/assets/actual-products/file_0000000074c882118348e9c24fe82d25.png',
+    fenugreek: '/assets/actual-products/file_00000000994881fa98fd0eaf2e29e679.png',
+    kaunch: '/assets/actual-products/file_000000009da481faa3f2211e4d5d4b9e.png',
+    talmakhana: '/assets/actual-products/file_000000009ea081fa9e6c0434f317e49e.png',
+    ginger: '/assets/actual-products/file_00000000d90881fabf04f01472e8b388.png',
   },
 } as const;
