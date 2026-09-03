@@ -14,8 +14,8 @@ export const FAQPage: React.FC = () => {
     {
       id: 'faq-1',
       category: 'product',
-      title: 'What is TESTO Natural Power+ Capsules?',
-      content: 'TESTO Natural Power+ is a dietary botanical supplement combining 10 classical plant extracts including Ashwagandha, Purified Shilajit, Gokhuru, Safed Musli, and Saffron designed for physical stamina, daily vigor, and stress adaptation.',
+      title: 'What is TESTO BOOSTER Capsules?',
+      content: 'TESTO BOOSTER is a dietary botanical supplement combining 10 classical plant extracts including Ashwagandha, Purified Shilajit, Gokhuru, Safed Musli, and Saffron designed for physical stamina, daily vigor, and stress adaptation.',
     },
     {
       id: 'faq-2',
@@ -26,7 +26,7 @@ export const FAQPage: React.FC = () => {
     {
       id: 'faq-3',
       category: 'ingredients',
-      title: 'Is TESTO Natural Power+ 100% vegetarian?',
+      title: 'Is TESTO BOOSTER 100% vegetarian?',
       content: 'Yes. Every capsule shell is manufactured from 100% vegetarian HPMC cellulose (E 464) carrying the official green vegetarian mark.',
     },
     {
@@ -44,8 +44,8 @@ export const FAQPage: React.FC = () => {
     {
       id: 'faq-6',
       category: 'product',
-      title: 'What is the MRP of TESTO Natural Power+?',
-      content: 'The Maximum Retail Price (MRP) is ₹999 for 30 Veg Capsules as declared on our physical label.',
+      title: 'What is the MRP of TESTO BOOSTER?',
+      content: 'The Maximum Retail Price (MRP) is ₹1,499 for 30 Veg Capsules as declared on our physical label.',
     },
   ];
 

@@ -11,8 +11,8 @@ import { Package, Truck, CheckCircle2, Clock, MapPin, ShieldCheck, ArrowRight } 
 const getInitialOrderNumber = (urlParam: string): string => {
   if (urlParam.trim()) return urlParam.trim();
   try {
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      const saved = window.sessionStorage.getItem('arogyapath_recent_order');
+    if (typeof window !== 'undefined') {
+      const saved = window.localStorage?.getItem('arogyapath_recent_order') || window.sessionStorage?.getItem('arogyapath_recent_order');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.orderNumber) {
@@ -29,8 +29,8 @@ const getInitialOrderNumber = (urlParam: string): string => {
 const getInitialToken = (urlParam: string): string => {
   if (urlParam.trim()) return urlParam.trim();
   try {
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      const saved = window.sessionStorage.getItem('arogyapath_recent_order');
+    if (typeof window !== 'undefined') {
+      const saved = window.localStorage?.getItem('arogyapath_recent_order') || window.sessionStorage?.getItem('arogyapath_recent_order');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.guestAccessToken) {

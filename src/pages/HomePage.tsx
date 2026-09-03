@@ -23,7 +23,7 @@ export const HomePage: React.FC = () => {
       {/* 04 Category / Need Discovery Grid */}
       <CategoryDiscoverySection />
 
-      {/* 05 Featured Product Stage (TESTO Natural Power+) */}
+      {/* 05 Featured Product Stage (TESTO BOOSTER) */}
       <ProductIntroductionSection />
 
       {/* 06 Editorial Commerce Banner */}

@@ -218,7 +218,7 @@ export const AccountOverviewPage: React.FC = () => {
             </p>
             <Link to="/testo" className="inline-block pt-2">
               <Button variant="primary" size="md" rightIcon={<ArrowRight size={16} />}>
-                Explore TESTO Power+
+                Explore TESTO BOOSTER
               </Button>
             </Link>
           </div>

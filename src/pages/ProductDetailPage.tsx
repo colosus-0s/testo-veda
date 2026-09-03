@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { ShieldCheck, ShoppingBag, Truck, RefreshCw, CheckCircle2, ShieldAlert, FileText } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { ShieldCheck, ShoppingBag, Truck, RefreshCw, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
@@ -12,10 +12,12 @@ import { getProductBySlug, getProducts } from '@/repositories/productRepository'
 import { Badge } from '@/components/ui/Badge';
 import { Accordion } from '@/components/ui/Accordion';
 import { ProductCard } from '@/components/commerce/ProductCard';
+import { SupplementFactsPanel } from '@/components/commerce/SupplementFactsPanel';
 import { useCart } from '@/context/CartContext';
 
 export const ProductDetailPage: React.FC = () => {
-  const { addToCart } = useCart();
+  const { addToCart, buyNow } = useCart();
+  const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
   const product = getProductBySlug(slug || '') || getProducts()[0];
   
@@ -28,12 +30,12 @@ export const ProductDetailPage: React.FC = () => {
   const faqItems = [
     {
       id: 'faq-1',
-      title: 'What is the dosage instructions for TESTO Natural Power+?',
+      title: 'What is the dosage instructions for TESTO BOOSTER?',
       content: `${product.directions.labelInstruction}. ${product.directions.suggestedUse}`,
     },
     {
       id: 'faq-2',
-      title: 'Is TESTO Natural Power+ 100% vegetarian?',
+      title: 'Is TESTO BOOSTER 100% vegetarian?',
       content: 'Yes. Every capsule shell is made from 100% vegetarian HPMC cellulose (E 464) carrying the official green vegetarian mark as declared on our physical label.',
     },
     {
@@ -43,8 +45,8 @@ export const ProductDetailPage: React.FC = () => {
     },
     {
       id: 'faq-4',
-      title: 'What botanicals are included in TESTO Power+?',
-      content: 'TESTO Natural Power+ combines 10 classical botanical extracts: Ashwagandha (100mg), Gokhuru / Tribulus (100mg), Safed Musli (50mg), Sea Buckthorn (50mg), Fenugreek (30mg), Saffron (15mg), and a 170mg Proprietary Blend (Kaunch Beej, Purified Shilajit, Talmakhana, Ginger).',
+      title: 'What botanicals are included in TESTO BOOSTER?',
+      content: 'TESTO BOOSTER combines 10 classical botanical extracts: Ashwagandha (100mg), Gokhuru / Tribulus (100mg), Safed Musli (50mg), Sea Buckthorn (50mg), Fenugreek (30mg), Saffron (15mg), and a 170mg Proprietary Blend (Kaunch Beej, Purified Shilajit, Talmakhana, Ginger).',
     },
   ];
 
@@ -110,7 +112,7 @@ export const ProductDetailPage: React.FC = () => {
                 <ProductRating rating={product.rating} reviewCount={product.reviewCount} size="md" />
                 <span className="text-[#EBE7DF]">|</span>
                 <span className="text-xs text-[#173C2B] font-bold flex items-center gap-1">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" /> 30 Veg Capsules • MRP ₹999
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" /> 30 Veg Capsules • MRP ₹1,499
                 </span>
               </div>
 
@@ -168,14 +170,28 @@ export const ProductDetailPage: React.FC = () => {
               </div>
 
               {/* Quantity & CTA */}
-              <div className="flex items-center gap-4 pt-4 border-t border-[#EBE7DF]">
-                <QuantitySelector quantity={quantity} onQuantityChange={setQuantity} size="lg" />
+              <div className="space-y-3 pt-4 border-t border-[#EBE7DF]">
+                <div className="flex items-center gap-4">
+                  <QuantitySelector quantity={quantity} onQuantityChange={setQuantity} size="lg" />
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="flex-1 font-bold text-sm border-[#6A1423] text-[#6A1423] hover:bg-[#6A1423] hover:text-white transition-all"
+                    leftIcon={<ShoppingBag className="w-4 h-4" />}
+                    onClick={() => addToCart(product, selectedVariant, quantity)}
+                  >
+                    Add to Cart
+                  </Button>
+                </div>
                 <Button
                   variant="primary"
                   size="lg"
-                  className="flex-1 shadow-md font-bold text-base"
-                  leftIcon={<ShoppingBag className="w-5 h-5" />}
-                  onClick={() => addToCart(product, selectedVariant, quantity)}
+                  className="w-full shadow-md font-bold text-base bg-[#6A1423] hover:bg-[#520f1b]"
+                  leftIcon={<Truck className="w-5 h-5" />}
+                  onClick={() => {
+                    buyNow(product, selectedVariant, quantity);
+                    navigate('/checkout');
+                  }}
                 >
                   Buy Now • ₹{(selectedVariant.price * quantity).toLocaleString('en-IN')}
                 </Button>
@@ -202,66 +218,21 @@ export const ProductDetailPage: React.FC = () => {
       </Section>
 
       {/* Official Supplement Facts & Formula Section */}
-      <Section padding="xl" className="bg-[#173C2B] text-white border-y border-[#2E6B4A]/50">
+      <Section padding="xl" className="bg-[#F7F4ED] border-y border-[#EBE7DF]">
         <Container size="narrow">
-          <div className="text-center mb-12">
-            <span className="text-xs uppercase font-bold tracking-widest text-[#F3E5AB] bg-white/10 px-3.5 py-1.5 rounded-full inline-block mb-3 border border-white/20">
+          <div className="text-center mb-10">
+            <span className="text-xs uppercase font-bold tracking-widest text-[#6A1423] bg-red-50 px-3.5 py-1.5 rounded-full inline-block mb-3 border border-red-100 shadow-sm">
               Technical Label Disclosure
             </span>
-            <h2 className="font-serif text-3xl sm:text-5xl font-bold text-white mb-3">
+            <h2 className="font-serif text-3xl sm:text-5xl font-bold text-[#171717] mb-3">
               What's In Each Capsule
             </h2>
-            <p className="text-sm text-[#E2E8F0] font-semibold">
+            <p className="text-sm text-slate-700 font-semibold">
               Serving Size: {facts.servingSize} • FSSAI License No. {product.regulatory.fssaiLicense}
             </p>
           </div>
 
-          <div className="bg-[#FCFBF8] text-[#171717] rounded-2xl p-6 sm:p-8 border-2 border-slate-900 shadow-2xl overflow-x-auto">
-            <div className="border-b-4 border-[#171717] pb-3 mb-4 flex items-center justify-between">
-              <h3 className="font-serif text-2xl font-black text-[#171717] uppercase">
-                Supplement Facts
-              </h3>
-              <FileText className="w-5 h-5 text-[#6A1423]" />
-            </div>
-
-            <div className="flex justify-between text-xs font-black text-[#171717] border-b-2 border-slate-900 pb-2 mb-3">
-              <span>Amount Per Serving</span>
-              <span>% Daily Value</span>
-            </div>
-
-            <div className="divide-y divide-slate-300 text-sm">
-              {facts.ingredients.map((ing, i) => (
-                <div key={i} className="py-2.5 flex justify-between items-baseline gap-4">
-                  <div>
-                    <span className="font-bold text-slate-950">{ing.name}</span>
-                    {ing.botanicalName && (
-                      <span className="text-xs italic text-slate-700 ml-1.5">({ing.botanicalName})</span>
-                    )}
-                  </div>
-                  <span className="font-mono text-xs font-black text-slate-950">{ing.amount}</span>
-                </div>
-              ))}
-
-              {facts.proprietaryBlend && (
-                <div className="py-3 bg-emerald-50 px-3.5 rounded-lg my-2 border border-emerald-300">
-                  <div className="flex justify-between font-bold text-slate-950">
-                    <span>{facts.proprietaryBlend.name}</span>
-                    <span className="font-mono text-xs font-black text-[#173C2B]">{facts.proprietaryBlend.amount}</span>
-                  </div>
-                  <ul className="mt-1.5 pl-4 list-disc text-xs text-slate-900 font-semibold space-y-1">
-                    {facts.proprietaryBlend.ingredients.map((item, idx) => (
-                      <li key={idx}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            <div className="border-t-4 border-[#171717] pt-3 mt-4 text-[11px] text-slate-900 font-semibold space-y-1">
-              <p>* Daily Value (% DV) not established for dietary supplements.</p>
-              <p><strong>Other Ingredients:</strong> {facts.otherIngredients.join(', ')}.</p>
-            </div>
-          </div>
+          <SupplementFactsPanel />
         </Container>
       </Section>
 

@@ -154,7 +154,7 @@ export const StoreLayout: React.FC = () => {
               Popular Formulations & Ingredients
             </span>
             <div className="flex flex-wrap gap-2 text-xs">
-              {['TESTO Power+', 'Ashwagandha', 'Shilajit', 'Safed Musli', 'Vitality & Stamina'].map((term) => (
+              {['TESTO BOOSTER', 'Ashwagandha', 'Shilajit', 'Safed Musli', 'Vitality & Stamina'].map((term) => (
                 <Link
                   key={term}
                   to={`/shop?q=${encodeURIComponent(term)}`}

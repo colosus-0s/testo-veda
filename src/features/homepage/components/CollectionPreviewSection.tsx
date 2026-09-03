@@ -75,9 +75,9 @@ export const CollectionPreviewSection: React.FC = () => {
             </div>
 
             <div className="pt-4 border-t border-[#EBE7DF]">
-              <Link to={`/products/${product.slug}`}>
+              <Link to="/testo">
                 <Button variant="primary" size="md" className="w-full shadow-md" rightIcon={<ArrowRight className="w-4 h-4" />}>
-                  Explore TESTO Power+ Details
+                  Explore TESTO BOOSTER Details
                 </Button>
               </Link>
             </div>

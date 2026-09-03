@@ -12,7 +12,7 @@ export const getFeaturedProductId = (): string => {
   } catch {
     // Ignore storage errors
   }
-  return 'prod_testo_power_1';
+  return 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 };
 
 export const setFeaturedProductId = (id: string) => {

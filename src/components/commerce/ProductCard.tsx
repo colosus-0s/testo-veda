@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, ShieldCheck, CheckCircle2, Heart } from 'lucide-react';
+import { ShoppingBag, ShieldCheck, CheckCircle2, Heart, ArrowRight } from 'lucide-react';
 import type { Product } from '@/types/product';
 import { ProductPrice } from './ProductPrice';
 import { ProductRating } from './ProductRating';
@@ -56,7 +56,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
       {/* Product Image Stage */}
       <Link
-        to={`/products/${product.slug}`}
+        to="/testo"
         className="relative block w-full aspect-square bg-[#F7F4ED] overflow-hidden p-6 border-b border-[#EBE7DF]"
       >
         <img
@@ -78,7 +78,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </span>
           </div>
 
-          <Link to={`/products/${product.slug}`} className="block group-hover:text-[#6A1423] transition-colors">
+          <Link to="/testo" className="block group-hover:text-[#6A1423] transition-colors">
             <h3 className="font-serif text-lg font-bold text-[#171717] tracking-tight line-clamp-1 mb-1">
               {product.name}
             </h3>
@@ -101,15 +101,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <ProductPrice price={product.price} size="sm" textColor="text-[#171717]" showDiscountBadge={false} />
           </div>
 
-          <Button
-            variant="primary"
-            size="sm"
-            className="w-full shadow-sm font-bold"
-            leftIcon={<ShoppingBag className="w-4 h-4" />}
-            onClick={handleAction}
-          >
-            Explore TESTO
-          </Button>
+          <div className="flex gap-2">
+            <Link to="/testo" className="flex-1">
+              <Button
+                variant="primary"
+                size="sm"
+                className="w-full shadow-sm font-bold"
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+              >
+                Explore TESTO BOOSTER Details
+              </Button>
+            </Link>
+            <Button
+              variant="outline"
+              size="sm"
+              className="px-3 border-[#6A1423] text-[#6A1423] hover:bg-[#6A1423] hover:text-white transition-colors"
+              aria-label="Add to Cart"
+              title="Add to Cart"
+              onClick={handleAction}
+            >
+              <ShoppingBag className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

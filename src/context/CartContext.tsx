@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { CartItem, CartSummary } from '@/types/cart';
 import type { Product, ProductVariant } from '@/types/product';
-import { INITIAL_PRODUCTS } from '@/features/products/data/initialProducts';
 
 export interface CartContextType {
   cartItems: CartItem[];
@@ -11,9 +10,12 @@ export interface CartContextType {
   openCart: () => void;
   closeCart: () => void;
   addToCart: (product: Product, variant?: ProductVariant, quantity?: number) => void;
+  buyNow: (product: Product, variant?: ProductVariant, quantity?: number) => void;
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
+  directCheckoutItem: CartItem | null;
+  clearDirectCheckout: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -22,31 +24,27 @@ const LOCAL_STORAGE_CART_KEY = 'arogyapath_cart_v1';
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [directCheckoutItem, setDirectCheckoutItem] = useState<CartItem | null>(null);
 
+  // Initial cart state MUST be empty if nothing is stored in localStorage
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
         const saved = window.localStorage.getItem(LOCAL_STORAGE_CART_KEY);
         if (saved) {
-          return JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
         }
       }
     } catch (e) {
       console.warn('Failed to restore cart from localStorage', e);
     }
-    const defaultProd = INITIAL_PRODUCTS[0];
-    return [
-      {
-        id: `cart_${defaultProd.id}_${defaultProd.variants[0].id}`,
-        productId: defaultProd.id,
-        variantId: defaultProd.variants[0].id,
-        quantity: 1,
-        product: defaultProd,
-        variant: defaultProd.variants[0],
-      },
-    ];
+    return []; // NO AUTOMATIC DEFAULT PRODUCTS! EMPTY BY DEFAULT!
   });
 
+  // Persist cart to localStorage ONLY when cartItems changes
   useEffect(() => {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
@@ -60,16 +58,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
 
+  // Explicit Add to Cart action
   const addToCart = (product: Product, variant?: ProductVariant, quantity = 1) => {
     const targetVariant = variant || product.variants[0];
     const itemId = `cart_${product.id}_${targetVariant.id}`;
+    const qtyToAdd = Math.max(1, quantity);
 
     setCartItems((prev) => {
       const existing = prev.find((item) => item.id === itemId);
       if (existing) {
         return prev.map((item) =>
           item.id === itemId
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: item.quantity + qtyToAdd }
             : item
         );
       }
@@ -79,7 +79,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: itemId,
           productId: product.id,
           variantId: targetVariant.id,
-          quantity,
+          quantity: qtyToAdd,
           product,
           variant: targetVariant,
         },
@@ -87,6 +87,28 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     setIsCartOpen(true);
+  };
+
+  // Buy Now direct purchase: sets direct checkout payload without mutating persistent cart or header badge
+  const buyNow = (product: Product, variant?: ProductVariant, quantity = 1) => {
+    const targetVariant = variant || product.variants[0];
+    const itemId = `direct_${product.id}_${targetVariant.id}`;
+    const qtyToBuy = Math.max(1, quantity);
+
+    const directItem: CartItem = {
+      id: itemId,
+      productId: product.id,
+      variantId: targetVariant.id,
+      quantity: qtyToBuy,
+      product,
+      variant: targetVariant,
+    };
+
+    setDirectCheckoutItem(directItem);
+  };
+
+  const clearDirectCheckout = () => {
+    setDirectCheckoutItem(null);
   };
 
   const removeFromCart = (itemId: string) => {
@@ -134,9 +156,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         openCart,
         closeCart,
         addToCart,
+        buyNow,
         removeFromCart,
         updateQuantity,
         clearCart,
+        directCheckoutItem,
+        clearDirectCheckout,
       }}
     >
       {children}

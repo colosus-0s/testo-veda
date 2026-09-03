@@ -6,14 +6,10 @@ import {
   Menu,
   ShieldCheck,
   ShieldAlert,
-  User,
   Package,
-  MapPin,
-  Heart,
-  Lock,
   LogOut,
   ChevronRight,
-  ArrowRight,
+  LayoutDashboard,
 } from 'lucide-react';
 import { SITE_CONFIG } from '@/config/site';
 import { Drawer } from '@/components/ui/Drawer';
@@ -34,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const { user, isAuthenticated, isGuest, isAdmin, logout } = useAuth();
+  const { isAdmin, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -194,161 +190,60 @@ export const Header: React.FC<HeaderProps> = ({
             </nav>
           </div>
 
-          {/* Section 2: Account Experience */}
+          {/* Section 2: Quick Links & Logistics */}
           <div className="space-y-2 pt-4 border-t border-[#EBE7DF]">
             <span className="text-[10px] font-bold uppercase tracking-widest text-[#6A1423] block">
-              CUSTOMER ACCOUNT
+              LOGISTICS & ORDERS
             </span>
 
-            {isAuthenticated ? (
-              <div className="space-y-1">
-                <div className="p-3 bg-[#F7F4ED] rounded-xl border border-[#EBE7DF] mb-2 flex items-center justify-between">
-                  <div>
-                    <span className="font-bold text-xs text-[#171717] font-serif block">
-                      Hello, {user?.fullName?.split(' ')[0] || 'Customer'}
-                    </span>
-                    <span className="text-[11px] text-slate-500 block truncate">{user?.email}</span>
-                  </div>
-                </div>
-
-                <Link
-                  to="/account"
-                  onClick={handleMobileNavClick}
-                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#171717] hover:bg-[#F7F4ED]"
-                >
-                  <span className="flex items-center gap-2"><User size={15} /> My Account</span>
-                  <ChevronRight size={14} className="text-slate-400" />
-                </Link>
-
-                <Link
-                  to="/account/orders"
-                  onClick={handleMobileNavClick}
-                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#171717] hover:bg-[#F7F4ED]"
-                >
-                  <span className="flex items-center gap-2"><Package size={15} /> My Orders</span>
-                  <ChevronRight size={14} className="text-slate-400" />
-                </Link>
-
-                <Link
-                  to="/account/addresses"
-                  onClick={handleMobileNavClick}
-                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#171717] hover:bg-[#F7F4ED]"
-                >
-                  <span className="flex items-center gap-2"><MapPin size={15} /> Saved Addresses</span>
-                  <ChevronRight size={14} className="text-slate-400" />
-                </Link>
-
-                <Link
-                  to="/account/wishlist"
-                  onClick={handleMobileNavClick}
-                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#171717] hover:bg-[#F7F4ED]"
-                >
-                  <span className="flex items-center gap-2"><Heart size={15} /> My Wishlist</span>
-                  <ChevronRight size={14} className="text-slate-400" />
-                </Link>
-
-                <Link
-                  to="/cart"
-                  onClick={handleMobileNavClick}
-                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#171717] hover:bg-[#F7F4ED]"
-                >
-                  <span className="flex items-center gap-2"><ShoppingBag size={15} /> Shopping Cart</span>
-                  <ChevronRight size={14} className="text-slate-400" />
-                </Link>
-
-                <Link
-                  to="/account/security"
-                  onClick={handleMobileNavClick}
-                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#171717] hover:bg-[#F7F4ED]"
-                >
-                  <span className="flex items-center gap-2"><Lock size={15} /> Profile & Security</span>
-                  <ChevronRight size={14} className="text-slate-400" />
-                </Link>
-
-                <button
-                  onClick={handleSignOut}
-                  className="w-full flex items-center justify-center gap-2 mt-2 px-3 py-2 rounded-xl text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200"
-                >
-                  <LogOut size={14} /> Sign Out
-                </button>
-              </div>
-            ) : isGuest ? (
-              <div className="space-y-1.5 pt-1">
-                <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 mb-2 text-left">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-amber-800 block">Guest Account Active</span>
-                  <p className="text-xs font-serif font-bold text-amber-950 mt-0.5">Welcome Back, Guest</p>
-                </div>
-                <Link
-                  to="/account/orders"
-                  onClick={handleMobileNavClick}
-                  className="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-[#171717] bg-[#F7F4ED]"
-                >
-                  <span className="flex items-center gap-2"><Package size={15} className="text-[#6A1423]" /> My Orders</span>
-                  <ChevronRight size={14} className="text-slate-400" />
-                </Link>
-                <Link
-                  to="/orders/track"
-                  onClick={handleMobileNavClick}
-                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#171717] hover:bg-[#F7F4ED]"
-                >
-                  <span className="flex items-center gap-2"><User size={15} /> Track an Order</span>
-                  <ChevronRight size={14} className="text-slate-400" />
-                </Link>
-                <Link
-                  to="/register"
-                  onClick={handleMobileNavClick}
-                  className="flex items-center justify-between bg-[#6A1423] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm mt-2"
-                >
-                  <span>Create Free Account</span>
-                  <ArrowRight size={14} />
-                </Link>
-                <Link
-                  to="/login"
-                  onClick={handleMobileNavClick}
-                  className="flex items-center justify-between bg-[#F7F4ED] border border-[#EBE7DF] text-[#171717] px-4 py-2 rounded-xl text-xs font-bold"
-                >
-                  <span>Sign In</span>
-                </Link>
-              </div>
-            ) : (
-              <div className="space-y-2 pt-1">
-                <Link
-                  to="/login"
-                  onClick={handleMobileNavClick}
-                  className="flex items-center justify-between bg-[#6A1423] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm"
-                >
-                  <span>Sign In</span>
-                  <ArrowRight size={14} />
-                </Link>
-
-                <Link
-                  to="/register"
-                  onClick={handleMobileNavClick}
-                  className="flex items-center justify-between bg-[#F7F4ED] border border-[#EBE7DF] text-[#171717] px-4 py-2.5 rounded-xl text-xs font-bold"
-                >
-                  <span>Create Account / Register</span>
-                  <ChevronRight size={14} />
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Section 3: Admin Access (Only if authenticated user is real admin/superadmin) */}
-          {isAdmin && (
-            <div className="space-y-2 pt-4 border-t border-[#EBE7DF]">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#6A1423] block">
-                ADMINISTRATION
-              </span>
+            <div className="space-y-1">
               <Link
-                to="/admin"
+                to="/orders/track"
                 onClick={handleMobileNavClick}
-                className="flex items-center justify-between bg-[#6A1423]/10 border border-[#6A1423] text-[#6A1423] px-3.5 py-2.5 rounded-xl text-xs font-bold hover:bg-[#6A1423] hover:text-white"
+                className="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-[#171717] bg-[#F7F4ED] hover:bg-[#6A1423] hover:text-white transition-all"
               >
-                <span className="flex items-center gap-2"><ShieldAlert size={16} /> Admin Panel</span>
+                <span className="flex items-center gap-2">
+                  <Package size={16} className="text-[#6A1423]" /> View / Track Order
+                </span>
                 <ChevronRight size={14} />
               </Link>
+
+              <Link
+                to="/cart"
+                onClick={handleMobileNavClick}
+                className="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-[#171717] hover:bg-[#F7F4ED]"
+              >
+                <span className="flex items-center gap-2">
+                  <ShoppingBag size={16} className="text-slate-500" /> Shopping Cart
+                </span>
+                <ChevronRight size={14} className="text-slate-400" />
+              </Link>
+
+              {isAdmin && (
+                <div className="pt-2 border-t border-[#EBE7DF] mt-2">
+                  <Link
+                    to="/admin"
+                    onClick={handleMobileNavClick}
+                    className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold text-[#6A1423] bg-[#6A1423]/10 border border-[#6A1423]/20"
+                  >
+                    <span className="flex items-center gap-2">
+                      <LayoutDashboard size={15} /> Admin Panel
+                    </span>
+                    <ChevronRight size={14} />
+                  </Link>
+
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full flex items-center justify-center gap-2 mt-2 px-3 py-2 rounded-xl text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200"
+                  >
+                    <LogOut size={14} /> Admin Sign Out
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
+
+
 
           {/* Footer Information */}
           <div className="pt-6 border-t border-[#EBE7DF] space-y-2 text-xs text-slate-600">

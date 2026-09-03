@@ -13,7 +13,7 @@ export const SITE_CONFIG = {
   announcementBar: {
     enabled: true,
     text: 'Free Express Shipping Across India on Orders Above ₹499 | 100% Authentic & FSSAI Compliant',
-    ctaText: 'Shop TESTO Power+',
+    ctaText: 'Shop TESTO BOOSTER',
     ctaLink: '/testo',
   },
 
@@ -26,7 +26,7 @@ export const SITE_CONFIG = {
 
   navigation: [
     { label: 'Shop All', href: '/shop' },
-    { label: 'TESTO Power+', href: '/testo' },
+    { label: 'TESTO BOOSTER', href: '/testo' },
     { label: 'Formula & Ingredients', href: '/formula-ingredients' },
     { label: 'Quality & Trust', href: '/quality-trust' },
     { label: 'Our Story', href: '/our-story' },
@@ -35,7 +35,7 @@ export const SITE_CONFIG = {
 
   footerLinks: {
     shop: [
-      { label: 'TESTO Natural Power+ (30 Caps)', href: '/testo' },
+      { label: 'TESTO BOOSTER (30 Caps)', href: '/testo' },
       { label: 'Shop All Formulations', href: '/shop' },
       { label: 'Vitality & Stamina Collection', href: '/shop?category=vitality' },
     ],

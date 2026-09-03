@@ -14,8 +14,8 @@ export const HeroSection: React.FC = () => {
   const targetId = getFeaturedProductId();
   const featuredProduct = getProductById(targetId) || getProductBySlug(targetId) || activeProducts.find((p) => p.featured) || activeProducts[0];
 
-  const primaryCtaLink = featuredProduct ? `/products/${featuredProduct.slug}` : HERO_CONFIG.primaryCtaLink;
-  const primaryCtaText = featuredProduct ? `Explore ${featuredProduct.name}` : HERO_CONFIG.primaryCtaText;
+  const primaryCtaLink = '/testo';
+  const primaryCtaText = 'Explore TESTO BOOSTER';
   const subheadline = featuredProduct ? (featuredProduct.shortDescription || featuredProduct.description) : HERO_CONFIG.subheadline;
   const featuredPrice = featuredProduct ? ` ₹${featuredProduct.price}` : '';
 

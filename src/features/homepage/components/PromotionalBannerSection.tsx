@@ -40,19 +40,19 @@ export const PromotionalBannerSection: React.FC = () => {
                 <CheckCircle2 size={14} className="text-[#C7A33A]" /> 30 Veg Capsules
               </span>
               <span className="text-xs text-white bg-white/10 px-3 py-1.5 rounded-md font-semibold flex items-center gap-1.5">
-                <CheckCircle2 size={14} className="text-[#C7A33A]" /> MRP ₹999
+                <CheckCircle2 size={14} className="text-[#C7A33A]" /> MRP ₹1,499
               </span>
             </div>
 
             <div className="pt-4">
-              <Link to={`/products/${product.slug}`}>
+              <Link to="/testo">
                 <Button
                   variant="gold"
                   size="lg"
                   className="shadow-xl shadow-black/20 text-base"
                   rightIcon={<ArrowRight className="w-5 h-5" />}
                 >
-                  Explore TESTO Power+
+                  Explore TESTO BOOSTER
                 </Button>
               </Link>
             </div>
@@ -67,7 +67,7 @@ export const PromotionalBannerSection: React.FC = () => {
             <div className="relative w-full max-w-xs sm:max-w-sm aspect-square bg-white/5 rounded-2xl p-6 border border-white/15 backdrop-blur-md flex items-center justify-center">
               <img
                 src={product.images.primary}
-                alt="Arogya Path TESTO Natural Power+"
+                alt="Arogya Path TESTO BOOSTER"
                 className="w-full h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)] hover:scale-105 transition-transform duration-500"
               />
             </div>
