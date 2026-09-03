@@ -21,8 +21,8 @@ export const FormulaIngredientsPage: React.FC = () => {
             <div className="lg:col-span-6 relative">
               <div className="relative bg-[#FCFBF8] rounded-3xl overflow-hidden aspect-[16/10] sm:aspect-[4/3] shadow-subtle-card border-2 border-[#EBE7DF] group">
                 <img
-                  src={ASSET_REGISTRY.ingredients.allBotanicalsHero}
-                  alt="Arogya Path 10 Classical Botanical Ingredients Still Life"
+                  src={ASSET_REGISTRY.infographics.formula}
+                  alt="Arogya Path 10 Classical Botanical Ingredients Formula Disclosure"
                   className="w-full h-full object-contain p-2 object-center group-hover:scale-102 transition-transform duration-700"
                 />
                 <div className="absolute bottom-4 left-4 right-4 bg-[#FCFBF8]/95 backdrop-blur-sm p-3.5 rounded-xl border border-[#EBE7DF] shadow-md flex items-center justify-between text-xs font-bold text-[#171717]">

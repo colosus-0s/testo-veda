@@ -1,11 +1,12 @@
 /**
  * Central Asset Registry for Arogya Path
- * Maps verified product photography, botanical ingredient assets, brand lifestyle visuals, and infographics.
+ * Maps verified product photography, botanical ingredient assets, brand lifestyle visuals, and infographics
+ * from the authoritative Supabase Storage bucket: arogya-path-assets
  */
 
 const rawSupabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://oqqrcluijcvvxrnkhsip.supabase.co';
 const supabaseBaseUrl = rawSupabaseUrl.replace(/\/rest\/v1\/?$/i, '').replace(/\/$/, '');
-const storageBase = `${supabaseBaseUrl}/storage/v1/object/public/arogya-path-storefront-v2`;
+const storageBase = `${supabaseBaseUrl}/storage/v1/object/public/arogya-path-assets`;
 
 export const ASSET_REGISTRY = {
   brand: {
@@ -15,47 +16,60 @@ export const ASSET_REGISTRY = {
     fssaiBadge: '/static/fssai-badge.svg',
     gmpSeal: '/static/gmp-seal.svg',
     isoSeal: '/static/iso-seal.svg',
-    lifestyleHero: '/assets/brand/arogya_lifestyle_hero.png',
+    lifestyleHero: `${storageBase}/lifestyle/lifestyle_hero.png`,
   },
   
   hero: {
     video: `${storageBase}/hero/hero_commercial_video.mp4`,
-    poster: '/assets/products/testo_front.png',
-    fallbackImage: '/assets/products/testo_front.png',
+    poster: `${storageBase}/products/testo-front.png`,
+    fallbackImage: `${storageBase}/products/testo-front.png`,
   },
 
   products: {
     testoNatural: {
-      front: '/assets/products/testo_front.png',
-      label: '/assets/products/testo_label.png',
-      render3d: '/assets/products/testo_3d.png',
-      side: '/assets/products/testo_side.png',
-      ingredientsInfographic: '/assets/products/ingredients_infographic.png',
-      directionsInfographic: '/assets/products/directions_infographic.png',
-      benefitsInfographic: '/assets/products/benefits_infographic.png',
+      front: `${storageBase}/products/testo-front.png`,
+      label: `${storageBase}/products/testo-label.png`,
+      render3d: `${storageBase}/products/testo-3d.png`,
+      side: `${storageBase}/products/testo-side.png`,
+      ingredientsInfographic: `${storageBase}/infographics/formula.png`,
+      directionsInfographic: `${storageBase}/infographics/directions.png`,
+      benefitsInfographic: `${storageBase}/infographics/benefits.png`,
       gallery: [
-        '/assets/products/testo_front.png',
-        '/assets/products/testo_3d.png',
-        '/assets/products/testo_side.png',
-        '/assets/products/testo_label.png',
-        '/assets/products/ingredients_infographic.png',
-        '/assets/products/directions_infographic.png',
-        '/assets/products/benefits_infographic.png',
+        `${storageBase}/products/testo-front.png`,
+        `${storageBase}/products/testo-3d.png`,
+        `${storageBase}/products/testo-side.png`,
+        `${storageBase}/products/testo-label.png`,
+        `${storageBase}/infographics/formula.png`,
+        `${storageBase}/infographics/directions.png`,
+        `${storageBase}/infographics/benefits.png`,
       ],
     },
   },
 
   ingredients: {
-    allBotanicalsHero: '/assets/products/ingredients_infographic.png',
-    ashwagandha: '/assets/ingredients/ashwagandha.png',
-    shilajit: '/assets/ingredients/shilajit.png',
-    gokhuru: '/assets/ingredients/gokhuru.png',
-    safedMusli: '/assets/ingredients/safed_musli.png',
-    saffron: '/assets/ingredients/saffron.png',
-    seaBuckthorn: '/assets/ingredients/sea_buckthorn.png',
-    fenugreek: '/assets/ingredients/fenugreek.png',
-    kaunch: '/assets/ingredients/kaunch.png',
-    talmakhana: '/assets/ingredients/talmakhana.png',
-    ginger: '/assets/ingredients/ginger.png',
+    allBotanicalsHero: `${storageBase}/infographics/formula.png`,
+    ashwagandha: `${storageBase}/ingredients/ashwagandha.png`,
+    shilajit: `${storageBase}/ingredients/shilajit.png`,
+    gokhuru: `${storageBase}/ingredients/gokhuru.png`,
+    safedMusli: `${storageBase}/ingredients/safed-musli.png`,
+    saffron: `${storageBase}/ingredients/saffron.png`,
+    seaBuckthorn: `${storageBase}/ingredients/sea-buckthorn.png`,
+    fenugreek: `${storageBase}/ingredients/fenugreek.png`,
+    kaunch: `${storageBase}/ingredients/kaunch-beej.png`,
+    talmakhana: `${storageBase}/ingredients/talmakhana.png`,
+    ginger: `${storageBase}/ingredients/ginger.png`,
+  },
+
+  infographics: {
+    formula: `${storageBase}/infographics/formula.png`,
+    directions: `${storageBase}/infographics/directions.png`,
+    benefits: `${storageBase}/infographics/benefits.png`,
+  },
+
+  lifestyle: {
+    hero: `${storageBase}/lifestyle/lifestyle_hero.png`,
+    one: `${storageBase}/lifestyle/lifestyle_1.png`,
+    two: `${storageBase}/lifestyle/lifestyle_2.png`,
+    three: `${storageBase}/lifestyle/lifestyle_3.png`,
   },
 } as const;
