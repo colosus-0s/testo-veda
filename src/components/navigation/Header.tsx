@@ -68,33 +68,34 @@ export const Header: React.FC<HeaderProps> = ({
             : 'bg-[#F7F4ED]/90 backdrop-blur-sm py-4 border-b border-[#EBE7DF]/60'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
-          {/* Mobile Menu Trigger Button */}
-          <div className="flex items-center lg:hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 md:gap-4">
+          {/* Mobile Menu Trigger Button (Left) */}
+          <div className="flex items-center lg:hidden shrink-0">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="p-2 text-[#171717] hover:text-[#6A1423] transition-colors focus:outline-none flex items-center gap-1.5 font-bold text-xs"
+              className="p-1.5 text-[#171717] hover:text-[#6A1423] transition-colors focus:outline-none"
               aria-label="Open navigation menu"
             >
               <Menu className="w-6 h-6 text-[#171717]" />
-              <span className="hidden sm:inline text-[#171717]">Menu</span>
             </button>
           </div>
 
-          {/* Brand Logo & Title */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-full bg-[#6A1423] border border-[#C7A33A]/40 flex items-center justify-center font-serif font-black text-xl text-white shadow-md group-hover:scale-105 transition-transform">
-              AP
-            </div>
-            <div className="flex flex-col text-left">
-              <span className="font-serif text-xl font-extrabold tracking-wider text-[#171717] group-hover:text-[#6A1423] transition-colors">
-                {SITE_CONFIG.brandName.toUpperCase()}
-              </span>
-              <span className="text-[10px] tracking-widest text-[#6A1423] uppercase font-bold">
-                {SITE_CONFIG.tagline}
-              </span>
-            </div>
-          </Link>
+          {/* Brand Logo & Title (Centered on Mobile, Left-aligned on Desktop) */}
+          <div className="flex-1 flex justify-center lg:justify-start lg:flex-initial">
+            <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#6A1423] border border-[#C7A33A]/40 flex items-center justify-center font-serif font-black text-base sm:text-xl text-white shadow-md group-hover:scale-105 transition-transform">
+                AP
+              </div>
+              <div className="flex flex-col text-left">
+                <span className="font-serif text-base sm:text-xl font-extrabold tracking-wider text-[#171717] group-hover:text-[#6A1423] transition-colors whitespace-nowrap">
+                  {SITE_CONFIG.brandName.toUpperCase()}
+                </span>
+                <span className="text-[9px] sm:text-[10px] tracking-widest text-[#6A1423] uppercase font-bold hidden xs:inline">
+                  {SITE_CONFIG.tagline}
+                </span>
+              </div>
+            </Link>
+          </div>
 
           {/* Desktop Navigation Links */}
           <nav aria-label="Main Navigation" className="hidden lg:flex items-center space-x-7">
@@ -116,8 +117,8 @@ export const Header: React.FC<HeaderProps> = ({
             })}
           </nav>
 
-          {/* Header Action Icons */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
+          {/* Header Action Icons (Right) */}
+          <div className="flex items-center space-x-1 sm:space-x-3 shrink-0">
             {isAdmin && (
               <Link
                 to="/admin"
@@ -129,18 +130,20 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={onOpenSearch}
-              className="p-2 text-[#171717] hover:text-[#6A1423] transition-colors focus:outline-none"
+              className="p-1.5 sm:p-2 text-[#171717] hover:text-[#6A1423] transition-colors focus:outline-none"
               aria-label="Search products"
             >
               <Search className="w-5 h-5" />
             </button>
 
-            {/* Account Popover Menu */}
-            <AccountPopover />
+            {/* Account Popover Menu (Visible on md+) */}
+            <div className="hidden sm:block">
+              <AccountPopover />
+            </div>
 
             <button
               onClick={onOpenCart}
-              className="relative p-2 text-[#171717] hover:text-[#6A1423] transition-colors focus:outline-none"
+              className="relative p-1.5 sm:p-2 text-[#171717] hover:text-[#6A1423] transition-colors focus:outline-none"
               aria-label="Shopping Cart"
             >
               <ShoppingBag className="w-6 h-6" />

@@ -154,6 +154,31 @@
   background: #6A1423;
 }
 
+/* Mobile Marquee Ticker */
+@keyframes ticker {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+.animate-ticker {
+  display: flex;
+  width: max-content;
+  animation: ticker 20s linear infinite;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
+/* Hide scrollbar for clean horizontal snap sliders */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Reduced Motion Respect */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
