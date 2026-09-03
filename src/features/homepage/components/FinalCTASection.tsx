@@ -37,7 +37,7 @@ export const FinalCTASection: React.FC = () => {
           viewport={{ once: true }}
           className="text-base sm:text-lg text-slate-200 mb-10 max-w-2xl mx-auto font-light leading-relaxed"
         >
-          Explore TESTO Natural Power+ Capsules today. 100% Vegetarian, FSSAI License No. 12118441000654, ISO 9001:2015 & GMP Certified.
+          Explore TESTO BOOSTER Capsules today. 100% Vegetarian, FSSAI License No. 12118441000654, ISO 9001:2015 & GMP Certified.
         </motion.p>
 
         <motion.div
@@ -53,7 +53,7 @@ export const FinalCTASection: React.FC = () => {
               className="w-full sm:w-auto text-base shadow-xl shadow-black/30 font-bold"
               rightIcon={<ArrowRight className="w-5 h-5" />}
             >
-              Explore TESTO Power+ (₹999)
+              Explore TESTO BOOSTER (₹999)
             </Button>
           </Link>
 

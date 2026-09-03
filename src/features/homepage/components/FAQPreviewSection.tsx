@@ -7,23 +7,23 @@ import { Accordion } from '@/components/ui/Accordion';
 const HOMEPAGE_FAQ = [
   {
     id: 'faq-1',
-    title: 'What are the active ingredients in TESTO Natural Power+?',
+    title: 'What are the active ingredients in TESTO BOOSTER?',
     content: 'Each vegetarian capsule contains Ashwagandha (100mg), Gokhuru / Tribulus (100mg), Safed Musli (50mg), Sea Buckthorn (50mg), Fenugreek (30mg), Saffron (15mg), and a 170mg extract blend of Kaunch Beej, Purified Shilajit, Talmakhana, and Ginger.',
   },
   {
     id: 'faq-2',
-    title: 'How should I consume TESTO Natural Power+ capsules?',
+    title: 'How should I consume TESTO BOOSTER capsules?',
     content: 'As stated on the official physical packaging label: "One capsule twice a day as directed by dietician." Swallow capsules whole with lukewarm milk or water after meals. Do not chew or crush capsules.',
   },
   {
     id: 'faq-3',
     title: 'What is the FSSAI license number and product classification?',
-    content: 'Arogya Path TESTO Natural Power+ is a botanical dietary supplement marketed under active FSSAI License No. 12118441000654. The capsule shell is 100% vegetarian HPMC cellulose (E 464) carrying the official green vegetarian mark.',
+    content: 'Arogya Path TESTO BOOSTER is a botanical dietary supplement marketed under active FSSAI License No. 12118441000654. The capsule shell is 100% vegetarian HPMC cellulose (E 464) carrying the official green vegetarian mark.',
   },
   {
     id: 'faq-4',
     title: 'Where is the product manufactured and marketed?',
-    content: 'TESTO Natural Power+ is manufactured by Streamline Pharma Private Limited in Jagraon (Punjab - 142026) in ISO 9001:2015 & GMP certified facilities, and marketed by Arogyapath Marketing (Logardaga).',
+    content: 'TESTO BOOSTER is manufactured by Streamline Pharma Private Limited in Jagraon (Punjab - 142026) in ISO 9001:2015 & GMP certified facilities, and marketed by Arogyapath Marketing (Logardaga).',
   },
   {
     id: 'faq-5',

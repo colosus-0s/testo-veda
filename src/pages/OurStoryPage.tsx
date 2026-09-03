@@ -64,7 +64,7 @@ export const OurStoryPage: React.FC = () => {
                 Quantitative Formulations Only
               </h2>
               <p className="text-slate-700 text-sm sm:text-base leading-relaxed font-normal">
-                We believe you deserve to know exactly what enters your body. Every capsule of TESTO Natural Power+ explicitly declares its quantitative ingredient breakdown: 100mg Ashwagandha Root, 100mg Gokhuru Fruit, 50mg Safed Musli, 50mg Sea Buckthorn, 30mg Fenugreek, 15mg Saffron, and 170mg Proprietary Blend.
+                We believe you deserve to know exactly what enters your body. Every capsule of TESTO BOOSTER explicitly declares its quantitative ingredient breakdown: 100mg Ashwagandha Root, 100mg Gokhuru Fruit, 50mg Safed Musli, 50mg Sea Buckthorn, 30mg Fenugreek, 15mg Saffron, and 170mg Proprietary Blend.
               </p>
             </div>
 

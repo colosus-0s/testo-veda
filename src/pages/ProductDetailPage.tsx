@@ -29,12 +29,12 @@ export const ProductDetailPage: React.FC = () => {
   const faqItems = [
     {
       id: 'faq-1',
-      title: 'What is the dosage instructions for TESTO Natural Power+?',
+      title: 'What is the dosage instructions for TESTO BOOSTER?',
       content: `${product.directions.labelInstruction}. ${product.directions.suggestedUse}`,
     },
     {
       id: 'faq-2',
-      title: 'Is TESTO Natural Power+ 100% vegetarian?',
+      title: 'Is TESTO BOOSTER 100% vegetarian?',
       content: 'Yes. Every capsule shell is made from 100% vegetarian HPMC cellulose (E 464) carrying the official green vegetarian mark as declared on our physical label.',
     },
     {
@@ -44,8 +44,8 @@ export const ProductDetailPage: React.FC = () => {
     },
     {
       id: 'faq-4',
-      title: 'What botanicals are included in TESTO Power+?',
-      content: 'TESTO Natural Power+ combines 10 classical botanical extracts: Ashwagandha (100mg), Gokhuru / Tribulus (100mg), Safed Musli (50mg), Sea Buckthorn (50mg), Fenugreek (30mg), Saffron (15mg), and a 170mg Proprietary Blend (Kaunch Beej, Purified Shilajit, Talmakhana, Ginger).',
+      title: 'What botanicals are included in TESTO BOOSTER?',
+      content: 'TESTO BOOSTER combines 10 classical botanical extracts: Ashwagandha (100mg), Gokhuru / Tribulus (100mg), Safed Musli (50mg), Sea Buckthorn (50mg), Fenugreek (30mg), Saffron (15mg), and a 170mg Proprietary Blend (Kaunch Beej, Purified Shilajit, Talmakhana, Ginger).',
     },
   ];
 

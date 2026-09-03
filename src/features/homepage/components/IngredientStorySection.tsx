@@ -29,7 +29,7 @@ export const IngredientStorySection: React.FC = () => {
             Botanical Visual Storytelling
           </span>
           <h2 className="font-serif text-3xl sm:text-5xl font-bold text-[#171717] mb-4">
-            The 10 Botanicals Behind TESTO Power+
+            The 10 Botanicals Behind TESTO BOOSTER
           </h2>
           <p className="text-slate-700 text-base sm:text-lg font-normal leading-relaxed">
             Raw botanical heritage paired with quantitative formulation disclosure. Every ingredient is declared on our physical packaging label.
@@ -126,7 +126,7 @@ export const IngredientStorySection: React.FC = () => {
             The Botanical Formulation Gallery
           </h3>
           <p className="text-sm text-slate-700 font-normal">
-            Visual presentation of all active plant extracts in TESTO Natural Power+.
+            Visual presentation of all active plant extracts in TESTO BOOSTER.
           </p>
         </div>
 

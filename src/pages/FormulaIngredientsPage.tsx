@@ -21,9 +21,9 @@ export const FormulaIngredientsPage: React.FC = () => {
             <div className="lg:col-span-6 relative">
               <div className="relative bg-[#FCFBF8] rounded-3xl overflow-hidden aspect-[16/10] sm:aspect-[4/3] shadow-subtle-card border-2 border-[#EBE7DF] group">
                 <img
-                  src={ASSET_REGISTRY.infographics.formula}
-                  alt="Arogya Path 10 Classical Botanical Ingredients Formula Disclosure"
-                  className="w-full h-full object-contain p-2 object-center group-hover:scale-102 transition-transform duration-700"
+                  src={ASSET_REGISTRY.ingredients.allBotanicalsHero}
+                  alt="Arogya Path 10 Classical Botanical Ingredients Still Life"
+                  className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-700"
                 />
                 <div className="absolute bottom-4 left-4 right-4 bg-[#FCFBF8]/95 backdrop-blur-sm p-3.5 rounded-xl border border-[#EBE7DF] shadow-md flex items-center justify-between text-xs font-bold text-[#171717]">
                   <span className="flex items-center gap-1.5 text-[#173C2B]">
@@ -44,7 +44,7 @@ export const FormulaIngredientsPage: React.FC = () => {
                   Formula & Botanical Ingredients
                 </h1>
                 <p className="text-slate-700 text-base sm:text-lg leading-relaxed font-normal">
-                  Every capsule of TESTO Natural Power+ blends 10 classical plant extracts—disclosed with full quantitative label transparency and zero synthetic fillers.
+                  Every capsule of TESTO BOOSTER blends 10 classical plant extracts—disclosed with full quantitative label transparency and zero synthetic fillers.
                 </p>
               </div>
 

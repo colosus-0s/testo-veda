@@ -6,10 +6,10 @@ export const INITIAL_PRODUCTS: Product[] = [
     id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
     slug: 'testo-natural-power-plus',
     sku: 'AP-TESTO-30V',
-    name: 'TESTO Natural Power+ Capsules',
-    subtitle: 'Botanical Dietary Supplement',
+    name: 'TESTO BOOSTER Capsules',
+    subtitle: 'Botanical Dietary Supplement for Men',
     shortDescription: 'Dietary supplement formulated with botanical extracts including Ashwagandha, Gokhuru, Shilajit, Safed Musli, and Saffron to support daily vitality and physical endurance.',
-    description: `Arogya Path TESTO Natural Power+ Capsules represent a modern dietary supplement crafted to complement an active lifestyle. Integrating traditional botanicals—Ashwagandha, Tribulus Terrestris (Gokhuru), Safed Musli, and Purified Shilajit—with botanical extracts like Saffron and Sea Buckthorn. 
+    description: `Arogya Path TESTO BOOSTER Capsules represent an authentic dietary supplement crafted to complement an active lifestyle. Integrating traditional botanicals—Ashwagandha, Tribulus Terrestris (Gokhuru), Safed Musli, and Purified Shilajit—with botanical extracts like Saffron and Sea Buckthorn. 
 Formulated in 100% vegetarian capsule shells (E 464). Manufactured in ISO 9001:2015 & GMP certified facilities under FSSAI License No. 12118441000654.`,
     category: 'Men\'s Wellness',
     collections: ['mens-wellness', 'vitality'],
@@ -144,10 +144,10 @@ Formulated in 100% vegetarian capsule shells (E 464). Manufactured in ISO 9001:2
     disclaimer: 'The statements on this packaging have not been evaluated by FSSAI or medical authorities for therapeutic claims. This product is a food supplement intended to support general wellness.',
 
     images: {
-      primary: ASSET_REGISTRY.products.testoNatural.front,
-      label: ASSET_REGISTRY.products.testoNatural.label,
-      render3d: ASSET_REGISTRY.products.testoNatural.render3d,
-      gallery: [...ASSET_REGISTRY.products.testoNatural.gallery],
+      primary: ASSET_REGISTRY.products.testoBooster.front,
+      label: ASSET_REGISTRY.products.testoBooster.front,
+      render3d: ASSET_REGISTRY.products.testoBooster.stillLife,
+      gallery: [...ASSET_REGISTRY.products.testoBooster.gallery],
     },
 
     badges: ['FSSAI Lic. #12118441000654', '100% Veg', 'ISO 9001:2015', 'GMP Certified'],
@@ -159,9 +159,9 @@ Formulated in 100% vegetarian capsule shells (E 464). Manufactured in ISO 9001:2
     tags: ['stamina', 'ashwagandha', 'shilajit', 'mens wellness', 'botanical supplement'],
 
     seo: {
-      title: 'TESTO Natural Power+ Capsules (30 Veg Caps) | Arogya Path',
-      description: 'Arogya Path TESTO Natural Power+ Capsules. Botanical formula with Ashwagandha, Gokhuru, Shilajit, Safed Musli, and Saffron for daily vitality.',
-      ogImage: ASSET_REGISTRY.products.testoNatural.front,
+      title: 'TESTO BOOSTER Capsules (30 Veg Caps) | Arogya Path',
+      description: 'Arogya Path TESTO BOOSTER Capsules. Botanical formula with Ashwagandha, Gokhuru, Shilajit, Safed Musli, and Saffron for daily vitality.',
+      ogImage: ASSET_REGISTRY.products.testoBooster.front,
     },
 
     regulatory: {

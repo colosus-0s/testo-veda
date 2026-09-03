@@ -74,7 +74,7 @@ export const ProductIntroductionSection: React.FC = () => {
 
               <Link to={`/products/${product.slug}`}>
                 <Button variant="primary" size="lg" className="w-full sm:w-auto shadow-md" rightIcon={<ArrowRight className="w-5 h-5" />}>
-                  Explore TESTO Power+
+                  Explore TESTO BOOSTER
                 </Button>
               </Link>
             </div>
