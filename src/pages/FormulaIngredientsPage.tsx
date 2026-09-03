@@ -1,12 +1,14 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { IngredientStorySection } from '@/features/homepage/components/IngredientStorySection';
 import { FormulaSection } from '@/features/homepage/components/FormulaSection';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
+import { Button } from '@/components/ui/Button';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { ASSET_REGISTRY } from '@/config/assets';
 import { SITE_CONFIG } from '@/config/site';
-import { ShieldCheck, Leaf, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Leaf, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export const FormulaIngredientsPage: React.FC = () => {
   return (
@@ -72,6 +74,27 @@ export const FormulaIngredientsPage: React.FC = () => {
 
       {/* 03 Botanical Visual Storytelling Showcase */}
       <IngredientStorySection />
+
+      {/* 04 Exploration Navigation CTA */}
+      <Section padding="lg" background="ivory" className="border-t border-[#EBE7DF] text-center">
+        <Container size="narrow">
+          <div className="max-w-xl mx-auto space-y-4">
+            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#171717]">
+              Experience TESTO BOOSTER
+            </h3>
+            <p className="text-slate-700 text-sm sm:text-base font-normal">
+              Formulated with 10 classical botanicals, 100% vegetarian capsule shells, and full quantitative label disclosure.
+            </p>
+            <div className="pt-2">
+              <Link to="/testo">
+                <Button variant="primary" size="lg" className="shadow-md font-bold" rightIcon={<ArrowRight className="w-5 h-5" />}>
+                  Explore TESTO BOOSTER Details
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </Container>
+      </Section>
     </div>
   );
 };

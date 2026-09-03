@@ -45,7 +45,7 @@ export const FAQPage: React.FC = () => {
       id: 'faq-6',
       category: 'product',
       title: 'What is the MRP of TESTO BOOSTER?',
-      content: 'The Maximum Retail Price (MRP) is ₹999 for 30 Veg Capsules as declared on our physical label.',
+      content: 'The Maximum Retail Price (MRP) is ₹1,499 for 30 Veg Capsules as declared on our physical label.',
     },
   ];
 

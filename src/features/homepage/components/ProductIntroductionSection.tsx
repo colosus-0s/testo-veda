@@ -72,7 +72,7 @@ export const ProductIntroductionSection: React.FC = () => {
                 <ProductPrice price={product.price} size="xl" textColor="text-[#171717]" showDiscountBadge={false} />
               </div>
 
-              <Link to={`/products/${product.slug}`}>
+              <Link to="/testo">
                 <Button variant="primary" size="lg" className="w-full sm:w-auto shadow-md" rightIcon={<ArrowRight className="w-5 h-5" />}>
                   Explore TESTO BOOSTER
                 </Button>

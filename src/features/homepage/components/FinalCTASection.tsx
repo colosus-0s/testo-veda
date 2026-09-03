@@ -53,7 +53,7 @@ export const FinalCTASection: React.FC = () => {
               className="w-full sm:w-auto text-base shadow-xl shadow-black/30 font-bold"
               rightIcon={<ArrowRight className="w-5 h-5" />}
             >
-              Explore TESTO BOOSTER (₹999)
+              Explore TESTO BOOSTER (₹1,499)
             </Button>
           </Link>
 

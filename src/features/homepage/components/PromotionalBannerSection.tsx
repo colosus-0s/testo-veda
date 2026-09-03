@@ -40,12 +40,12 @@ export const PromotionalBannerSection: React.FC = () => {
                 <CheckCircle2 size={14} className="text-[#C7A33A]" /> 30 Veg Capsules
               </span>
               <span className="text-xs text-white bg-white/10 px-3 py-1.5 rounded-md font-semibold flex items-center gap-1.5">
-                <CheckCircle2 size={14} className="text-[#C7A33A]" /> MRP ₹999
+                <CheckCircle2 size={14} className="text-[#C7A33A]" /> MRP ₹1,499
               </span>
             </div>
 
             <div className="pt-4">
-              <Link to={`/products/${product.slug}`}>
+              <Link to="/testo">
                 <Button
                   variant="gold"
                   size="lg"
