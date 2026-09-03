@@ -32,8 +32,8 @@ export const OurStoryPage: React.FC = () => {
           {/* Visual Brand Still Life Hero Stage */}
           <div className="mb-12 rounded-3xl overflow-hidden aspect-[16/9] sm:aspect-[21/9] border-2 border-[#EBE7DF] shadow-subtle-card">
             <img
-              src={ASSET_REGISTRY.brand.lifestyleHero}
-              alt="Arogya Path Brand Philosophy & Botanical Science"
+              src={ASSET_REGISTRY.brand.brandStoryHeritage}
+              alt="Arogya Path Traditional Botanical Heritage and Herbology"
               className="w-full h-full object-cover object-center"
             />
           </div>

@@ -13,16 +13,20 @@ export const ShopPage: React.FC = () => {
 
   const categories = [
     { id: 'all', label: 'All Formulations' },
-    { id: 'vitality', label: 'Vitality & Stamina' },
-    { id: 'vigor', label: 'Daily Vigor' },
-    { id: 'adaptogen', label: 'Stress Adaptation' },
-    { id: 'recovery', label: 'Sleep & Recovery' },
+    { id: 'mens-wellness', label: "Men's Wellness" },
+    { id: 'botanicals', label: 'Classical Botanicals' },
+    { id: 'vegetarian', label: '100% Vegetarian (HPMC)' },
   ];
 
   const filteredProducts = products.filter((product) => {
-    const matchesCategory = selectedCategory === 'all' || (product.category && product.category.toLowerCase().includes(selectedCategory));
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          (product.shortDescription && product.shortDescription.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesCategory =
+      selectedCategory === 'all' ||
+      (selectedCategory === 'mens-wellness' && product.category?.toLowerCase().includes('men')) ||
+      (selectedCategory === 'botanicals' && (product.supplementFacts?.ingredients?.length ?? 0) > 0) ||
+      (selectedCategory === 'vegetarian' && product.regulatory?.isVegetarian);
+    const matchesSearch =
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.shortDescription && product.shortDescription.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
 

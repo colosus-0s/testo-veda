@@ -67,9 +67,8 @@ export const FAQPreviewSection: React.FC = () => {
           initial={{ opacity: 1, y: 0 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-[#FCFBF8] rounded-2xl p-6 sm:p-8 border border-[#EBE7DF] shadow-subtle-card"
         >
-          <Accordion items={HOMEPAGE_FAQ} defaultOpenId="faq-1" dark={false} />
+          <Accordion items={HOMEPAGE_FAQ} defaultOpenId="faq-1" variant="cards" />
         </motion.div>
       </Container>
     </Section>

@@ -29,7 +29,7 @@ export const HERO_CONFIG: HeroConfig = {
   type: 'video',
   videoUrl: ASSET_REGISTRY.hero.video,
   posterUrl: ASSET_REGISTRY.hero.poster,
-  fallbackImageUrl: ASSET_REGISTRY.hero.fallbackImage,
+  fallbackImageUrl: '/assets/brand/botanical-atmosphere.jpg',
   headline: 'THE PATH TO WELLNESS',
   subheadline: 'Arogya Path botanical formulations represent dietary supplements formulated with classical herbs to support daily vitality.',
   primaryCtaText: 'Explore Formulations',

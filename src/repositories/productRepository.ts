@@ -174,12 +174,12 @@ export const createProduct = async (productData: Partial<Product>): Promise<Prod
       ],
     },
     badges: productData.badges || ['100% Ayurvedic', 'FSSAI Approved'],
-    rating: 4.9,
-    reviewCount: 12,
+    rating: productData.rating || 0,
+    reviewCount: productData.reviewCount || 0,
     featured: productData.featured !== undefined ? productData.featured : true,
     bestSeller: productData.bestSeller !== undefined ? productData.bestSeller : false,
-    newArrival: productData.newArrival !== undefined ? productData.newArrival : true,
-    tags: productData.tags || ['ayurveda', 'vitality', 'herbal'],
+    newArrival: productData.newArrival !== undefined ? productData.newArrival : false,
+    tags: productData.tags || ['ayurveda', 'botanical supplement'],
     seo: productData.seo || {
       title: productData.name || 'Botanical Supplement',
       description: productData.shortDescription || 'Ayurvedic dietary supplement',
@@ -187,10 +187,10 @@ export const createProduct = async (productData: Partial<Product>): Promise<Prod
     regulatory: productData.regulatory || {
       fssaiLicense: '12118441000654',
       isVegetarian: true,
-      certifications: ['GMP Certified', 'ISO 9001:2015', 'FSSAI'],
-      marketedBy: 'Arogya Path Wellness Pvt. Ltd.',
-      manufacturedBy: 'Arogya Botanical Labs India',
-      mrp: productData.compareAtPrice || 1499,
+      certifications: ['GMP Certified', 'ISO 9001:2015 22000:2005'],
+      marketedBy: 'Arogyapath Marketing',
+      manufacturedBy: 'Streamline Pharma Private Limited',
+      mrp: 1499,
     },
   };
 

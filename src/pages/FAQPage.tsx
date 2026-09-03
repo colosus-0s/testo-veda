@@ -120,7 +120,7 @@ export const FAQPage: React.FC = () => {
 
           {/* Accordion Results */}
           {filteredFaqs.length > 0 ? (
-            <Accordion items={filteredFaqs} />
+            <Accordion items={filteredFaqs} variant="cards" />
           ) : (
             <div className="py-12 text-center text-slate-600">
               <p className="font-serif text-lg font-bold text-[#171717] mb-2">No matching questions found</p>

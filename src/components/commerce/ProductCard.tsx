@@ -38,7 +38,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     >
       {/* Badges Overlay */}
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5 items-start">
-        {product.bestSeller && <Badge variant="maroon" size="sm">Featured Formulation</Badge>}
+        <Badge variant="maroon" size="sm">10 Botanicals</Badge>
         {product.regulatory.isVegetarian && <Badge variant="veg" size="sm">100% Veg</Badge>}
       </div>
 

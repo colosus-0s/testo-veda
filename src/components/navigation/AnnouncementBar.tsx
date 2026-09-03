@@ -10,11 +10,11 @@ export const AnnouncementBar: React.FC = () => {
   if (!config.enabled || dismissed) return null;
 
   const tickerItems = [
-    'CASH ON DELIVERY AVAILABLE',
-    'FREE DELIVERY ACROSS INDIA',
+    'FREE DELIVERY ACROSS INDIA ON ORDERS ABOVE ₹499',
     '100% VEGETARIAN HPMC CAPSULES',
-    'DISPATCH IN 24 HOURS',
     'FSSAI LIC. #12118441000654',
+    'ISO 9001:2015 & GMP CERTIFIED',
+    'CASH ON DELIVERY AVAILABLE',
   ];
 
   return (

@@ -71,7 +71,7 @@ export const ProductDetailPage: React.FC = () => {
       id: 'faq-5',
       title: 'How is TESTO BOOSTER packaged and delivered?',
       content:
-        'Each bottle contains 30 vegetarian capsules sealed with tamper-evident induction foil. Orders are packaged in discreet protective boxes and dispatched within 24 hours with Cash on Delivery available across India.',
+        'Each bottle contains 30 vegetarian capsules as declared on our physical packaging label. Cash on Delivery is available across India with free delivery on orders above ₹499.',
     },
   ];
 
