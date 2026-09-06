@@ -15,7 +15,7 @@ export const FAQPage: React.FC = () => {
       id: 'faq-1',
       category: 'product',
       title: 'What is TESTO BOOSTER Capsules?',
-      content: 'TESTO BOOSTER is a dietary botanical supplement combining 10 classical plant extracts including Ashwagandha, Purified Shilajit, Gokhuru, Safed Musli, and Saffron designed for physical stamina, daily vigor, and stress adaptation.',
+      content: 'TESTO BOOSTER is a dietary botanical supplement combining 10 classical plant extracts including Ashwagandha, Purified Shilajit, Gokhuru, Safed Musli, and Saffron to support overall health and vitality for men.',
     },
     {
       id: 'faq-2',
@@ -27,7 +27,7 @@ export const FAQPage: React.FC = () => {
       id: 'faq-3',
       category: 'ingredients',
       title: 'Is TESTO BOOSTER 100% vegetarian?',
-      content: 'Yes. Every capsule shell is manufactured from 100% vegetarian HPMC cellulose (E 464) carrying the official green vegetarian mark.',
+      content: 'Yes. Every capsule shell is manufactured from 100% vegetarian HPMC cellulose carrying the official green vegetarian mark.',
     },
     {
       id: 'faq-4',

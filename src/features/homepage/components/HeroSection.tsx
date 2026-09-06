@@ -1,119 +1,151 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useReducedMotion } from 'framer-motion';
-import { ShieldCheck, ArrowRight, ChevronDown } from 'lucide-react';
-import { HERO_CONFIG, getFeaturedProductId } from '../config/homepageConfig';
-import { getActiveProducts, getProductById, getProductBySlug } from '@/repositories/productRepository';
+import { motion } from 'framer-motion';
+import { ShieldCheck, ArrowRight, CheckCircle2, ChevronDown } from 'lucide-react';
+import { ASSET_REGISTRY } from '@/config/assets';
 import { Button } from '@/components/ui/Button';
 
 export const HeroSection: React.FC = () => {
-  const [videoFailed, setVideoFailed] = useState(false);
-  const shouldReduceMotion = useReducedMotion();
-  
-  const activeProducts = getActiveProducts();
-  const targetId = getFeaturedProductId();
-  const featuredProduct = getProductById(targetId) || getProductBySlug(targetId) || activeProducts.find((p) => p.featured) || activeProducts[0];
-
   const primaryCtaLink = '/testo';
   const primaryCtaText = 'Explore TESTO BOOSTER';
-  const subheadline = featuredProduct ? (featuredProduct.shortDescription || featuredProduct.description) : HERO_CONFIG.subheadline;
-  const featuredPrice = featuredProduct ? ` ₹${featuredProduct.price}` : '';
+  const priceDisplay = '₹1,499';
 
   return (
-    <section className="relative min-h-[75vh] sm:min-h-[85vh] w-full flex items-center justify-center overflow-hidden bg-[#0f0f11] pt-12 opacity-100">
-      {/* Background Media Stage */}
-      <div className="absolute inset-0 z-0">
-        {!videoFailed && !shouldReduceMotion ? (
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster={HERO_CONFIG.posterUrl}
-            onError={() => setVideoFailed(true)}
-            className="w-full h-full object-cover object-center opacity-45 scale-105 transition-all duration-1000"
+    <section className="relative w-full bg-[#111210] text-white overflow-hidden pt-6 sm:pt-10 pb-14 sm:pb-20 border-b border-white/10">
+      {/* Subtle ambient botanical lighting in background */}
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-bl from-[#6A1423]/25 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-gradient-to-tr from-[#173C2B]/30 via-transparent to-transparent pointer-events-none" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* Left Column (58% desktop / col-span-7) */}
+          <div className="lg:col-span-7 space-y-5 sm:space-y-6 text-left">
+            {/* Regulatory Kicker Badge */}
+            <motion.div
+              initial={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-md text-xs font-semibold text-[#F3E5AB]"
+            >
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>AYURVEDIC BOTANICAL FORMULATION</span>
+              <span className="text-white/40">•</span>
+              <span className="text-white/80">FSSAI Lic. #12118441000654</span>
+            </motion.div>
+
+            {/* Monumental Headline */}
+            <div className="space-y-2">
+              <motion.h1
+                initial={{ opacity: 1, y: 0 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.08]"
+              >
+                TESTO BOOSTER <br className="hidden sm:inline" />
+                <span className="gold-gradient-text">CAPSULES</span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 1, y: 0 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="font-serif text-sm sm:text-lg font-bold text-[#F3E5AB] tracking-wide uppercase"
+              >
+                Support Overall Health and Vitality for Men
+              </motion.p>
+            </div>
+
+            {/* Authoritative Label Paragraph */}
+            <motion.p
+              initial={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-sm sm:text-base text-slate-300 max-w-xl font-normal leading-relaxed"
+            >
+              A factual botanical dietary supplement formulated with 10 classical plant extracts—including Ashwagandha, Gokhuru, Purified Shilajit, Safed Musli, and Saffron. Encapsulated in 100% vegetarian capsule shells.
+            </motion.p>
+
+            {/* Verified Fact Badges Bar */}
+            <motion.div
+              initial={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-2.5 sm:gap-3 flex-wrap pt-1"
+            >
+              <span className="text-xs font-semibold text-white bg-white/10 px-3 py-1.5 rounded-lg border border-white/15 flex items-center gap-1.5">
+                <CheckCircle2 size={14} className="text-emerald-400 shrink-0" /> 30 Veg Capsules
+              </span>
+              <span className="text-xs font-semibold text-white bg-white/10 px-3 py-1.5 rounded-lg border border-white/15">
+                MRP ₹1,499 <span className="text-white/60 font-normal">(~₹49.97/Cap)</span>
+              </span>
+              <span className="text-xs font-semibold text-[#F3E5AB] bg-[#6A1423]/40 px-3 py-1.5 rounded-lg border border-[#6A1423]">
+                Capsule shell: HPMC Vegetarian
+              </span>
+            </motion.div>
+
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 pt-2 max-w-xl"
+            >
+              <Link to={primaryCtaLink} className="w-full sm:w-auto shrink-0">
+                <Button
+                  variant="gold"
+                  size="lg"
+                  className="w-full sm:w-auto text-sm sm:text-base font-bold px-7 py-3.5 shadow-xl shadow-[#C7A33A]/20"
+                  rightIcon={<ArrowRight className="w-4 h-4 shrink-0" />}
+                >
+                  {primaryCtaText} • {priceDisplay}
+                </Button>
+              </Link>
+
+              <a href="#formula" className="w-full sm:w-auto shrink-0">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full sm:w-auto text-sm sm:text-base font-bold px-6 py-3.5 border-white/30 hover:border-white/60 text-white"
+                >
+                  View Formula & Ingredients
+                </Button>
+              </a>
+            </motion.div>
+          </div>
+
+          {/* Right Column (42% desktop / col-span-5): Dedicated Clean Product Stage */}
+          <motion.div
+            initial={{ opacity: 1, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="lg:col-span-5 relative"
           >
-            <source src={HERO_CONFIG.videoUrl} type="video/mp4" />
-          </video>
-        ) : (
-          <img
-            src={featuredProduct?.images?.primary || HERO_CONFIG.fallbackImageUrl}
-            alt={featuredProduct?.name || 'Arogya Path Botanical Formulation'}
-            className="w-full h-full object-cover object-center opacity-45"
-          />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f11] via-[#0f0f11]/70 to-[#0f0f11]/40" />
+            <div className="relative rounded-3xl overflow-hidden bg-gradient-to-b from-white/10 to-white/5 border border-white/15 p-6 sm:p-10 flex items-center justify-center aspect-[4/4.5] shadow-2xl backdrop-blur-sm group">
+              {/* Natural warm radial lighting behind bottle */}
+              <div className="absolute inset-0 bg-radial-gradient from-[#C7A33A]/15 via-transparent to-transparent pointer-events-none" />
+
+              {/* Physical Still Life Photograph */}
+              <img
+                src={ASSET_REGISTRY.products.testoBooster.stillLife}
+                alt="TESTO BOOSTER CAPSULES Packaging and Physical Product"
+                className="w-full h-full object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.6)] group-hover:scale-105 transition-transform duration-700 relative z-10"
+              />
+
+              {/* Floating Verified Badge */}
+              <div className="absolute bottom-4 left-4 right-4 z-20 flex items-center justify-between text-[11px] font-semibold text-white/90 bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/15">
+                <span className="flex items-center gap-1.5 text-emerald-300">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  10 Classical Botanicals
+                </span>
+                <span className="text-[#F3E5AB]">30 Veg Capsules</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </div>
 
-      {/* Atmospheric Glow Overlay */}
-      <div className="hero-glow top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none" />
-
-      {/* Hero Content Box */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-16 pb-16 opacity-100">
-        <motion.div
-          initial={{ opacity: 1, y: 0 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#6A1423]/60 border border-[#6A1423] text-xs font-semibold text-[#F3E5AB] mb-6 backdrop-blur-md"
-        >
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span>{HERO_CONFIG.trustBadgeText}</span>
-        </motion.div>
-
-        <motion.h1
-          initial={{ opacity: 1, y: 0 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="font-serif text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 drop-shadow-2xl"
-        >
-          AROGYA PATH <br className="hidden sm:inline" />
-          <span className="gold-gradient-text">
-            {featuredProduct ? featuredProduct.name.toUpperCase() : 'THE PATH TO WELLNESS'}
-          </span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 1, y: 0 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-base sm:text-xl text-slate-200 max-w-2xl mx-auto font-normal leading-relaxed mb-10 drop-shadow"
-        >
-          {subheadline}
-        </motion.p>
-
-        {/* CTA Container with ample max-width & responsive flex layout to eliminate text collision */}
-        <motion.div
-          initial={{ opacity: 1, y: 0 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 max-w-2xl mx-auto px-2"
-        >
-          <Link to={primaryCtaLink} className="w-full sm:w-auto shrink-0">
-            <Button
-              variant="gold"
-              size="lg"
-              className="w-full sm:w-auto text-sm sm:text-base font-bold px-6 py-3.5 shadow-xl shadow-[#C7A33A]/20 whitespace-normal sm:whitespace-nowrap leading-snug"
-              rightIcon={<ArrowRight className="w-5 h-5 shrink-0" />}
-            >
-              {primaryCtaText}{featuredPrice ? ` • ${featuredPrice}` : ''}
-            </Button>
-          </Link>
-
-          <a href={HERO_CONFIG.secondaryCtaLink} className="w-full sm:w-auto shrink-0">
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full sm:w-auto text-sm sm:text-base font-bold px-6 py-3.5 border-white/30 hover:border-white/60 text-white whitespace-nowrap"
-            >
-              {HERO_CONFIG.secondaryCtaText}
-            </Button>
-          </a>
-        </motion.div>
-      </div>
-
-      {/* Scroll Indicator */}
+      {/* Subtle Scroll Indicator */}
       <a
-        href="#formula"
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 text-slate-400 hover:text-white transition-colors p-2"
-        aria-label="Scroll down to formula"
+        href="#pillars"
+        className="hidden md:flex absolute bottom-3 left-1/2 -translate-x-1/2 text-slate-400 hover:text-white transition-colors p-1 items-center gap-1 text-[11px] font-semibold tracking-wider uppercase"
+        aria-label="Scroll to botanical pillars"
       >
-        <ChevronDown className="w-6 h-6" />
+        <span>Explore Formulation</span>
+        <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
       </a>
     </section>
   );

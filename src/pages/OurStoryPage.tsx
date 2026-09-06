@@ -48,10 +48,10 @@ export const OurStoryPage: React.FC = () => {
                 Rooted In Classical Wisdom
               </h2>
               <p className="text-slate-700 text-base sm:text-lg leading-relaxed font-normal">
-                Arogya Path ("The Path to Wellness") was established to provide clean, intentional botanical dietary support for individuals seeking physical stamina, daily vigor, and stress resilience.
+                Arogya Path ("The Path to Wellness") was established to provide clean, intentional botanical dietary support to support overall health and vitality for men.
               </p>
               <p className="text-slate-700 text-sm sm:text-base leading-relaxed font-normal">
-                We draw inspiration from classical Indian Rasayana traditions—utilizing botanicals such as Ashwagandha, Purified Shilajit, Gokhuru, and Saffron—without relying on unverified medical claims or artificial promises.
+                We draw inspiration from classical Indian botanical traditions—utilizing botanicals such as Ashwagandha, Purified Shilajit, Gokhuru, and Saffron—without relying on unverified medical claims or artificial promises.
               </p>
             </div>
 
@@ -77,7 +77,7 @@ export const OurStoryPage: React.FC = () => {
                 100% Vegetarian Standard
               </h2>
               <p className="text-slate-700 text-sm sm:text-base leading-relaxed font-normal">
-                Our commitment extends to capsule shell composition. All Arogya Path formulations are encapsulated in 100% vegetarian HPMC cellulose shells (E 464) carrying the green vegetarian emblem, ensuring accessible consumption for all dietary preferences.
+                Our commitment extends to capsule shell composition. All Arogya Path formulations are encapsulated in 100% vegetarian HPMC cellulose shells carrying the green vegetarian emblem, ensuring accessible consumption for all dietary preferences.
               </p>
             </div>
           </div>

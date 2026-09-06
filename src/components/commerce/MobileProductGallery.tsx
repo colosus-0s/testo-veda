@@ -39,7 +39,7 @@ export const MobileProductGallery: React.FC<MobileProductGalleryProps> = ({
       {/* Badges Overlay */}
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5 pointer-events-none">
         <span className="inline-flex items-center gap-1 bg-[#173C2B] text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md tracking-wider uppercase">
-          <Sparkles className="w-3 h-3 text-[#C7A33A]" /> 100% Veg (E 464)
+          <Sparkles className="w-3 h-3 text-[#C7A33A]" /> 100% Veg (HPMC)
         </span>
         <span className="inline-flex items-center gap-1 bg-[#FCFBF8]/90 backdrop-blur-sm text-[#171717] border border-[#EBE7DF] text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
           <ShieldCheck className="w-3 h-3 text-[#173C2B]" /> Lic. #{fssaiLicense}

@@ -20,29 +20,29 @@ export const TrustSection: React.FC = () => {
     {
       icon: <Leaf className="w-7 h-7 text-[#6A1423]" />,
       title: '100% Vegetarian Capsules',
-      desc: 'Encapsulated in vegetarian HPMC cellulose shells (E 464) with approved food colors.',
+      desc: 'Encapsulated in vegetarian HPMC cellulose shells carrying the official green vegetarian symbol.',
     },
     {
       icon: <Factory className="w-7 h-7 text-[#6A1423]" />,
       title: 'Verified Manufacturing',
-      desc: 'Manufactured by Streamline Pharma Private Limited (Jagraon) and marketed by Arogyapath Marketing.',
+      desc: 'Manufactured by STREAMLINE PHARMA PVT. LTD., KOTHE AATH CHAK-142026.',
     },
     {
       icon: <FileText className="w-7 h-7 text-[#6A1423]" />,
-      title: 'Full Label Disclosure',
-      desc: 'Transparent declaration of all active botanical extracts and proprietary blend ingredients.',
+      title: 'Marketed By',
+      desc: 'Marketed by AROGYA PATH MARKETING, Ashok Nagar, Lohardaga - 835302, M: 9288515228.',
     },
     {
       icon: <CheckCircle2 className="w-7 h-7 text-[#6A1423]" />,
-      title: 'Botanical Dietary Formulation',
-      desc: 'Formulated as a dietary botanical supplement for daily wellness support.',
+      title: 'Full Quantitative Disclosure',
+      desc: '515 mg total active botanical extracts per capsule: 6 individually quantified herbs plus 170 mg Botanical Extract Blend.',
     },
   ];
 
   return (
     <Section id="quality" padding="xl" className="bg-[#F7F4ED] border-b border-[#EBE7DF] text-[#171717] opacity-100">
       <Container>
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
           <motion.span
             initial={{ opacity: 1, y: 0 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -55,7 +55,7 @@ export const TrustSection: React.FC = () => {
             initial={{ opacity: 1, y: 0 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-serif text-3xl sm:text-4xl font-bold text-[#171717] mb-4"
+            className="font-serif text-3xl sm:text-4xl font-bold text-[#171717] mb-3"
           >
             Factual Regulatory & Manufacturing Details
           </motion.h2>
@@ -65,7 +65,7 @@ export const TrustSection: React.FC = () => {
             viewport={{ once: true }}
             className="text-sm sm:text-base text-slate-700 leading-relaxed font-normal"
           >
-            We operate with complete regulatory clarity so you can verify our compliance credentials and manufacturing details.
+            We operate with complete regulatory clarity so you can verify our compliance credentials and manufacturing details directly.
           </motion.p>
         </div>
 

@@ -61,7 +61,7 @@ export const CollectionPreviewSection: React.FC = () => {
               <div className="space-y-3 border-t border-[#EBE7DF] pt-4">
                 <div className="flex items-center gap-3 text-xs font-bold text-[#171717]">
                   <CheckCircle2 size={16} className="text-[#173C2B] shrink-0" />
-                  <span>100% Vegetarian HPMC Capsules (E 464)</span>
+                  <span>100% Vegetarian Capsule Shells (HPMC)</span>
                 </div>
                 <div className="flex items-center gap-3 text-xs font-bold text-[#171717]">
                   <ShieldCheck size={16} className="text-[#173C2B] shrink-0" />

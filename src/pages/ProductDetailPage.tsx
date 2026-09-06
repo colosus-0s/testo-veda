@@ -54,7 +54,7 @@ export const ProductDetailPage: React.FC = () => {
       id: 'faq-2',
       title: 'Is TESTO BOOSTER 100% vegetarian?',
       content:
-        'Yes. Every capsule shell is made from 100% vegetarian HPMC cellulose (E 464) carrying the official green vegetarian mark as declared on our physical label.',
+        'Yes. Every capsule shell is made from 100% vegetarian HPMC cellulose carrying the official green vegetarian mark as declared on our physical label.',
     },
     {
       id: 'faq-3',
@@ -71,7 +71,7 @@ export const ProductDetailPage: React.FC = () => {
       id: 'faq-5',
       title: 'How is TESTO BOOSTER packaged and delivered?',
       content:
-        'Each bottle contains 30 vegetarian capsules as declared on our physical packaging label. Cash on Delivery is available across India with free delivery on orders above ₹499.',
+        'Each bottle contains 30 vegetarian capsules as declared on our physical packaging label. Cash on Delivery and standard delivery options are available across India.',
     },
   ];
 
@@ -132,7 +132,7 @@ export const ProductDetailPage: React.FC = () => {
               <div>
                 <div className="flex items-center gap-2 mb-2.5 flex-wrap">
                   <Badge variant="maroon">{product.category}</Badge>
-                  <Badge variant="veg">100% Veg (E 464)</Badge>
+                  <Badge variant="veg">100% Veg (HPMC Shell)</Badge>
                   <span className="text-[11px] text-amber-900 font-bold uppercase tracking-wider bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-md">
                     FSSAI Lic. #{product.regulatory.fssaiLicense}
                   </span>
@@ -277,7 +277,7 @@ export const ProductDetailPage: React.FC = () => {
                     <div className="w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center shrink-0">
                       <Leaf size={12} />
                     </div>
-                    <span>100% Vegetarian HPMC Cellulose Shell (E 464)</span>
+                    <span>100% Vegetarian Capsule Shell (HPMC)</span>
                   </div>
                   <div className="flex items-center gap-2.5 p-2.5 bg-emerald-50/80 rounded-xl border border-emerald-100">
                     <div className="w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center shrink-0">

@@ -8,7 +8,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     sku: 'AP-TESTO-30V',
     name: 'TESTO BOOSTER Capsules',
     subtitle: 'Support Overall Health and Vitality for Men',
-    shortDescription: 'Botanical health supplement formulated with 10 classical plant extracts including Ashwagandha, Gokhuru, Shilajit, Safed Musli, and Saffron to support daily stamina and male vitality.',
+    shortDescription: 'Botanical health supplement formulated with 10 classical plant extracts including Ashwagandha, Gokhuru, Shilajit, Safed Musli, and Saffron to support overall health and vitality for men.',
     description: `Arogya Path TESTO BOOSTER Capsules represent an authentic botanical health supplement crafted to support overall health and vitality for men. Formulated with classical botanicals—Ashwagandha, Gokhuru, Safed Musli, Purified Shilajit, Saffron, and Sea Buckthorn. 100% vegetarian capsule shells (HPMC Vegetarian). Manufactured in ISO 9001:2015 & GMP certified facilities under active FSSAI License No. 12118441000654.`,
     category: 'Men\'s Wellness',
     collections: ['mens-wellness', 'vitality'],
@@ -65,8 +65,8 @@ export const INITIAL_PRODUCTS: Product[] = [
           botanicalName: 'Withania somnifera',
           amount: '100mg',
           dailyValue: 'Daily value not established',
-          description: 'Adaptogenic root extract recognized for supporting stress resilience, stamina, and daily vigor.',
-          approvedBenefit: 'Supports daily stamina and vitality.',
+          description: 'Classical Ayurvedic botanical traditionally used to support overall health and vitality for men.',
+          approvedBenefit: 'Supports overall health and vitality for men.',
         },
         {
           name: 'Gokhuru Extract',
@@ -121,7 +121,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       },
       otherIngredients: [
         'Excipients q.s.',
-        'Capsule Shell: 100% Vegetarian HPMC (E 464)',
+        'Capsule Shell: HPMC Vegetarian',
       ],
     },
 
@@ -156,7 +156,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     featured: true,
     bestSeller: true,
     newArrival: false,
-    tags: ['stamina', 'ashwagandha', 'shilajit', 'mens wellness', 'botanical supplement'],
+    tags: ['mens wellness', 'ashwagandha', 'shilajit', 'botanical supplement'],
 
     seo: {
       title: 'TESTO BOOSTER Capsules (30 Veg Caps) | Arogya Path',

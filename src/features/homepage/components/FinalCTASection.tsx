@@ -68,15 +68,15 @@ export const FinalCTASection: React.FC = () => {
         <div className="pt-8 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-300 font-medium">
           <div className="flex items-center justify-center gap-2">
             <Truck className="w-4 h-4 text-[#F3E5AB]" />
-            <span>Free Express Shipping Above ₹499</span>
+            <span>Direct Storefront Dispatch</span>
           </div>
           <div className="flex items-center justify-center gap-2">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>FSSAI License Compliance</span>
+            <span>FSSAI Lic. #12118441000654</span>
           </div>
           <div className="flex items-center justify-center gap-2">
             <Lock className="w-4 h-4 text-amber-300" />
-            <span>100% Vegetarian Shell (E 464)</span>
+            <span>100% Vegetarian Capsule Shell</span>
           </div>
         </div>
       </Container>

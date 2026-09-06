@@ -24,7 +24,7 @@ export const BrandStandardsSection: React.FC = () => {
     {
       icon: Lock,
       title: '100% Vegetarian Capsule Shells',
-      description: 'Formulated exclusively in HPMC vegetarian capsule shells (E 464) carrying the official green vegetarian mark.',
+      description: 'Formulated exclusively in HPMC vegetarian capsule shells carrying the official green vegetarian mark.',
     },
   ];
 
@@ -84,7 +84,7 @@ export const BrandStandardsSection: React.FC = () => {
             <span>Official Packaging & Regulatory Declaration</span>
           </div>
           <p className="text-xs text-slate-700 leading-relaxed font-normal">
-            Arogya Path dietary supplements are formulated for daily dietary support. Manufactured by Streamline Pharma Private Limited (Jagraon) and marketed by Arogyapath Marketing.
+            Arogya Path dietary supplements are formulated for daily dietary support. Manufactured by STREAMLINE PHARMA PVT. LTD., KOTHE AATH CHAK-142026 and marketed by AROGYA PATH MARKETING, Ashok Nagar, Lohardaga - 835302, M: 9288515228.
           </p>
         </motion.div>
       </Container>

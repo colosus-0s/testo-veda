@@ -1,9 +1,9 @@
 export const SITE_CONFIG = {
   brandName: 'Arogya Path',
   tagline: 'The Path to Wellness',
-  legalEntity: 'Arogyapath Marketing',
-  manufacturer: 'Streamline Pharma Private Limited',
-  address: 'Ashok Nagar, Logardaga, Jharkhand, India',
+  legalEntity: 'Arogya Path Marketing',
+  manufacturer: 'Streamline Pharma Pvt. Ltd.',
+  address: 'Ashok Nagar, Lohardaga - 835302, Jharkhand, India',
   supportEmail: 'arogyapathmarketing@gmail.com',
   supportPhone: '+91 9288515228',
   fssaiLicense: '12118441000654',
@@ -12,8 +12,8 @@ export const SITE_CONFIG = {
   
   announcementBar: {
     enabled: true,
-    text: 'Free Express Shipping Across India on Orders Above ₹499 | 100% Authentic & FSSAI Compliant',
-    ctaText: 'Shop TESTO BOOSTER',
+    text: 'TESTO BOOSTER CAPSULES • 10 Classical Botanicals • FSSAI Lic. No. 12118441000654',
+    ctaText: 'Explore TESTO BOOSTER',
     ctaLink: '/testo',
   },
 
@@ -37,7 +37,7 @@ export const SITE_CONFIG = {
     shop: [
       { label: 'TESTO BOOSTER (30 Caps)', href: '/testo' },
       { label: 'Shop All Formulations', href: '/shop' },
-      { label: 'Vitality & Stamina Collection', href: '/shop?category=vitality' },
+      { label: "Men's Wellness Collection", href: '/shop' },
     ],
     company: [
       { label: 'Our Story & Heritage', href: '/our-story' },

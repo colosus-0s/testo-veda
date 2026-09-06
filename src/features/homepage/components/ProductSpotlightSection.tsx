@@ -42,7 +42,7 @@ export const ProductSpotlightSection: React.FC = () => {
             Botanical Formula & Mineral Complex
           </h2>
           <p className="text-slate-700 text-base font-normal">
-            Every dose is encapsulated in 100% vegetarian HPMC shells (E 464) designed for clean consumption post-meals.
+            Every dose is encapsulated in 100% vegetarian HPMC capsule shells designed for clean consumption post-meals.
           </p>
         </div>
 

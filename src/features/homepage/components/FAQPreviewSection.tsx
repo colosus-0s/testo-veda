@@ -13,28 +13,28 @@ const HOMEPAGE_FAQ = [
   {
     id: 'faq-2',
     title: 'How should I consume TESTO BOOSTER capsules?',
-    content: 'As stated on the official physical packaging label: "One capsule twice a day as directed by dietician." Swallow capsules whole with lukewarm milk or water after meals. Do not chew or crush capsules.',
+    content: 'As stated on our physical packaging label: "One capsule twice a day or as directed by a Healthcare Professional. Swallow whole with lukewarm milk or water after a meal." Do not open, chew, or crush capsules.',
   },
   {
     id: 'faq-3',
     title: 'What is the FSSAI license number and product classification?',
-    content: 'Arogya Path TESTO BOOSTER is a botanical dietary supplement marketed under active FSSAI License No. 12118441000654. The capsule shell is 100% vegetarian HPMC cellulose (E 464) carrying the official green vegetarian mark.',
+    content: 'Arogya Path TESTO BOOSTER is a botanical dietary health supplement marketed under active FSSAI License No. 12118441000654. The capsule shell is 100% vegetarian HPMC cellulose carrying the official green vegetarian mark.',
   },
   {
     id: 'faq-4',
     title: 'Where is the product manufactured and marketed?',
-    content: 'TESTO BOOSTER is manufactured by Streamline Pharma Private Limited in Jagraon (Punjab - 142026) in ISO 9001:2015 & GMP certified facilities, and marketed by Arogyapath Marketing (Logardaga).',
+    content: 'TESTO BOOSTER is manufactured by STREAMLINE PHARMA PVT. LTD., KOTHE AATH CHAK-142026 in ISO 9001:2015 & GMP certified facilities, and marketed by AROGYA PATH MARKETING, Ashok Nagar, Lohardaga - 835302, M: 9288515228.',
   },
   {
     id: 'faq-5',
-    title: 'What are the delivery timelines and shipping policies?',
-    content: 'We offer free express shipping across India on orders above ₹499. Typical delivery timelines range from 2 to 5 business days depending on destination pincode.',
+    title: 'How are orders fulfilled and supported?',
+    content: 'Orders are securely packaged and dispatched across India with Cash on Delivery and online payment options. For order inquiries or customer assistance, our support line is M: 9288515228.',
   },
 ];
 
 export const FAQPreviewSection: React.FC = () => {
   return (
-    <Section padding="xl" background="ivory" className="border-b border-[#EBE7DF] text-[#171717]">
+    <Section padding="xl" className="bg-[#F7F4ED] border-b border-[#EBE7DF] text-[#171717] opacity-100">
       <Container size="narrow">
         <div className="text-center mb-10">
           <motion.span
@@ -59,7 +59,7 @@ export const FAQPreviewSection: React.FC = () => {
             viewport={{ once: true }}
             className="text-sm sm:text-base text-slate-700 font-normal max-w-xl mx-auto"
           >
-            Factual information regarding formulation, directions, manufacturing compliance, and order delivery.
+            Factual information regarding formulation, directions, manufacturing compliance, and order fulfillment.
           </motion.p>
         </div>
 

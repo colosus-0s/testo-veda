@@ -114,7 +114,7 @@ export interface Ingredient {
   botanicalName: string;
   image: string;
   shortDescription: string;
-  approvedBenefit: string;
+  approvedBenefit?: string;
   quantity?: string;
   source?: string;
   displayOrder: number;

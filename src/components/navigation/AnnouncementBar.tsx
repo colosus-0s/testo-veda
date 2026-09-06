@@ -10,11 +10,12 @@ export const AnnouncementBar: React.FC = () => {
   if (!config.enabled || dismissed) return null;
 
   const tickerItems = [
-    'FREE DELIVERY ACROSS INDIA ON ORDERS ABOVE ₹499',
-    '100% VEGETARIAN HPMC CAPSULES',
+    'TESTO BOOSTER CAPSULES',
+    'SUPPORT OVERALL HEALTH AND VITALITY FOR MEN',
+    '30 VEG CAPSULES • MRP ₹1499/-',
+    '100% VEGETARIAN CAPSULE SHELLS (HPMC)',
     'FSSAI LIC. #12118441000654',
     'ISO 9001:2015 & GMP CERTIFIED',
-    'CASH ON DELIVERY AVAILABLE',
   ];
 
   return (

@@ -82,8 +82,10 @@ export const ASSET_REGISTRY = {
     mountainVitality: `${storageBase}/lifestyle/mountain-vitality.png`,
     naturalWay: `${storageBase}/lifestyle/natural-way-banner.png`,
     capsuleEnergy: `${storageBase}/lifestyle/capsule-energy.png`,
-    dailyRoutine: '/assets/lifestyle/daily-wellness-routine.jpg',
-    benefitEnergy: '/assets/lifestyle/benefit-daily-energy.jpg',
-    benefitVitality: '/assets/lifestyle/benefit-male-vitality.jpg',
+    dailyRoutine: `${storageBase}/lifestyle/daily-wellness-routine.jpg`,
+    wellnessMorningRitual: '/assets/lifestyle/wellness-morning-ritual.jpg',
+    botanicalApothecaryPrep: '/assets/lifestyle/botanical-apothecary-prep.jpg',
+    activeVitalityMovement: '/assets/lifestyle/active-vitality-movement.jpg',
+    restorativeEveningCalm: '/assets/lifestyle/restorative-evening-calm.jpg',
   },
 } as const;

@@ -57,7 +57,7 @@ export const FormulaIngredientsPage: React.FC = () => {
                 </div>
                 <div className="bg-[#FCFBF8] p-3 rounded-xl border border-[#EBE7DF] flex flex-col gap-1">
                   <Leaf className="w-4 h-4 text-emerald-600" />
-                  <span>100% Veg Shell (E 464)</span>
+                  <span>100% Veg Shell (HPMC)</span>
                 </div>
                 <div className="bg-[#FCFBF8] p-3 rounded-xl border border-[#EBE7DF] flex flex-col gap-1">
                   <Sparkles className="w-4 h-4 text-[#6A1423]" />

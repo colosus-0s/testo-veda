@@ -22,14 +22,14 @@ export const QualityTrustPage: React.FC = () => {
     {
       icon: <Leaf className="w-8 h-8 text-[#6A1423]" />,
       title: '100% Vegetarian Shells',
-      subtitle: 'HPMC Cellulose (E 464)',
+      subtitle: 'HPMC Cellulose Vegetarian',
       desc: 'Clean vegetarian capsule shells formulated without gelatin, carry the official green vegetarian symbol.',
     },
     {
       icon: <Factory className="w-8 h-8 text-[#6A1423]" />,
       title: 'Verified Manufacturing',
       subtitle: 'Streamline Pharma Pvt. Ltd.',
-      desc: 'Manufactured by Streamline Pharma Private Limited (Jagraon - 142026) under rigorous pharmaceutical standards.',
+      desc: 'Manufactured by STREAMLINE PHARMA PVT. LTD., KOTHE AATH CHAK-142026 under rigorous pharmaceutical standards.',
     },
     {
       icon: <FileText className="w-8 h-8 text-[#6A1423]" />,
@@ -41,7 +41,7 @@ export const QualityTrustPage: React.FC = () => {
       icon: <CheckCircle2 className="w-8 h-8 text-[#6A1423]" />,
       title: 'Dietary Supplement Standard',
       subtitle: 'Non-Medicinal Support',
-      desc: 'Formulated as a dietary botanical supplement for daily routine integration and physical stamina support.',
+      desc: 'Formulated as a dietary botanical supplement for daily routine integration to support overall health and vitality for men.',
     },
   ];
 
@@ -138,8 +138,8 @@ export const QualityTrustPage: React.FC = () => {
                   <Factory size={18} />
                   <span>Manufactured By</span>
                 </div>
-                <p className="font-bold text-[#171717] text-sm">Streamline Pharma Private Limited</p>
-                <p>Jagraon - 142026, Punjab, India</p>
+                <p className="font-bold text-[#171717] text-sm">STREAMLINE PHARMA PVT. LTD.</p>
+                <p>KOTHE AATH CHAK-142026, Punjab, India</p>
                 <div className="pt-2 border-t border-[#EBE7DF] space-y-1.5 text-[11px] font-semibold text-slate-700">
                   <p className="flex items-center gap-2"><ShieldCheck size={14} className="text-[#173C2B]" /> FSSAI Lic. #{SITE_CONFIG.fssaiLicense}</p>
                   <p className="flex items-center gap-2"><Award size={14} className="text-[#173C2B]" /> ISO 9001:2015 & GMP</p>
