@@ -41,8 +41,8 @@ export const AnnouncementBar: React.FC = () => {
       </div>
 
       {/* Desktop Centered Static Layout (>= md) */}
-      <div className="hidden md:flex max-w-7xl mx-auto items-center justify-between gap-4">
-        <div className="flex-1 text-center flex items-center justify-center gap-2 flex-wrap">
+      <div className="hidden md:flex max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 items-center justify-between gap-4">
+        <div className="flex-1 text-center flex items-center justify-center gap-2 flex-wrap text-xs">
           <span>{config.text}</span>
           {config.ctaText && (
             <Link

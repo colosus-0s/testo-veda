@@ -11,6 +11,12 @@ export const MobileBottomNav: React.FC = () => {
   const isShopActive = location.pathname === '/shop' || location.pathname === '/testo' || location.pathname.startsWith('/products/');
   const isCartActive = isCartOpen || location.pathname === '/cart';
 
+  // Do not conflict with sticky bottom purchase actions on product pages (frame_01.jpg & frame_28.jpg)
+  const isProductPage = location.pathname === '/testo' || location.pathname.startsWith('/products/');
+  if (isProductPage) {
+    return null;
+  }
+
   return (
     <nav
       aria-label="Mobile bottom navigation"

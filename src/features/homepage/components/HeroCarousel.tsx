@@ -267,7 +267,7 @@ export const HeroCarousel: React.FC = () => {
   return (
     <section
       aria-label="Arogya Path Hero Carousel"
-      className="relative w-full overflow-hidden bg-[#111210] text-white border-b border-white/10 select-none min-h-[560px] sm:min-h-[620px] lg:min-h-[680px] xl:min-h-[720px] flex items-center"
+      className="relative w-full overflow-hidden bg-[#0F100E] text-white border-b border-white/10 select-none min-h-[500px] sm:min-h-[560px] lg:min-h-[640px] xl:min-h-[680px] flex items-center"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
@@ -282,20 +282,20 @@ export const HeroCarousel: React.FC = () => {
       </div>
 
       {/* Main Full-Width Viewport Container */}
-      <div className="relative z-10 w-full max-w-[1720px] mx-auto px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-8 sm:py-12 lg:py-14">
+      <div className="relative z-10 w-full max-w-[1720px] mx-auto px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 pt-4 pb-14 sm:py-10 lg:py-14">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={slide.id}
-            initial={{ opacity: 0, x: direction > 0 ? 30 : -30 }}
+            initial={{ opacity: 0, x: direction > 0 ? 25 : -25 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction > 0 ? -30 : 30 }}
-            transition={{ duration: 0.4, ease: 'easeInOut' }}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 xl:gap-16 items-center"
+            exit={{ opacity: 0, x: direction > 0 ? -25 : 25 }}
+            transition={{ duration: 0.35, ease: 'easeInOut' }}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 lg:gap-12 xl:gap-16 items-center"
           >
-            {/* Left Content Column (55% desktop / col-span-7) */}
-            <div className="lg:col-span-7 space-y-4 sm:space-y-5 text-left order-2 lg:order-1">
+            {/* Mobile Visual Banner (< lg) & Desktop Left Content (lg:) */}
+            <div className="lg:col-span-7 space-y-3 sm:space-y-5 text-left order-2 lg:order-1">
               {/* Kicker Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-md text-[11px] sm:text-xs font-semibold text-[#F3E5AB]">
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-md text-[10px] sm:text-xs font-semibold text-[#F3E5AB]">
                 {slide.badge.icon}
                 <span>{slide.badge.text}</span>
                 {slide.badge.subtext && (
@@ -307,7 +307,7 @@ export const HeroCarousel: React.FC = () => {
               </div>
 
               {/* Monumental Headline */}
-              <div className="space-y-1 sm:space-y-2">
+              <div className="space-y-0.5 sm:space-y-1.5">
                 <h1 className="font-serif text-2xl sm:text-4xl md:text-5xl xl:text-6xl font-extrabold text-white tracking-tight leading-[1.1]">
                   {slide.headlinePrimary}{' '}
                   {slide.headlineAccent && (
@@ -315,22 +315,22 @@ export const HeroCarousel: React.FC = () => {
                   )}
                 </h1>
 
-                <p className="font-serif text-xs sm:text-base md:text-lg font-bold text-[#F3E5AB] tracking-wide uppercase">
+                <p className="font-serif text-xs sm:text-sm md:text-base font-bold text-[#F3E5AB] tracking-wide uppercase">
                   {slide.subtitle}
                 </p>
               </div>
 
               {/* Factual Body Description */}
-              <p className="text-xs sm:text-sm md:text-base text-slate-300 max-w-2xl font-normal leading-relaxed">
+              <p className="text-xs sm:text-sm md:text-base text-slate-300 max-w-2xl font-normal leading-relaxed line-clamp-2 sm:line-clamp-none">
                 {slide.description}
               </p>
 
               {/* Verified Fact Badges Bar */}
-              <div className="flex items-center gap-2 sm:gap-3 flex-wrap pt-0.5">
+              <div className="flex items-center gap-1.5 sm:gap-3 flex-wrap pt-0.5">
                 {slide.pills.map((pill, idx) => (
                   <span
                     key={idx}
-                    className={`text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-lg border flex items-center gap-1.5 ${
+                    className={`text-[10px] sm:text-xs font-semibold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border flex items-center gap-1 sm:gap-1.5 ${
                       pill.highlight
                         ? 'text-[#F3E5AB] bg-[#6A1423]/40 border-[#6A1423]'
                         : 'text-white bg-white/10 border-white/15'
@@ -346,23 +346,23 @@ export const HeroCarousel: React.FC = () => {
               </div>
 
               {/* Action CTAs */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2 max-w-xl">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-1 sm:pt-2 max-w-xl">
                 <Link to={slide.primaryCta.link} className="w-full sm:w-auto shrink-0">
                   <Button
                     variant="gold"
                     size="lg"
-                    className="w-full sm:w-auto text-xs sm:text-base font-bold px-6 sm:px-8 py-3.5 shadow-xl shadow-[#C7A33A]/20"
+                    className="w-full sm:w-auto text-xs sm:text-base font-bold px-5 sm:px-8 py-3 sm:py-3.5 shadow-xl shadow-[#C7A33A]/20"
                     rightIcon={<ArrowRight className="w-4 h-4 shrink-0" />}
                   >
                     {slide.primaryCta.text}
                   </Button>
                 </Link>
 
-                <Link to={slide.secondaryCta.link} className="w-full sm:w-auto shrink-0">
+                <Link to={slide.secondaryCta.link} className="hidden sm:inline-block w-full sm:w-auto shrink-0">
                   <Button
                     variant="outline"
                     size="lg"
-                    className="w-full sm:w-auto text-xs sm:text-base font-bold px-5 sm:px-6 py-3.5 border-white/30 hover:border-white/60 text-white"
+                    className="w-full sm:w-auto text-xs sm:text-base font-bold px-5 sm:px-6 py-3 sm:py-3.5 border-white/30 hover:border-white/60 text-white"
                   >
                     {slide.secondaryCta.text}
                   </Button>
@@ -371,30 +371,46 @@ export const HeroCarousel: React.FC = () => {
             </div>
 
             {/* Right Visual Stage (45% desktop / col-span-5) */}
-            <div className="lg:col-span-5 relative order-1 lg:order-2 flex justify-center">
-              <div className="relative w-full max-w-lg lg:max-w-none rounded-3xl overflow-hidden bg-gradient-to-b from-white/10 to-white/5 border border-white/15 p-4 sm:p-6 lg:p-8 flex items-center justify-center aspect-[4/3] sm:aspect-[4/3.5] lg:aspect-[4/4.2] shadow-2xl backdrop-blur-sm group">
-                {/* Radial inner glow */}
-                <div className="absolute inset-0 bg-radial-gradient from-[#C7A33A]/20 via-transparent to-transparent pointer-events-none" />
+            <div className="lg:col-span-5 relative order-1 lg:order-2 flex justify-center items-center">
+              <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-none flex items-center justify-center group">
+                {/* Radial ambient glow */}
+                <div className="absolute inset-0 bg-radial-gradient from-[#C7A33A]/25 via-transparent to-transparent pointer-events-none scale-110 blur-xl" />
 
-                <img
-                  src={slide.image}
-                  alt={slide.imageAlt}
-                  className={`w-full h-full object-center drop-shadow-[0_25px_35px_rgba(0,0,0,0.6)] group-hover:scale-104 transition-transform duration-700 relative z-10 ${
-                    slide.imageType === 'product' || slide.imageType === 'board'
-                      ? 'object-contain'
-                      : 'object-cover rounded-2xl'
-                  }`}
-                  loading="eager"
-                />
-
-                {/* Floating Bottom Verified Tag */}
-                <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 flex items-center justify-between text-[10px] sm:text-[11px] font-semibold text-white/90 bg-black/70 backdrop-blur-md px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl border border-white/15">
-                  <span className="flex items-center gap-1.5 text-emerald-300">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                    {slide.visualTag}
-                  </span>
-                  <span className="text-[#F3E5AB] font-bold">Arogya Path</span>
-                </div>
+                {slide.imageType === 'product' || slide.imageType === 'board' ? (
+                  <div className="relative z-10 w-full flex flex-col items-center justify-center">
+                    <img
+                      src={slide.image}
+                      alt={slide.imageAlt}
+                      className="w-full max-h-[220px] sm:max-h-[320px] lg:max-h-[440px] xl:max-h-[480px] object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.85)] group-hover:scale-103 transition-transform duration-700"
+                      loading="eager"
+                    />
+                    {/* Floating Bottom Verified Tag */}
+                    <div className="mt-2 lg:mt-3 z-20 flex items-center justify-between gap-3 text-[10px] sm:text-[11px] font-semibold text-white/90 bg-black/75 backdrop-blur-md px-3.5 py-1.5 sm:py-2 rounded-xl border border-white/15 shadow-xl">
+                      <span className="flex items-center gap-1.5 text-emerald-300">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                        {slide.visualTag}
+                      </span>
+                      <span className="text-[#F3E5AB] font-bold">Arogya Path</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative z-10 w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-white/15 shadow-2xl bg-black/40">
+                    <img
+                      src={slide.image}
+                      alt={slide.imageAlt}
+                      className="w-full h-[200px] sm:h-[300px] lg:h-[400px] xl:h-[440px] object-cover object-center group-hover:scale-104 transition-transform duration-700"
+                      loading="eager"
+                    />
+                    {/* Floating Bottom Verified Tag */}
+                    <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 flex items-center justify-between text-[10px] sm:text-[11px] font-semibold text-white/90 bg-black/75 backdrop-blur-md px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl border border-white/15">
+                      <span className="flex items-center gap-1.5 text-emerald-300">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                        {slide.visualTag}
+                      </span>
+                      <span className="text-[#F3E5AB] font-bold">Arogya Path</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>

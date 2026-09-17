@@ -15,7 +15,7 @@ export const ProductIntroductionSection: React.FC = () => {
 
   return (
     <Section padding="xl" className="bg-[#FCFBF8] border-b border-[#EBE7DF] text-[#171717] opacity-100">
-      <Container>
+      <Container size="wide">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           {/* Left Column (col-span-6): High-Resolution Physical Product Board Stage */}
           <div className="lg:col-span-6 relative">

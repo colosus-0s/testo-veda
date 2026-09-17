@@ -68,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({
             : 'bg-[#F7F4ED]/90 backdrop-blur-sm py-4 border-b border-[#EBE7DF]/60'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 md:gap-4">
+        <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 flex items-center justify-between gap-2 md:gap-6">
           {/* Mobile Menu Trigger Button (Left) */}
           <div className="flex items-center lg:hidden shrink-0">
             <button
@@ -98,7 +98,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav aria-label="Main Navigation" className="hidden lg:flex items-center space-x-4 xl:space-x-6">
+          <nav aria-label="Main Navigation" className="hidden lg:flex items-center space-x-4 xl:space-x-7">
             {SITE_CONFIG.navigation.map((item) => {
               const active = isActive(item.href);
               return (

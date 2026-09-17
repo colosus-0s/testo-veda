@@ -45,7 +45,7 @@ const CAMPAIGN_CARDS: MediaCardItem[] = [
 export const WatchAndBuySection: React.FC = () => {
   return (
     <section aria-label="Lifestyle & Campaign Showcase" className="py-10 sm:py-16 bg-[#FCFBF8] border-y border-[#EBE7DF] overflow-hidden select-none">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-10 gap-4">
           <div>

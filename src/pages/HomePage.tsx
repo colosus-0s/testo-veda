@@ -1,5 +1,6 @@
 import React from 'react';
 import { HeroCarousel } from '@/features/homepage/components/HeroCarousel';
+import { TrustMarqueeStrip } from '@/components/commerce/TrustMarqueeStrip';
 import { ProductIntroductionSection } from '@/features/homepage/components/ProductIntroductionSection';
 import { CategoryDiscoverySection } from '@/features/homepage/components/CategoryDiscoverySection';
 import { IngredientStorySection } from '@/features/homepage/components/IngredientStorySection';
@@ -14,6 +15,9 @@ export const HomePage: React.FC = () => {
     <div className="w-full space-y-0 bg-[#F7F4ED] opacity-100">
       {/* 01 Hero Carousel Entry (Full-Width Advertising Canvas) */}
       <HeroCarousel />
+
+      {/* 01.5 Trust & Verification Marquee Band (Matching AR Ayurveda strip under Hero) */}
+      <TrustMarqueeStrip />
 
       {/* 02 Featured TESTO BOOSTER (Core Product Buying Stage) */}
       <ProductIntroductionSection />
