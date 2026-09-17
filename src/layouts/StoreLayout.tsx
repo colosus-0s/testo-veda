@@ -3,18 +3,17 @@ import { Outlet, Link } from 'react-router-dom';
 import { AnnouncementBar } from '@/components/navigation/AnnouncementBar';
 import { Header } from '@/components/navigation/Header';
 import { Footer } from '@/components/navigation/Footer';
+import { MobileBottomNav } from '@/components/navigation/MobileBottomNav';
 import { Drawer } from '@/components/ui/Drawer';
 import { useCart } from '@/context/useCart';
 import type { CartItem } from '@/types/cart';
 import { ProductPrice } from '@/components/commerce/ProductPrice';
 import { Button } from '@/components/ui/Button';
-import { Trash2, ShoppingBag, ArrowRight, Truck } from 'lucide-react';
+import { Trash2, ShoppingBag, ArrowRight, Package } from 'lucide-react';
 
 export const StoreLayout: React.FC = () => {
   const { cartItems, cartSummary, isCartOpen, openCart, closeCart, updateQuantity, removeFromCart } = useCart();
   const [searchOpen, setSearchOpen] = useState(false);
-
-  const progressPercent = Math.min(100, (cartSummary.subtotal / cartSummary.freeShippingThreshold) * 100);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F7F4ED] text-[#171717]">
@@ -25,11 +24,12 @@ export const StoreLayout: React.FC = () => {
         onOpenSearch={() => setSearchOpen(true)}
       />
 
-      <main className="flex-1">
+      <main className="flex-1 pb-16 lg:pb-0">
         <Outlet />
       </main>
 
       <Footer />
+      <MobileBottomNav />
 
       {/* Cart Drawer */}
       <Drawer
@@ -48,21 +48,14 @@ export const StoreLayout: React.FC = () => {
           </div>
         ) : (
           <div className="flex flex-col h-full justify-between space-y-6 text-left">
-            {/* Free Shipping Progress Indicator */}
-            <div className="bg-[#F7F4ED] p-3.5 rounded-xl border border-[#EBE7DF] space-y-1.5">
-              <div className="flex items-center justify-between text-[11px] font-bold">
-                <span className="flex items-center gap-1 text-[#173C2B]">
-                  <Truck size={14} /> Free Shipping
-                </span>
-                <span className="text-slate-700">
-                  {cartSummary.subtotal >= cartSummary.freeShippingThreshold
-                    ? 'Unlocked!'
-                    : `Add ₹${cartSummary.freeShippingThreshold - cartSummary.subtotal} more`}
-                </span>
-              </div>
-              <div className="w-full bg-[#EBE7DF] h-1.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-600 h-full transition-all duration-300" style={{ width: `${progressPercent}%` }} />
-              </div>
+            {/* Order Summary Status */}
+            <div className="bg-[#F7F4ED] p-3 rounded-xl border border-[#EBE7DF] flex items-center justify-between text-xs">
+              <span className="font-semibold text-slate-700 flex items-center gap-1.5">
+                <Package size={15} className="text-[#6A1423]" /> Order Summary
+              </span>
+              <span className="font-bold text-[#171717]">
+                {cartSummary.itemCount} {cartSummary.itemCount === 1 ? 'item' : 'items'}
+              </span>
             </div>
 
             {/* Cart Items List */}
@@ -117,7 +110,7 @@ export const StoreLayout: React.FC = () => {
                   ₹{cartSummary.subtotal.toLocaleString('en-IN')}
                 </span>
               </div>
-              <p className="text-[10px] text-slate-500">Taxes calculated. Free shipping applied at checkout.</p>
+              <p className="text-[10px] text-slate-500">Applicable taxes and delivery calculated at checkout.</p>
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <Link to="/cart" onClick={closeCart}>
                   <Button variant="outline" size="sm" className="w-full text-xs">

@@ -98,14 +98,14 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav aria-label="Main Navigation" className="hidden lg:flex items-center space-x-7">
+          <nav aria-label="Main Navigation" className="hidden lg:flex items-center space-x-4 xl:space-x-6">
             {SITE_CONFIG.navigation.map((item) => {
               const active = isActive(item.href);
               return (
                 <Link
                   key={item.label}
                   to={item.href}
-                  className={`text-sm transition-all pb-1 ${
+                  className={`text-xs xl:text-sm transition-all pb-1 whitespace-nowrap ${
                     active
                       ? 'font-bold text-[#6A1423] border-b-2 border-[#6A1423]'
                       : 'font-semibold text-[#171717] hover:text-[#6A1423] hover:border-b-2 hover:border-[#6A1423]/50'

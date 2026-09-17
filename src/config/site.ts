@@ -25,7 +25,8 @@ export const SITE_CONFIG = {
   },
 
   navigation: [
-    { label: 'Shop All', href: '/shop' },
+    { label: 'Home', href: '/' },
+    { label: 'Shop', href: '/shop' },
     { label: 'TESTO BOOSTER', href: '/testo' },
     { label: 'Formula & Ingredients', href: '/formula-ingredients' },
     { label: 'Quality & Trust', href: '/quality-trust' },
