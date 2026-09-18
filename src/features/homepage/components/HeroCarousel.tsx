@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -9,7 +9,7 @@ import {
   ChevronRight,
   Sparkles,
   Clock,
-  Award,
+  Dumbbell,
 } from 'lucide-react';
 import { ASSET_REGISTRY } from '@/config/assets';
 import { Button } from '@/components/ui/Button';
@@ -35,19 +35,21 @@ interface HeroSlide {
     text: string;
     link: string;
   };
-  secondaryCta: {
+  secondaryCta?: {
     text: string;
     link: string;
   };
-  image: string;
-  imageAlt: string;
-  imageType: 'product' | 'botanicals' | 'lifestyle' | 'board';
+  backgroundImage: string;
+  backgroundAlt: string;
+  productImage?: string;
+  productAlt?: string;
   visualTag: string;
+  focalPosition?: string;
 }
 
 const HERO_SLIDES: HeroSlide[] = [
   {
-    id: 'slide-formulation',
+    id: 'campaign-active-vitality',
     badge: {
       text: 'AYURVEDIC BOTANICAL FORMULATION',
       subtext: 'FSSAI Lic. #12118441000654',
@@ -80,23 +82,25 @@ const HERO_SLIDES: HeroSlide[] = [
       text: 'View Formula & Ingredients',
       link: '/formula-ingredients',
     },
-    image: ASSET_REGISTRY.products.testoBooster.stillLife,
-    imageAlt: 'TESTO BOOSTER CAPSULES Physical Still Life Photography',
-    imageType: 'product',
+    backgroundImage: ASSET_REGISTRY.campaign.morningRun,
+    backgroundAlt: 'Athletic morning vitality campaign against misty dawn mountain backdrop',
+    productImage: ASSET_REGISTRY.products.testoBooster.stillLife,
+    productAlt: 'TESTO BOOSTER CAPSULES physical bottle still life',
     visualTag: '10 Classical Botanicals • 30 Veg Capsules',
+    focalPosition: 'object-[75%_center]',
   },
   {
-    id: 'slide-botanicals',
+    id: 'campaign-strength-discipline',
     badge: {
-      text: 'QUANTITATIVE BOTANICAL DISCLOSURE',
-      subtext: 'Label-Disclosed Milligrams',
-      icon: <Sparkles className="w-4 h-4 text-[#C7A33A] shrink-0" />,
+      text: 'ACTIVE LIFESTYLE DISCIPLINE',
+      subtext: 'Standardized Formulation',
+      icon: <Dumbbell className="w-4 h-4 text-[#C7A33A] shrink-0" />,
     },
-    headlinePrimary: '10 CLASSICAL',
-    headlineAccent: 'BOTANICAL EXTRACTS',
-    subtitle: 'ANCIENT HERBOLOGY, QUANTIFIED LABEL TRANSPARENCY',
+    headlinePrimary: 'DISCIPLINED',
+    headlineAccent: 'VITALITY FOR MEN',
+    subtitle: '10 CLASSICAL BOTANICALS • 515 MG ACTIVE EXTRACTS',
     description:
-      'Every active ingredient is quantitatively declared. 6 individually quantified extracts totaling 345 mg, combined with our 170 mg synergy extract blend—delivering 515 mg of active botanicals per serving.',
+      'Formulated for men committed to physical discipline and daily wellness. Featuring 6 individually quantified extracts combined with our 170 mg synergy extract blend.',
     pills: [
       {
         label: '515 mg Active Extracts',
@@ -111,6 +115,44 @@ const HERO_SLIDES: HeroSlide[] = [
       },
     ],
     primaryCta: {
+      text: 'Discover Formulation Details',
+      link: '/formula-ingredients',
+    },
+    secondaryCta: {
+      text: 'Shop TESTO BOOSTER',
+      link: '/testo',
+    },
+    backgroundImage: ASSET_REGISTRY.campaign.strengthTraining,
+    backgroundAlt: 'Controlled physical movement and strength discipline in warm ambient sunlight',
+    visualTag: 'Physical Discipline • Daily Routine',
+    focalPosition: 'object-[70%_center]',
+  },
+  {
+    id: 'campaign-botanical-heritage',
+    badge: {
+      text: 'QUANTITATIVE BOTANICAL DISCLOSURE',
+      subtext: 'Label Transparency',
+      icon: <Sparkles className="w-4 h-4 text-[#C7A33A] shrink-0" />,
+    },
+    headlinePrimary: 'ANCIENT',
+    headlineAccent: 'APOTHECARY HERITAGE',
+    subtitle: 'VIVID SAFFRON, ASHWAGANDHA, SHILAJIT & GOKHURU',
+    description:
+      'Every active botanical is quantitatively disclosed on our packaging label. Formulated in adherence to classical Ayurvedic herbology and certified facility standards.',
+    pills: [
+      {
+        label: 'Kashmiri Saffron (15 mg)',
+        icon: <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />,
+      },
+      {
+        label: 'Ashwagandha (100 mg)',
+      },
+      {
+        label: 'Purified Shilajit (170 mg Blend)',
+        highlight: true,
+      },
+    ],
+    primaryCta: {
       text: 'Discover All 10 Botanicals',
       link: '/formula-ingredients',
     },
@@ -118,16 +160,18 @@ const HERO_SLIDES: HeroSlide[] = [
       text: 'Shop TESTO BOOSTER',
       link: '/testo',
     },
-    image: ASSET_REGISTRY.lifestyle.botanicalApothecaryPrep,
-    imageAlt: 'Authentic raw botanicals, whole saffron, ashwagandha root, and traditional brass mortar',
-    imageType: 'botanicals',
-    visualTag: 'Ashwagandha • Shilajit • Gokhuru • Saffron',
+    backgroundImage: ASSET_REGISTRY.campaign.botanicalApothecary,
+    backgroundAlt: 'Authentic Kashmiri saffron, whole ashwagandha roots, gokhuru, and brass mortar',
+    productImage: ASSET_REGISTRY.products.testoBooster.board,
+    productAlt: 'TESTO BOOSTER physical packaging with classical botanicals',
+    visualTag: 'Saffron • Shilajit • Ashwagandha • Gokhuru',
+    focalPosition: 'object-[60%_center]',
   },
   {
-    id: 'slide-ritual',
+    id: 'campaign-mindful-ritual',
     badge: {
       text: 'DAILY WELLNESS DISCIPLINE',
-      subtext: 'Non-Habit Forming Ritual',
+      subtext: 'After Meals',
       icon: <Clock className="w-4 h-4 text-emerald-400 shrink-0" />,
     },
     headlinePrimary: 'THE MINDFUL',
@@ -141,67 +185,31 @@ const HERO_SLIDES: HeroSlide[] = [
         icon: <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />,
       },
       {
-        label: 'Take with Lukewarm Water / Milk',
+        label: 'Lukewarm Water / Milk',
       },
       {
-        label: '100% Vegetarian Shell',
+        label: '100% Vegetarian HPMC Shell',
         highlight: true,
       },
     ],
     primaryCta: {
-      text: 'Read Dosage & Directions',
+      text: 'Read Directions & Dosage',
       link: '/testo',
     },
     secondaryCta: {
       text: 'Our Story & Philosophy',
       link: '/our-story',
     },
-    image: ASSET_REGISTRY.lifestyle.wellnessMorningRitual,
-    imageAlt: 'Mindful morning hydration and tea wellness routine in soft dawn lighting',
-    imageType: 'lifestyle',
+    backgroundImage: ASSET_REGISTRY.campaign.wellnessMorning,
+    backgroundAlt: 'Mindful morning hydration and wellness routine in soft morning sunlight',
+    productImage: ASSET_REGISTRY.products.testoBooster.front,
+    productAlt: 'TESTO BOOSTER physical bottle front packaging',
     visualTag: 'Consistent Daily Integration • After Meals',
-  },
-  {
-    id: 'slide-standards',
-    badge: {
-      text: 'CERTIFIED COMPLIANCE & MANUFACTURING',
-      subtext: 'FSSAI Lic. #12118441000654',
-      icon: <Award className="w-4 h-4 text-[#C7A33A] shrink-0" />,
-    },
-    headlinePrimary: 'ISO 9001:2015 &',
-    headlineAccent: 'GMP CERTIFIED',
-    subtitle: 'RIGOROUS FACILITY STANDARDS & PACKAGING CONTROLS',
-    description:
-      'Manufactured by Streamline Pharma Pvt. Ltd. (Kothe Aath Chak-142026) under state-inspected FSSAI licensing. Marketed by Arogya Path Marketing with comprehensive batch traceability.',
-    pills: [
-      {
-        label: 'ISO 9001:2015 22000:2018',
-        icon: <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />,
-      },
-      {
-        label: 'Streamline Pharma Pvt. Ltd.',
-      },
-      {
-        label: 'Arogya Path Marketing',
-        highlight: true,
-      },
-    ],
-    primaryCta: {
-      text: 'Verify Compliance Standards',
-      link: '/quality-trust',
-    },
-    secondaryCta: {
-      text: 'Explore TESTO BOOSTER',
-      link: '/testo',
-    },
-    image: ASSET_REGISTRY.products.testoBooster.board,
-    imageAlt: 'Physical TESTO BOOSTER packaging and manufacturing compliance presentation',
-    imageType: 'board',
-    visualTag: 'STREAMLINE PHARMA • FSSAI 12118441000654',
+    focalPosition: 'object-[65%_center]',
   },
 ];
 
-const AUTOPLAY_INTERVAL = 3000; // 3 seconds per slide
+const AUTOPLAY_INTERVAL = 4500; // 4.5 seconds per slide
 
 export const HeroCarousel: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -251,10 +259,8 @@ export const HeroCarousel: React.FC = () => {
       const diff = touchStartX.current - touchEndX.current;
       const minSwipeDistance = 40;
       if (diff > minSwipeDistance) {
-        // Swiped left -> next
         handleNext();
       } else if (diff < -minSwipeDistance) {
-        // Swiped right -> prev
         handlePrev();
       }
     }
@@ -266,36 +272,51 @@ export const HeroCarousel: React.FC = () => {
 
   return (
     <section
-      aria-label="Arogya Path Hero Carousel"
-      className="relative w-full overflow-hidden bg-[#0F100E] text-white border-b border-white/10 select-none min-h-[500px] sm:min-h-[560px] lg:min-h-[640px] xl:min-h-[680px] flex items-center"
+      aria-label="Arogya Path Campaign Hero"
+      className="relative w-full overflow-hidden bg-[#0A0B09] text-white select-none min-h-[520px] sm:min-h-[580px] lg:min-h-[660px] xl:min-h-[720px] flex items-center"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Ambient background atmosphere */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 right-0 w-3/5 h-full bg-gradient-to-bl from-[#6A1423]/25 via-transparent to-transparent" />
-        <div className="absolute bottom-0 left-0 w-2/5 h-3/5 bg-gradient-to-tr from-[#173C2B]/30 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-25" />
-      </div>
+      {/* Full-Bleed Background Advertising Campaign Image */}
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={`bg-${slide.id}`}
+          initial={{ opacity: 0, scale: 1.03 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1.0] }}
+          className="absolute inset-0 z-0 pointer-events-none"
+        >
+          <img
+            src={slide.backgroundImage}
+            alt={slide.backgroundAlt}
+            className={`w-full h-full object-cover ${slide.focalPosition || 'object-center'}`}
+            loading="eager"
+          />
+          {/* Cinematic Scrims: Dark gradient on left & bottom for crystal-clear readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/75 to-black/30 lg:from-black/90 lg:via-black/55 lg:to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/40 lg:hidden" />
+        </motion.div>
+      </AnimatePresence>
 
       {/* Main Full-Width Viewport Container */}
-      <div className="relative z-10 w-full max-w-[1720px] mx-auto px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 pt-4 pb-14 sm:py-10 lg:py-14">
+      <div className="relative z-10 w-full max-w-[1720px] mx-auto px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-8 sm:py-12 lg:py-16">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
-            key={slide.id}
-            initial={{ opacity: 0, x: direction > 0 ? 25 : -25 }}
+            key={`content-${slide.id}`}
+            initial={{ opacity: 0, x: direction > 0 ? 20 : -20 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction > 0 ? -25 : 25 }}
-            transition={{ duration: 0.35, ease: 'easeInOut' }}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 lg:gap-12 xl:gap-16 items-center"
+            exit={{ opacity: 0, x: direction > 0 ? -20 : 20 }}
+            transition={{ duration: 0.45, ease: 'easeInOut' }}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 xl:gap-16 items-center"
           >
-            {/* Mobile Visual Banner (< lg) & Desktop Left Content (lg:) */}
-            <div className="lg:col-span-7 space-y-3 sm:space-y-5 text-left order-2 lg:order-1">
+            {/* Left Content Column (col-span-7 / col-span-8) */}
+            <div className="lg:col-span-7 xl:col-span-8 space-y-3.5 sm:space-y-5 text-left">
               {/* Kicker Badge */}
-              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-md text-[10px] sm:text-xs font-semibold text-[#F3E5AB]">
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-black/50 border border-white/20 backdrop-blur-md text-[10px] sm:text-xs font-semibold text-[#F3E5AB]">
                 {slide.badge.icon}
                 <span>{slide.badge.text}</span>
                 {slide.badge.subtext && (
@@ -307,8 +328,8 @@ export const HeroCarousel: React.FC = () => {
               </div>
 
               {/* Monumental Headline */}
-              <div className="space-y-0.5 sm:space-y-1.5">
-                <h1 className="font-serif text-2xl sm:text-4xl md:text-5xl xl:text-6xl font-extrabold text-white tracking-tight leading-[1.1]">
+              <div className="space-y-1 sm:space-y-2">
+                <h1 className="font-serif text-2xl sm:text-4xl md:text-5xl xl:text-6xl font-extrabold text-white tracking-tight leading-[1.08]">
                   {slide.headlinePrimary}{' '}
                   {slide.headlineAccent && (
                     <span className="gold-gradient-text block sm:inline">{slide.headlineAccent}</span>
@@ -321,108 +342,104 @@ export const HeroCarousel: React.FC = () => {
               </div>
 
               {/* Factual Body Description */}
-              <p className="text-xs sm:text-sm md:text-base text-slate-300 max-w-2xl font-normal leading-relaxed line-clamp-2 sm:line-clamp-none">
+              <p className="text-xs sm:text-sm md:text-base text-slate-200 max-w-2xl font-normal leading-relaxed line-clamp-3 sm:line-clamp-none">
                 {slide.description}
               </p>
 
               {/* Verified Fact Badges Bar */}
-              <div className="flex items-center gap-1.5 sm:gap-3 flex-wrap pt-0.5">
+              <div className="flex items-center gap-1.5 sm:gap-2.5 flex-wrap pt-0.5">
                 {slide.pills.map((pill, idx) => (
                   <span
                     key={idx}
-                    className={`text-[10px] sm:text-xs font-semibold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border flex items-center gap-1 sm:gap-1.5 ${
+                    className={`text-[10px] sm:text-xs font-semibold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border backdrop-blur-md flex items-center gap-1 sm:gap-1.5 ${
                       pill.highlight
-                        ? 'text-[#F3E5AB] bg-[#6A1423]/40 border-[#6A1423]'
-                        : 'text-white bg-white/10 border-white/15'
+                        ? 'text-[#F3E5AB] bg-[#6A1423]/60 border-[#C7A33A]/40'
+                        : 'text-white bg-black/40 border-white/20'
                     }`}
                   >
                     {pill.icon}
                     <span>{pill.label}</span>
                     {pill.sublabel && (
-                      <span className="text-white/60 font-normal hidden sm:inline">{pill.sublabel}</span>
+                      <span className="text-white/70 font-normal hidden sm:inline">{pill.sublabel}</span>
                     )}
                   </span>
                 ))}
               </div>
 
               {/* Action CTAs */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-1 sm:pt-2 max-w-xl">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3.5 pt-1.5 sm:pt-2 max-w-xl">
                 <Link to={slide.primaryCta.link} className="w-full sm:w-auto shrink-0">
                   <Button
                     variant="gold"
                     size="lg"
-                    className="w-full sm:w-auto text-xs sm:text-base font-bold px-5 sm:px-8 py-3 sm:py-3.5 shadow-xl shadow-[#C7A33A]/20"
+                    className="w-full sm:w-auto text-xs sm:text-base font-bold px-5 sm:px-8 py-3 sm:py-3.5 shadow-2xl shadow-[#C7A33A]/25"
                     rightIcon={<ArrowRight className="w-4 h-4 shrink-0" />}
                   >
                     {slide.primaryCta.text}
                   </Button>
                 </Link>
 
-                <Link to={slide.secondaryCta.link} className="hidden sm:inline-block w-full sm:w-auto shrink-0">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full sm:w-auto text-xs sm:text-base font-bold px-5 sm:px-6 py-3 sm:py-3.5 border-white/30 hover:border-white/60 text-white"
-                  >
-                    {slide.secondaryCta.text}
-                  </Button>
-                </Link>
+                {slide.secondaryCta && (
+                  <Link to={slide.secondaryCta.link} className="hidden sm:inline-block w-full sm:w-auto shrink-0">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-full sm:w-auto text-xs sm:text-base font-bold px-5 sm:px-6 py-3 sm:py-3.5 border-white/30 hover:border-white/60 text-white backdrop-blur-md bg-black/20"
+                    >
+                      {slide.secondaryCta.text}
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
 
-            {/* Right Visual Stage (45% desktop / col-span-5) */}
-            <div className="lg:col-span-5 relative order-1 lg:order-2 flex justify-center items-center">
-              <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-none flex items-center justify-center group">
-                {/* Radial ambient glow */}
-                <div className="absolute inset-0 bg-radial-gradient from-[#C7A33A]/25 via-transparent to-transparent pointer-events-none scale-110 blur-xl" />
+            {/* Right Visual Stage: Organic Product Placement (col-span-5 / col-span-4) */}
+            <div className="lg:col-span-5 xl:col-span-4 relative flex justify-center items-center">
+              {slide.productImage ? (
+                <div className="relative w-full max-w-xs sm:max-w-sm lg:max-w-md flex flex-col items-center justify-center group">
+                  {/* Atmospheric radial backlight */}
+                  <div className="absolute inset-0 bg-radial-gradient from-[#C7A33A]/30 via-transparent to-transparent pointer-events-none scale-125 blur-2xl" />
 
-                {slide.imageType === 'product' || slide.imageType === 'board' ? (
-                  <div className="relative z-10 w-full flex flex-col items-center justify-center">
-                    <img
-                      src={slide.image}
-                      alt={slide.imageAlt}
-                      className="w-full max-h-[220px] sm:max-h-[320px] lg:max-h-[440px] xl:max-h-[480px] object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.85)] group-hover:scale-103 transition-transform duration-700"
-                      loading="eager"
-                    />
-                    {/* Floating Bottom Verified Tag */}
-                    <div className="mt-2 lg:mt-3 z-20 flex items-center justify-between gap-3 text-[10px] sm:text-[11px] font-semibold text-white/90 bg-black/75 backdrop-blur-md px-3.5 py-1.5 sm:py-2 rounded-xl border border-white/15 shadow-xl">
-                      <span className="flex items-center gap-1.5 text-emerald-300">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                        {slide.visualTag}
-                      </span>
-                      <span className="text-[#F3E5AB] font-bold">Arogya Path</span>
-                    </div>
+                  <img
+                    src={slide.productImage}
+                    alt={slide.productAlt || 'TESTO BOOSTER Physical Packaging'}
+                    className="w-full max-h-[220px] sm:max-h-[300px] lg:max-h-[420px] xl:max-h-[460px] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.9)] group-hover:scale-103 transition-transform duration-700 relative z-10"
+                    loading="eager"
+                  />
+
+                  {/* Floating Verified Packaging Tag */}
+                  <div className="mt-2.5 z-20 flex items-center justify-between gap-3 text-[10px] sm:text-[11px] font-semibold text-white/95 bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/20 shadow-2xl">
+                    <span className="flex items-center gap-1.5 text-emerald-300">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                      {slide.visualTag}
+                    </span>
+                    <span className="text-[#F3E5AB] font-bold">Arogya Path</span>
                   </div>
-                ) : (
-                  <div className="relative z-10 w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-white/15 shadow-2xl bg-black/40">
-                    <img
-                      src={slide.image}
-                      alt={slide.imageAlt}
-                      className="w-full h-[200px] sm:h-[300px] lg:h-[400px] xl:h-[440px] object-cover object-center group-hover:scale-104 transition-transform duration-700"
-                      loading="eager"
-                    />
-                    {/* Floating Bottom Verified Tag */}
-                    <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 flex items-center justify-between text-[10px] sm:text-[11px] font-semibold text-white/90 bg-black/75 backdrop-blur-md px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl border border-white/15">
-                      <span className="flex items-center gap-1.5 text-emerald-300">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                        {slide.visualTag}
-                      </span>
-                      <span className="text-[#F3E5AB] font-bold">Arogya Path</span>
-                    </div>
+                </div>
+              ) : (
+                /* Pure Lifestyle Slide: Clean breathing space so the human athletic movement is celebrated */
+                <div className="hidden lg:flex items-center justify-center p-6 text-right">
+                  <div className="bg-black/50 backdrop-blur-md p-4 rounded-2xl border border-white/15 max-w-xs text-left space-y-1 shadow-2xl">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#F3E5AB] block">
+                      Daily Discipline
+                    </span>
+                    <p className="text-xs text-slate-200">
+                      Formulated to support overall health and vitality for men. FSSAI Lic. #12118441000654.
+                    </p>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* Desktop Prev / Next Buttons */}
+      {/* Desktop Prev / Next Navigation Arrows */}
       <button
         type="button"
         onClick={handlePrev}
-        className="hidden md:flex absolute left-4 lg:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-black/40 hover:bg-black/70 border border-white/20 text-white backdrop-blur-md items-center justify-center transition-all hover:scale-110 focus:outline-none"
-        aria-label="Previous slide"
+        className="hidden md:flex absolute left-4 lg:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 border border-white/20 text-white backdrop-blur-md items-center justify-center transition-all hover:scale-110 focus:outline-none shadow-xl"
+        aria-label="Previous campaign slide"
       >
         <ChevronLeft className="w-6 h-6" />
       </button>
@@ -430,14 +447,14 @@ export const HeroCarousel: React.FC = () => {
       <button
         type="button"
         onClick={handleNext}
-        className="hidden md:flex absolute right-4 lg:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-black/40 hover:bg-black/70 border border-white/20 text-white backdrop-blur-md items-center justify-center transition-all hover:scale-110 focus:outline-none"
-        aria-label="Next slide"
+        className="hidden md:flex absolute right-4 lg:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 border border-white/20 text-white backdrop-blur-md items-center justify-center transition-all hover:scale-110 focus:outline-none shadow-xl"
+        aria-label="Next campaign slide"
       >
         <ChevronRight className="w-6 h-6" />
       </button>
 
-      {/* Slide Indicators & Progress */}
-      <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
+      {/* Slide Indicators & Dwell Progress */}
+      <div className="absolute bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
         {HERO_SLIDES.map((s, idx) => (
           <button
             key={s.id}
@@ -445,7 +462,7 @@ export const HeroCarousel: React.FC = () => {
             onClick={() => goToSlide(idx)}
             className={`transition-all duration-300 focus:outline-none rounded-full ${
               idx === currentIndex
-                ? 'w-7 sm:w-8 h-2 bg-[#C7A33A]'
+                ? 'w-8 sm:w-10 h-2 bg-[#C7A33A] shadow-md shadow-[#C7A33A]/50'
                 : 'w-2 h-2 bg-white/30 hover:bg-white/60'
             }`}
             aria-label={`Go to slide ${idx + 1}: ${s.headlinePrimary}`}

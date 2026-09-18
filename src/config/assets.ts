@@ -88,4 +88,12 @@ export const ASSET_REGISTRY = {
     activeVitalityMovement: '/assets/lifestyle/active-vitality-movement.jpg',
     restorativeEveningCalm: '/assets/lifestyle/restorative-evening-calm.jpg',
   },
+
+  campaign: {
+    morningRun: '/assets/campaign/morning-run-campaign.jpg',
+    strengthTraining: '/assets/campaign/strength-training-campaign.jpg',
+    wellnessMorning: '/assets/campaign/wellness-morning-campaign.jpg',
+    botanicalApothecary: '/assets/campaign/botanical-apothecary-campaign.jpg',
+    dailyRitualPrep: '/assets/campaign/daily-ritual-prep.jpg',
+  },
 } as const;
