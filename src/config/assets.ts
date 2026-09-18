@@ -95,5 +95,14 @@ export const ASSET_REGISTRY = {
     wellnessMorning: '/assets/campaign/wellness-morning-campaign.jpg',
     botanicalApothecary: '/assets/campaign/botanical-apothecary-campaign.jpg',
     dailyRitualPrep: '/assets/campaign/daily-ritual-prep.jpg',
+    // 4 Master Commercial Advertisements (Composited Environment + Real Packaging)
+    ad01Movement: '/assets/campaign/ad-01-movement.jpg',
+    ad01MovementMobile: '/assets/campaign/ad-01-movement-mobile.jpg',
+    ad02Strength: '/assets/campaign/ad-02-strength.jpg',
+    ad02StrengthMobile: '/assets/campaign/ad-02-strength-mobile.jpg',
+    ad03Ritual: '/assets/campaign/ad-03-ritual.jpg',
+    ad03RitualMobile: '/assets/campaign/ad-03-ritual-mobile.jpg',
+    ad04Botanicals: '/assets/campaign/ad-04-botanicals.jpg',
+    ad04BotanicalsMobile: '/assets/campaign/ad-04-botanicals-mobile.jpg',
   },
 } as const;

@@ -1,246 +1,125 @@
-﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  ShieldCheck,
-  ArrowRight,
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Sparkles,
-  Clock,
-  Dumbbell,
-} from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ASSET_REGISTRY } from '@/config/assets';
-import { Button } from '@/components/ui/Button';
 
-interface HeroSlide {
+interface HeroCampaignSlide {
   id: string;
-  badge: {
-    text: string;
-    subtext?: string;
-    icon: React.ReactNode;
-  };
-  headlinePrimary: string;
+  kicker: string;
+  headlineLine1: string;
+  headlineLine2?: string;
   headlineAccent?: string;
-  subtitle: string;
-  description: string;
-  pills: Array<{
-    label: string;
-    sublabel?: string;
-    icon?: React.ReactNode;
-    highlight?: boolean;
-  }>;
-  primaryCta: {
-    text: string;
-    link: string;
-  };
-  secondaryCta?: {
-    text: string;
-    link: string;
-  };
-  backgroundImage: string;
-  backgroundAlt: string;
-  productImage?: string;
-  productAlt?: string;
-  visualTag: string;
-  focalPosition?: string;
+  supportingLine: string;
+  ctaText: string;
+  ctaLink: string;
+  desktopImage: string;
+  mobileImage: string;
+  alt: string;
+  textAlign?: 'left' | 'right';
 }
 
-const HERO_SLIDES: HeroSlide[] = [
+const CAMPAIGN_SLIDES: HeroCampaignSlide[] = [
   {
-    id: 'campaign-active-vitality',
-    badge: {
-      text: 'AYURVEDIC BOTANICAL FORMULATION',
-      subtext: 'FSSAI Lic. #12118441000654',
-      icon: <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />,
-    },
-    headlinePrimary: 'TESTO BOOSTER',
-    headlineAccent: 'CAPSULES',
-    subtitle: 'SUPPORT OVERALL HEALTH AND VITALITY FOR MEN',
-    description:
-      'A factual botanical dietary supplement formulated with 10 classical plant extracts—including Ashwagandha, Gokhuru, Purified Shilajit, Safed Musli, and Saffron. Encapsulated in 100% vegetarian capsule shells.',
-    pills: [
-      {
-        label: '30 Veg Capsules',
-        icon: <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />,
-      },
-      {
-        label: 'MRP ₹1,499',
-        sublabel: '(~₹49.97/Cap)',
-      },
-      {
-        label: 'Capsule shell: HPMC Vegetarian',
-        highlight: true,
-      },
-    ],
-    primaryCta: {
-      text: 'Explore TESTO BOOSTER • ₹1,499',
-      link: '/testo',
-    },
-    secondaryCta: {
-      text: 'View Formula & Ingredients',
-      link: '/formula-ingredients',
-    },
-    backgroundImage: ASSET_REGISTRY.campaign.morningRun,
-    backgroundAlt: 'Athletic morning vitality campaign against misty dawn mountain backdrop',
-    productImage: ASSET_REGISTRY.products.testoBooster.stillLife,
-    productAlt: 'TESTO BOOSTER CAPSULES physical bottle still life',
-    visualTag: '10 Classical Botanicals • 30 Veg Capsules',
-    focalPosition: 'object-[75%_center]',
+    id: 'ad-01-active-movement',
+    kicker: 'TESTO BOOSTER CAPSULES',
+    headlineLine1: 'SUPPORT OVERALL HEALTH',
+    headlineLine2: 'AND VITALITY FOR MEN',
+    supportingLine: '10 classical botanicals • 30 vegetarian capsules',
+    ctaText: 'Explore TESTO BOOSTER',
+    ctaLink: '/testo',
+    desktopImage: ASSET_REGISTRY.campaign.ad01Movement,
+    mobileImage: ASSET_REGISTRY.campaign.ad01MovementMobile,
+    alt: 'TESTO BOOSTER campaign with South Asian male runner in full stride at sunrise and verified product bottle on stone ledge',
+    textAlign: 'left',
   },
   {
-    id: 'campaign-strength-discipline',
-    badge: {
-      text: 'ACTIVE LIFESTYLE DISCIPLINE',
-      subtext: 'Standardized Formulation',
-      icon: <Dumbbell className="w-4 h-4 text-[#C7A33A] shrink-0" />,
-    },
-    headlinePrimary: 'DISCIPLINED',
-    headlineAccent: 'VITALITY FOR MEN',
-    subtitle: '10 CLASSICAL BOTANICALS • 515 MG ACTIVE EXTRACTS',
-    description:
-      'Formulated for men committed to physical discipline and daily wellness. Featuring 6 individually quantified extracts combined with our 170 mg synergy extract blend.',
-    pills: [
-      {
-        label: '515 mg Active Extracts',
-        icon: <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />,
-      },
-      {
-        label: '6 Individually Quantified',
-      },
-      {
-        label: '170 mg Synergy Blend',
-        highlight: true,
-      },
-    ],
-    primaryCta: {
-      text: 'Discover Formulation Details',
-      link: '/formula-ingredients',
-    },
-    secondaryCta: {
-      text: 'Shop TESTO BOOSTER',
-      link: '/testo',
-    },
-    backgroundImage: ASSET_REGISTRY.campaign.strengthTraining,
-    backgroundAlt: 'Controlled physical movement and strength discipline in warm ambient sunlight',
-    visualTag: 'Physical Discipline • Daily Routine',
-    focalPosition: 'object-[70%_center]',
+    id: 'ad-02-strength-discipline',
+    kicker: 'ACTIVE LIFESTYLE DISCIPLINE',
+    headlineLine1: 'FORMULATED WITH',
+    headlineLine2: 'CLASSICAL BOTANICALS',
+    supportingLine: '10 botanical extracts • 30 vegetarian capsules',
+    ctaText: 'Discover the Formula',
+    ctaLink: '/formula-ingredients',
+    desktopImage: ASSET_REGISTRY.campaign.ad02Strength,
+    mobileImage: ASSET_REGISTRY.campaign.ad02StrengthMobile,
+    alt: 'TESTO BOOSTER strength discipline campaign with South Asian male deadlifter in sunlight beam and bottle on gym floor',
+    textAlign: 'left',
   },
   {
-    id: 'campaign-botanical-heritage',
-    badge: {
-      text: 'QUANTITATIVE BOTANICAL DISCLOSURE',
-      subtext: 'Label Transparency',
-      icon: <Sparkles className="w-4 h-4 text-[#C7A33A] shrink-0" />,
-    },
-    headlinePrimary: 'ANCIENT',
-    headlineAccent: 'APOTHECARY HERITAGE',
-    subtitle: 'VIVID SAFFRON, ASHWAGANDHA, SHILAJIT & GOKHURU',
-    description:
-      'Every active botanical is quantitatively disclosed on our packaging label. Formulated in adherence to classical Ayurvedic herbology and certified facility standards.',
-    pills: [
-      {
-        label: 'Kashmiri Saffron (15 mg)',
-        icon: <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />,
-      },
-      {
-        label: 'Ashwagandha (100 mg)',
-      },
-      {
-        label: 'Purified Shilajit (170 mg Blend)',
-        highlight: true,
-      },
-    ],
-    primaryCta: {
-      text: 'Discover All 10 Botanicals',
-      link: '/formula-ingredients',
-    },
-    secondaryCta: {
-      text: 'Shop TESTO BOOSTER',
-      link: '/testo',
-    },
-    backgroundImage: ASSET_REGISTRY.campaign.botanicalApothecary,
-    backgroundAlt: 'Authentic Kashmiri saffron, whole ashwagandha roots, gokhuru, and brass mortar',
-    productImage: ASSET_REGISTRY.products.testoBooster.board,
-    productAlt: 'TESTO BOOSTER physical packaging with classical botanicals',
-    visualTag: 'Saffron • Shilajit • Ashwagandha • Gokhuru',
-    focalPosition: 'object-[60%_center]',
+    id: 'ad-03-daily-ritual',
+    kicker: 'CONSISTENT DAILY CADENCE',
+    headlineLine1: 'A SIMPLE',
+    headlineLine2: 'DAILY RITUAL',
+    supportingLine: 'One capsule twice a day after a meal.',
+    ctaText: 'Explore TESTO BOOSTER',
+    ctaLink: '/testo',
+    desktopImage: ASSET_REGISTRY.campaign.ad03Ritual,
+    mobileImage: ASSET_REGISTRY.campaign.ad03RitualMobile,
+    alt: 'TESTO BOOSTER daily ritual campaign with South Asian man at morning wooden table and bottle beside water',
+    textAlign: 'left',
   },
   {
-    id: 'campaign-mindful-ritual',
-    badge: {
-      text: 'DAILY WELLNESS DISCIPLINE',
-      subtext: 'After Meals',
-      icon: <Clock className="w-4 h-4 text-emerald-400 shrink-0" />,
-    },
-    headlinePrimary: 'THE MINDFUL',
-    headlineAccent: 'DAILY RHYTHM',
-    subtitle: 'ONE CAPSULE TWICE A DAY AFTER MEALS',
-    description:
-      'Formulated for seamless integration into your daily wellness routine. Swallow whole with lukewarm milk or water as directed by a Healthcare Professional. Packaged in 100% vegetarian capsule shells.',
-    pills: [
-      {
-        label: 'Morning & Evening Routine',
-        icon: <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />,
-      },
-      {
-        label: 'Lukewarm Water / Milk',
-      },
-      {
-        label: '100% Vegetarian HPMC Shell',
-        highlight: true,
-      },
-    ],
-    primaryCta: {
-      text: 'Read Directions & Dosage',
-      link: '/testo',
-    },
-    secondaryCta: {
-      text: 'Our Story & Philosophy',
-      link: '/our-story',
-    },
-    backgroundImage: ASSET_REGISTRY.campaign.wellnessMorning,
-    backgroundAlt: 'Mindful morning hydration and wellness routine in soft morning sunlight',
-    productImage: ASSET_REGISTRY.products.testoBooster.front,
-    productAlt: 'TESTO BOOSTER physical bottle front packaging',
-    visualTag: 'Consistent Daily Integration • After Meals',
-    focalPosition: 'object-[65%_center]',
+    id: 'ad-04-botanical-heritage',
+    kicker: 'HERBOLOGY TRANSPARENCY',
+    headlineLine1: '10 CLASSICAL',
+    headlineLine2: 'BOTANICALS',
+    supportingLine: 'Quantitative formulation disclosure on the physical label.',
+    ctaText: 'Explore the Formula',
+    ctaLink: '/formula-ingredients',
+    desktopImage: ASSET_REGISTRY.campaign.ad04Botanicals,
+    mobileImage: ASSET_REGISTRY.campaign.ad04BotanicalsMobile,
+    alt: 'TESTO BOOSTER botanical heritage campaign with authentic bottle staged beside brass mortar, saffron, and ashwagandha',
+    textAlign: 'left',
   },
 ];
 
-const AUTOPLAY_INTERVAL = 4500; // 4.5 seconds per slide
+const AUTOPLAY_INTERVAL = 4500; // 4.5 seconds dwell per advertisement
 
 export const HeroCarousel: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
+  const [progress, setProgress] = useState(0);
+
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
 
+  const activeSlide = CAMPAIGN_SLIDES[currentIndex];
+
   const handleNext = useCallback(() => {
-    setDirection(1);
-    setCurrentIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+    setCurrentIndex((prev) => (prev + 1) % CAMPAIGN_SLIDES.length);
+    setProgress(0);
   }, []);
 
   const handlePrev = useCallback(() => {
-    setDirection(-1);
-    setCurrentIndex((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+    setCurrentIndex((prev) => (prev - 1 + CAMPAIGN_SLIDES.length) % CAMPAIGN_SLIDES.length);
+    setProgress(0);
   }, []);
 
-  const goToSlide = (index: number) => {
-    setDirection(index > currentIndex ? 1 : -1);
+  const selectSlide = (index: number) => {
     setCurrentIndex(index);
+    setProgress(0);
   };
 
-  // Autoplay timer
+  // Pure progress timer loop (50ms interval, React 19 / purity compliant)
   useEffect(() => {
     if (isPaused) return;
+
+    const stepMs = 50;
+    const increment = (stepMs / AUTOPLAY_INTERVAL) * 100;
+
     const timer = setInterval(() => {
-      handleNext();
-    }, AUTOPLAY_INTERVAL);
+      setProgress((prev) => {
+        if (prev >= 100) {
+          setCurrentIndex((curr) => (curr + 1) % CAMPAIGN_SLIDES.length);
+          return 0;
+        }
+        return prev + increment;
+      });
+    }, stepMs);
+
     return () => clearInterval(timer);
-  }, [isPaused, handleNext]);
+  }, [isPaused]);
 
   // Touch handlers for mobile swipe
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -257,10 +136,9 @@ export const HeroCarousel: React.FC = () => {
     setIsPaused(false);
     if (touchStartX.current !== null && touchEndX.current !== null) {
       const diff = touchStartX.current - touchEndX.current;
-      const minSwipeDistance = 40;
-      if (diff > minSwipeDistance) {
+      if (diff > 45) {
         handleNext();
-      } else if (diff < -minSwipeDistance) {
+      } else if (diff < -45) {
         handlePrev();
       }
     }
@@ -268,209 +146,140 @@ export const HeroCarousel: React.FC = () => {
     touchEndX.current = null;
   };
 
-  const slide = HERO_SLIDES[currentIndex];
-
   return (
     <section
-      aria-label="Arogya Path Campaign Hero"
-      className="relative w-full overflow-hidden bg-[#0A0B09] text-white select-none min-h-[520px] sm:min-h-[580px] lg:min-h-[660px] xl:min-h-[720px] flex items-center"
+      aria-label="Full-Screen Product Advertisement Campaign"
+      className="relative w-full overflow-hidden select-none bg-[#0D0C0A] min-h-[540px] sm:min-h-[600px] lg:min-h-[660px] max-h-[720px] h-[78vh]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Full-Bleed Background Advertising Campaign Image */}
-      <AnimatePresence initial={false}>
+      {/* 80% VISUAL: Background Advertising Composition (Image + Human + Product) */}
+      <AnimatePresence mode="sync">
         <motion.div
-          key={`bg-${slide.id}`}
-          initial={{ opacity: 0, scale: 1.03 }}
-          animate={{ opacity: 1, scale: 1 }}
+          key={activeSlide.id}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1.0] }}
-          className="absolute inset-0 z-0 pointer-events-none"
+          className="absolute inset-0 w-full h-full"
         >
-          <img
-            src={slide.backgroundImage}
-            alt={slide.backgroundAlt}
-            className={`w-full h-full object-cover ${slide.focalPosition || 'object-center'}`}
-            loading="eager"
-          />
-          {/* Cinematic Scrims: Dark gradient on left & bottom for crystal-clear readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/75 to-black/30 lg:from-black/90 lg:via-black/55 lg:to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/40 lg:hidden" />
+          <picture className="w-full h-full block">
+            <source media="(max-width: 640px)" srcSet={activeSlide.mobileImage} />
+            <img
+              src={activeSlide.desktopImage}
+              alt={activeSlide.alt}
+              className="w-full h-full object-cover object-center"
+              loading={currentIndex === 0 ? 'eager' : 'lazy'}
+            />
+          </picture>
+
+          {/* Targeted Typography Scrim: Left-sided gradient so typography is crisp while the right-side human & product remain bright */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/35 to-transparent hidden sm:block pointer-events-none" />
+          {/* Mobile Scrim: Bottom/Top gradient for vertical framing */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/30 sm:hidden pointer-events-none" />
         </motion.div>
       </AnimatePresence>
 
-      {/* Main Full-Width Viewport Container */}
-      <div className="relative z-10 w-full max-w-[1720px] mx-auto px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-8 sm:py-12 lg:py-16">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={`content-${slide.id}`}
-            initial={{ opacity: 0, x: direction > 0 ? 20 : -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction > 0 ? -20 : 20 }}
-            transition={{ duration: 0.45, ease: 'easeInOut' }}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 xl:gap-16 items-center"
-          >
-            {/* Left Content Column (col-span-7 / col-span-8) */}
-            <div className="lg:col-span-7 xl:col-span-8 space-y-3.5 sm:space-y-5 text-left">
-              {/* Kicker Badge */}
-              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-black/50 border border-white/20 backdrop-blur-md text-[10px] sm:text-xs font-semibold text-[#F3E5AB]">
-                {slide.badge.icon}
-                <span>{slide.badge.text}</span>
-                {slide.badge.subtext && (
-                  <>
-                    <span className="text-white/40 hidden sm:inline">•</span>
-                    <span className="text-white/80 hidden sm:inline">{slide.badge.subtext}</span>
-                  </>
+      {/* 20% UI: Short Headline + Short Supporting Line + Single CTA */}
+      <div className="relative z-10 w-full h-full max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-12 flex flex-col justify-between py-8 sm:py-12 lg:py-16 pointer-events-none">
+        {/* Top spacer */}
+        <div />
+
+        {/* Core Advertising Copy Area (Compact & Left-Aligned in Negative Space) */}
+        <div className="max-w-[460px] sm:max-w-[500px] lg:max-w-[560px] text-left pointer-events-auto">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeSlide.id + '-copy'}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.45, ease: 'easeOut' }}
+              className="space-y-2.5 sm:space-y-3.5"
+            >
+              {/* Short Kicker */}
+              <span className="inline-block text-[11px] sm:text-xs uppercase font-bold tracking-[0.22em] text-[#E8C547] drop-shadow-sm">
+                {activeSlide.kicker}
+              </span>
+
+              {/* Big Bold Headline */}
+              <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.08] tracking-tight drop-shadow-md">
+                <span>{activeSlide.headlineLine1}</span>
+                {activeSlide.headlineLine2 && (
+                  <span className="block text-[#F4E6C3]">{activeSlide.headlineLine2}</span>
                 )}
-              </div>
+              </h1>
 
-              {/* Monumental Headline */}
-              <div className="space-y-1 sm:space-y-2">
-                <h1 className="font-serif text-2xl sm:text-4xl md:text-5xl xl:text-6xl font-extrabold text-white tracking-tight leading-[1.08]">
-                  {slide.headlinePrimary}{' '}
-                  {slide.headlineAccent && (
-                    <span className="gold-gradient-text block sm:inline">{slide.headlineAccent}</span>
-                  )}
-                </h1>
-
-                <p className="font-serif text-xs sm:text-sm md:text-base font-bold text-[#F3E5AB] tracking-wide uppercase">
-                  {slide.subtitle}
-                </p>
-              </div>
-
-              {/* Factual Body Description */}
-              <p className="text-xs sm:text-sm md:text-base text-slate-200 max-w-2xl font-normal leading-relaxed line-clamp-3 sm:line-clamp-none">
-                {slide.description}
+              {/* One Short Supporting Line */}
+              <p className="text-xs sm:text-base text-stone-200 font-medium leading-relaxed drop-shadow-sm max-w-md">
+                {activeSlide.supportingLine}
               </p>
 
-              {/* Verified Fact Badges Bar */}
-              <div className="flex items-center gap-1.5 sm:gap-2.5 flex-wrap pt-0.5">
-                {slide.pills.map((pill, idx) => (
-                  <span
-                    key={idx}
-                    className={`text-[10px] sm:text-xs font-semibold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border backdrop-blur-md flex items-center gap-1 sm:gap-1.5 ${
-                      pill.highlight
-                        ? 'text-[#F3E5AB] bg-[#6A1423]/60 border-[#C7A33A]/40'
-                        : 'text-white bg-black/40 border-white/20'
-                    }`}
-                  >
-                    {pill.icon}
-                    <span>{pill.label}</span>
-                    {pill.sublabel && (
-                      <span className="text-white/70 font-normal hidden sm:inline">{pill.sublabel}</span>
-                    )}
-                  </span>
-                ))}
-              </div>
-
-              {/* Action CTAs */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3.5 pt-1.5 sm:pt-2 max-w-xl">
-                <Link to={slide.primaryCta.link} className="w-full sm:w-auto shrink-0">
-                  <Button
-                    variant="gold"
-                    size="lg"
-                    className="w-full sm:w-auto text-xs sm:text-base font-bold px-5 sm:px-8 py-3 sm:py-3.5 shadow-2xl shadow-[#C7A33A]/25"
-                    rightIcon={<ArrowRight className="w-4 h-4 shrink-0" />}
-                  >
-                    {slide.primaryCta.text}
-                  </Button>
+              {/* Single Primary CTA */}
+              <div className="pt-2 sm:pt-3">
+                <Link
+                  to={activeSlide.ctaLink}
+                  className="inline-flex items-center gap-2.5 bg-[#6A1423] hover:bg-[#83182C] text-white text-xs sm:text-sm font-bold tracking-wide px-6 sm:px-8 py-3 sm:py-3.5 rounded-full transition-all duration-300 shadow-xl hover:shadow-[#6A1423]/30 hover:scale-[1.02] group"
+                >
+                  <span>{activeSlide.ctaText}</span>
+                  <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
-
-                {slide.secondaryCta && (
-                  <Link to={slide.secondaryCta.link} className="hidden sm:inline-block w-full sm:w-auto shrink-0">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="w-full sm:w-auto text-xs sm:text-base font-bold px-5 sm:px-6 py-3 sm:py-3.5 border-white/30 hover:border-white/60 text-white backdrop-blur-md bg-black/20"
-                    >
-                      {slide.secondaryCta.text}
-                    </Button>
-                  </Link>
-                )}
               </div>
-            </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
-            {/* Right Visual Stage: Organic Product Placement (col-span-5 / col-span-4) */}
-            <div className="lg:col-span-5 xl:col-span-4 relative flex justify-center items-center">
-              {slide.productImage ? (
-                <div className="relative w-full max-w-xs sm:max-w-sm lg:max-w-md flex flex-col items-center justify-center group">
-                  {/* Atmospheric radial backlight */}
-                  <div className="absolute inset-0 bg-radial-gradient from-[#C7A33A]/30 via-transparent to-transparent pointer-events-none scale-125 blur-2xl" />
+        {/* Bottom Progress Controls & Carousel Indicators (Grouped on Left to Keep Right Product Canvas Unobstructed) */}
+        <div className="flex items-center gap-4 sm:gap-6 pointer-events-auto pt-4">
+          {/* Linear Progress Indicators */}
+          <div className="flex items-center gap-2 sm:gap-3" role="tablist">
+            {CAMPAIGN_SLIDES.map((slide, idx) => {
+              const isActive = idx === currentIndex;
+              return (
+                <button
+                  key={slide.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-label={`Go to slide ${idx + 1}: ${slide.kicker}`}
+                  onClick={() => selectSlide(idx)}
+                  className="relative h-1.5 sm:h-2 rounded-full overflow-hidden transition-all duration-300 focus:outline-none"
+                  style={{ width: isActive ? '48px' : '20px', backgroundColor: 'rgba(255,255,255,0.25)' }}
+                >
+                  {isActive && (
+                    <div
+                      className="absolute inset-0 bg-gradient-to-r from-[#E8C547] to-white transition-all duration-75 ease-linear"
+                      style={{ width: `${progress}%` }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-                  <img
-                    src={slide.productImage}
-                    alt={slide.productAlt || 'TESTO BOOSTER Physical Packaging'}
-                    className="w-full max-h-[220px] sm:max-h-[300px] lg:max-h-[420px] xl:max-h-[460px] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.9)] group-hover:scale-103 transition-transform duration-700 relative z-10"
-                    loading="eager"
-                  />
-
-                  {/* Floating Verified Packaging Tag */}
-                  <div className="mt-2.5 z-20 flex items-center justify-between gap-3 text-[10px] sm:text-[11px] font-semibold text-white/95 bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/20 shadow-2xl">
-                    <span className="flex items-center gap-1.5 text-emerald-300">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                      {slide.visualTag}
-                    </span>
-                    <span className="text-[#F3E5AB] font-bold">Arogya Path</span>
-                  </div>
-                </div>
-              ) : (
-                /* Pure Lifestyle Slide: Clean breathing space so the human athletic movement is celebrated */
-                <div className="hidden lg:flex items-center justify-center p-6 text-right">
-                  <div className="bg-black/50 backdrop-blur-md p-4 rounded-2xl border border-white/15 max-w-xs text-left space-y-1 shadow-2xl">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#F3E5AB] block">
-                      Daily Discipline
-                    </span>
-                    <p className="text-xs text-slate-200">
-                      Formulated to support overall health and vitality for men. FSSAI Lic. #12118441000654.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* Desktop Prev / Next Navigation Arrows */}
-      <button
-        type="button"
-        onClick={handlePrev}
-        className="hidden md:flex absolute left-4 lg:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 border border-white/20 text-white backdrop-blur-md items-center justify-center transition-all hover:scale-110 focus:outline-none shadow-xl"
-        aria-label="Previous campaign slide"
-      >
-        <ChevronLeft className="w-6 h-6" />
-      </button>
-
-      <button
-        type="button"
-        onClick={handleNext}
-        className="hidden md:flex absolute right-4 lg:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 border border-white/20 text-white backdrop-blur-md items-center justify-center transition-all hover:scale-110 focus:outline-none shadow-xl"
-        aria-label="Next campaign slide"
-      >
-        <ChevronRight className="w-6 h-6" />
-      </button>
-
-      {/* Slide Indicators & Dwell Progress */}
-      <div className="absolute bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
-        {HERO_SLIDES.map((s, idx) => (
-          <button
-            key={s.id}
-            type="button"
-            onClick={() => goToSlide(idx)}
-            className={`transition-all duration-300 focus:outline-none rounded-full ${
-              idx === currentIndex
-                ? 'w-8 sm:w-10 h-2 bg-[#C7A33A] shadow-md shadow-[#C7A33A]/50'
-                : 'w-2 h-2 bg-white/30 hover:bg-white/60'
-            }`}
-            aria-label={`Go to slide ${idx + 1}: ${s.headlinePrimary}`}
-          />
-        ))}
+          {/* Desktop Navigation Arrows Grouped With Progress */}
+          <div className="hidden sm:flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={handlePrev}
+              className="w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-colors"
+              aria-label="Previous advertisement"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={handleNext}
+              className="w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-colors"
+              aria-label="Next advertisement"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );
 };
-
-export const HeroSection = HeroCarousel;
